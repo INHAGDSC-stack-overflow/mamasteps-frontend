@@ -3,6 +3,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:dio/dio.dart';
+import 'package:mamasteps_frontend/map/component/google_map/drawpolyline.dart';
+import 'package:mamasteps_frontend/map/component/google_map/drawmarker.dart';
 
 //서버로부터 받은 polyline을 decode한 결과
 final List<PointLatLng> results = PolylinePoints().decodePolyline(
@@ -30,50 +32,50 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     //getinformation();
-    drawPolylines();
-    drawMarkers();
+    drawPolylines(polylines, resultList);
+    drawMarkers(markers, resultList);
     super.initState();
   }
 
   //새롭게 경로와 마커를 그릴 때 마다 기존의 경로와 마커를 지우고 새것을 생성함
-  drawPolylines() async {
-    polylines.clear();
+  // drawPolylines() async {
+  //   polylines.clear();
+  //
+  //   polylines.add(
+  //     Polyline(
+  //       polylineId: PolylineId(
+  //         resultList[0].toString(),
+  //       ),
+  //       visible: true,
+  //       width: 5,
+  //       points: resultList,
+  //       color: Colors.blue,
+  //       patterns: [PatternItem.dash(20), PatternItem.gap(20)],
+  //     ),
+  //   );
+  //   setState(() {});
+  // }
 
-    polylines.add(
-      Polyline(
-        polylineId: PolylineId(
-          resultList[0].toString(),
-        ),
-        visible: true,
-        width: 5,
-        points: resultList,
-        color: Colors.blue,
-        patterns: [PatternItem.dash(20), PatternItem.gap(20)],
-      ),
-    );
-    setState(() {});
-  }
-
-  drawMarkers() async {
-    markers.clear();
-
-    markers.add(
-      Marker(
-        markerId: MarkerId("origin"),
-        visible: true,
-        icon: BitmapDescriptor.defaultMarker,
-        position: resultList[0],
-      ),
-    );
-    markers.add(
-      Marker(
-        markerId: MarkerId("destination"),
-        icon: BitmapDescriptor.defaultMarker,
-        position: resultList[resultList.length - 1],
-      ),
-    );
-    setState(() {});
-  }
+  // drawMarkers() async {
+  //   markers.clear();
+  //
+  //   markers.add(
+  //     Marker(
+  //       markerId: MarkerId("origin"),
+  //       visible: true,
+  //       icon: BitmapDescriptor.defaultMarker,
+  //       position: resultList[0],
+  //     ),
+  //   );
+  //   markers.add(
+  //     Marker(
+  //       markerId: MarkerId("destination"),
+  //       icon: BitmapDescriptor.defaultMarker,
+  //       position: resultList[resultList.length - 1],
+  //     ),
+  //   );
+  //   setState(() {});
+  // }
 
   List<LatLng> PointToLatLng (List<PointLatLng> input) {
     final List<LatLng> resultList = input.map((point) {
