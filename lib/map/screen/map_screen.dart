@@ -13,14 +13,14 @@ final List<LatLng> resultList = results.map((point) {
   return LatLng(point.latitude, point.longitude);
 }).toList();
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class MapScreen extends StatefulWidget {
+  const MapScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<MapScreen> createState() => _MapScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _MapScreenState extends State<MapScreen> {
   late GoogleMapController mapController;
   //polyline들의 집합
   Set<Polyline> polylines = {};
