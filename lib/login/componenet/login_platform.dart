@@ -1,4 +1,0 @@
-enum LoginPlatform{
-  google,
-  none,
-}

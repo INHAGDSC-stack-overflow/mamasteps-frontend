@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:mamasteps_frontend/login/const/data.dart';
-import 'package:mamasteps_frontend/login/componenet/login_platform.dart';
+import 'package:mamasteps_frontend/login/const/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:dio/dio.dart';
+import 'package:mamasteps_frontend/map/screen/map_page.dart';
 
-class SampleScreen extends StatefulWidget {
-  const SampleScreen({super.key});
+class GoogleLogin extends StatefulWidget {
+  const GoogleLogin({super.key});
 
   @override
-  State<SampleScreen> createState() => _SampleScreenState();
+  State<GoogleLogin> createState() => _GoogleLoginState();
 }
 
-class _SampleScreenState extends State<SampleScreen> {
+class _GoogleLoginState extends State<GoogleLogin> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
   final dio = Dio();
 
@@ -22,29 +23,29 @@ class _SampleScreenState extends State<SampleScreen> {
       print('email = ${googleUser.email}');
       print('id = ${googleUser.id}');
 
-      try {
-        final resp = await dio.post(
-          '서버 주소',
-          options: Options(
-            headers: {
-              'email': googleUser.email,
-              'id': googleUser.id,
-              'serverauthcode' : googleUser.serverAuthCode,
-            },
-          ),
-        );
-        storage.write(key: 'ACCESS_TOKEN', value: resp.data['access_token']);
-        storage.write(key: 'REFRESH_TOKEN', value: resp.data['refresh_token']);
-      } catch (e) {
-        print(e);
-      }
+      // try {
+      //   final resp = await dio.post(
+      //     '서버 주소',
+      //     options: Options(
+      //       headers: {
+      //         'email': googleUser.email,
+      //         'id': googleUser.id,
+      //         'serverauthcode' : googleUser.serverAuthCode,
+      //       },
+      //     ),
+      //   );
+      //   storage.write(key: 'ACCESS_TOKEN', value: resp.data['access_token']);
+      //   storage.write(key: 'REFRESH_TOKEN', value: resp.data['refresh_token']);
+      // } catch (e) {
+      //   print(e);
+      // }
 
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => const RootTab(),
-      //   ),
-      // );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MapPage(),
+        ),
+      );
 
       setState(() {
         _loginPlatform = LoginPlatform.google;
@@ -73,11 +74,11 @@ class _SampleScreenState extends State<SampleScreen> {
         child: _loginPlatform != LoginPlatform.none
             ? _logoutButton()
             : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _loginButton('google_logo', signInWithGoogle),
-                ],
-              ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _loginButton('google_logo', signInWithGoogle),
+          ],
+        ),
       ),
     );
   }
