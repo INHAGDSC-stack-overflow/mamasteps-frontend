@@ -1,6 +1,6 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:google_map_proj/component/geolocator/geolocator_getlocation.dart';
-import 'package:google_map_proj/component/geolocator/geolocator_getpermission.dart';
+import 'package:mamasteps_frontend/map/component/geolocator/geolocator_getlocation.dart';
+import 'package:mamasteps_frontend/map/component/geolocator/geolocator_getpermission.dart';
 
 void SetPermissionandLocation(originlatitude, originlongitude) {
   Future<bool> permission = determinePermission();
