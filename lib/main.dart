@@ -10,7 +10,7 @@ void main() async {
     MaterialApp(
          // 2번코드
       debugShowCheckedModeBanner: false,
-      home: GoogleLogin(),
+      home: MapPage(),
     ),
   );
 }

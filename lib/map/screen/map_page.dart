@@ -74,30 +74,20 @@ class _MapPageState extends State<MapPage> {
       ),
       body: Column(
         children: [
-          Container(child: Text('산책 시간 설정'),
+          Container(
+            child: Text('산책 시간 설정'),
           ),
           //TimePickerDialog(initialTime: TimeOfDay.now()),
           Container(child: Text('산책 경로 선택')),
           Expanded(
             flex: 2,
             child: Container(
-                padding: EdgeInsets.all(25.0),
-                height: MediaQuery.of(context).size.height / 8,
-                //width: MediaQuery.of(context).size.width/2,
-                //alignment: Alignment.center,
-                child: PageView(
-                  children: <Widget>[
-                    Container(
-                      color: Colors.pink,
-                    ),
-                    Container(
-                      color: Colors.cyan,
-                    ),
-                    Container(
-                      color: Colors.deepPurple,
-                    ),
-                  ],
-                )),
+              padding: EdgeInsets.all(25.0),
+              height: MediaQuery.of(context).size.height / 8,
+              //width: MediaQuery.of(context).size.width/2,
+              //alignment: Alignment.center,
+              child: MapScreen(),
+            ),
           ),
         ],
       ),
