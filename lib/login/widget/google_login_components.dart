@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:mamasteps_frontend/login/const/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -23,6 +24,7 @@ class _GoogleLoginState extends State<GoogleLogin> {
       print('name = ${googleUser.displayName}');
       print('email = ${googleUser.email}');
       print('id = ${googleUser.id}');
+      print('photoUrl = ${googleUser.photoUrl}');
 
       try {
         final response = await sendPostRequest(
