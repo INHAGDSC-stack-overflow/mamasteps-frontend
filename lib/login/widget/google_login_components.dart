@@ -1,12 +1,14 @@
+
 import 'package:flutter/material.dart';
-import 'package:mamasteps_frontend/login/const/data.dart';
 import 'package:mamasteps_frontend/login/const/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:dio/dio.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class GoogleLogin extends StatefulWidget {
-  const GoogleLogin({super.key});
+  const GoogleLogin({Key? key}) : super(key: key);
 
   @override
   State<GoogleLogin> createState() => _GoogleLoginState();
@@ -22,23 +24,19 @@ class _GoogleLoginState extends State<GoogleLogin> {
       print('name = ${googleUser.displayName}');
       print('email = ${googleUser.email}');
       print('id = ${googleUser.id}');
+      print('photoUrl = ${googleUser.photoUrl}');
 
-      // try {
-      //   final resp = await dio.post(
-      //     '서버 주소',
-      //     options: Options(
-      //       headers: {
-      //         'email': googleUser.email,
-      //         'id': googleUser.id,
-      //         'serverauthcode' : googleUser.serverAuthCode,
-      //       },
-      //     ),
-      //   );
-      //   storage.write(key: 'ACCESS_TOKEN', value: resp.data['access_token']);
-      //   storage.write(key: 'REFRESH_TOKEN', value: resp.data['refresh_token']);
-      // } catch (e) {
-      //   print(e);
-      // }
+      try {
+        final response = await sendPostRequest(
+          email: googleUser.email,
+          id: googleUser.id,
+          name: googleUser.displayName ?? 'DefaultName',
+        );
+
+        print('Server Response: $response');
+      } catch (error) {
+        print('Error sending POST request: $error');
+      }
 
       Navigator.push(
         context,
@@ -50,6 +48,39 @@ class _GoogleLoginState extends State<GoogleLogin> {
       setState(() {
         _loginPlatform = LoginPlatform.google;
       });
+    }
+  }
+
+  Future<String> sendPostRequest({
+    required String email,
+    required String id,
+    required String name,
+  }) async {
+    final String apiUrl = 'http://3.38.34.206:8080/api/v1/auth/login';
+
+    Map<String, dynamic> requestData = {
+      "email": "hjg000223@gmail.com",
+      "password": "password"
+    };
+
+    String requestBody = json.encode(requestData);
+
+    try {
+      final http.Response response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        return 'POST request successful! Response: ${utf8.decode(response.bodyBytes)}';
+      } else {
+        return 'Failed to send POST request. Status code: ${response.statusCode}\nResponse: ${utf8.decode(response.bodyBytes)}';
+      }
+    } catch (error) {
+      return 'Error sending POST request: $error';
     }
   }
 
