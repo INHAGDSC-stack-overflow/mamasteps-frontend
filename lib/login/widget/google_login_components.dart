@@ -57,9 +57,8 @@ class _GoogleLoginState extends State<GoogleLogin> {
     final String apiUrl = 'http://3.38.34.206:8080/api/v1/auth/login';
 
     Map<String, dynamic> requestData = {
-      "email": email,
-      "id": id,
-      "name": name,
+      "email": "hjg000223@gmail.com",
+      "password": "password"
     };
 
     String requestBody = json.encode(requestData);

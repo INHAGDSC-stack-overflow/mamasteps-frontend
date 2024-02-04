@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mamasteps_frontend/ui/data/contents.dart';
+import 'package:mamasteps_frontend/ui/layout/default_layout.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -11,72 +12,90 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  List<String> userInformation = ['', '', '', ''];
+  final _dateController = TextEditingController();
+  DateTime date = DateTime.now();
+  List<String> userInformation = ['', '', '', '',];
   DateTime? selectedDate;
-  @override
   PageController _pageController = PageController(initialPage: 0);
-
+  int user_activity_hours = 0;
+  int user_activity_minutes = 0;
+  List<List<bool>> scheduleData = List.generate(
+    24, // 24시간
+    (i) => List.generate(7, (j) => false), // 각 요일에 대한 데이터
+  );
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('회원가입', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blue,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: PageView(
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: _pageController,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: PageView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: _pageController,
+                children: [
+                  _nameSubPage(
+                    // 이름 입력 페이지
+                    content: contents[0],
+                    onChanged: onNameChanged,
+                  ),
+                  _ageSubPage(
+                    // 나이 입력 페이지
+                    content: contents[1],
+                    onChanged: onAgeChanged,
+                  ),
+                  _dateSubPage(
+                    // 임신 날짜 입력 페이지
+                    content: contents[2],
+                    dateController: _dateController,
+                    onTap:
+                        onDateChanged(selectedDate, context, _dateController),
+                  ),
+                  _activitiesSubPage(
+                    // 활동량 입력 페이지
+                    content: contents[3],
+                    onHoursChanged: onActivitesHourChanged,
+                    onMinutesChanged: onActivitesMinuteChanged,
+                    hour: user_activity_hours,
+                    minute: user_activity_minutes,
+                  ),
+                  _scheduleSubPage(
+                    // 산책 선호 시간 입력 페이지
+                    content: contents[5],
+                    scheduleData: scheduleData,
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _subPage0(
-                      onChanged: onNameChanged,
+                    OutlinedButton(
+                      onPressed: onPrevPressed,
+                      child: Text('이전'),
                     ),
-                    _subPage(
-                      content: contents[1],
-                      onChanged: onAgeChanged,
+                    OutlinedButton(
+                      onPressed: onNextPressed,
+                      child: Text('다음'),
                     ),
-                    _subPage(
-                      content: contents[2],
-                      onChanged: onDateChanged,
-                    ),
-                    _subPage(
-                      content: contents[3],
-                      onChanged: onActivitesChanged,
-                    ),
-                    _subpage2(),
-                    _subpage3(),
-                    _subPage4(
-                      onChanged: onNameChanged,
-                    ),
+                    OutlinedButton(onPressed: (){
+                      print("이름 : $userInformation");
+                      print("나이 : $userInformation");
+                      print("임신 날짜 : $userInformation");
+                      print("활동량 : $user_activity_hours 시간 $user_activity_minutes 분");
+                      print("산책 선호 시간 : $scheduleData");
+                    }, child: Text('출력'))
                   ],
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OutlinedButton(
-                        onPressed: onPrevPressed,
-                        child: Text('이전'),
-                      ),
-                      OutlinedButton(
-                        onPressed: onNextPressed,
-                        child: Text('다음'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -94,15 +113,46 @@ class _SignUpPageState extends State<SignUpPage> {
     });
   }
 
-  void onDateChanged(value) {
+  GestureTapCallback onDateChanged(
+      value, BuildContext context, TextEditingController dataController) {
+    return () async {
+      await showDatePicker(
+        context: context,
+        initialDate: date,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2025),
+      ).then((value) {
+        if (value != null) {
+          setState(() {
+            selectedDate = value;
+            dataController.text = DateFormat('yyyy-MM-dd').format(value);
+          });
+        }
+      });
+    };
+  }
+
+  void onActivitesHourChanged(value) {
     setState(() {
-      userInformation[2] = value;
+      user_activity_hours = value;
     });
   }
 
-  void onActivitesChanged(value) {
+  void onActivitesMinuteChanged(value) {
     setState(() {
-      userInformation[3] = value;
+      user_activity_minutes = value;
+    });
+  }
+
+  void onNumberChanged(value) {
+    setState(() {
+      userInformation[5] = value;
+    });
+  }
+
+  void onChangeSchedule(int hour, int day) {
+    setState(() {
+      scheduleData[hour][day] = !scheduleData[hour][day];
     });
   }
 
@@ -148,11 +198,39 @@ class _subPage extends StatelessWidget {
   }
 }
 
-class _subPage0 extends StatelessWidget {
+class _nameSubPage extends StatelessWidget {
   final ValueChanged onChanged;
-
-  const _subPage0({
+  final String content;
+  const _nameSubPage({
     super.key,
+    required this.onChanged,
+    required this.content,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(content),
+        const SizedBox(height: 16.0),
+        TextFormField(
+          autofocus: true,
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+}
+
+class _ageSubPage extends StatelessWidget {
+  final ValueChanged onChanged;
+  final String content;
+
+  const _ageSubPage({
+    super.key,
+    required this.content,
     required this.onChanged,
   });
 
@@ -162,7 +240,7 @@ class _subPage0 extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(contents[0]),
+        Text(content),
         const SizedBox(height: 16.0),
         TextFormField(
           autofocus: true,
@@ -198,14 +276,21 @@ class _subPage1 extends StatelessWidget {
   }
 }
 
-class _subpage2 extends StatefulWidget {
-  const _subpage2({super.key});
+class _dateSubPage extends StatefulWidget {
+  final String content;
+  final TextEditingController dateController;
+  final GestureTapCallback onTap;
+  const _dateSubPage(
+      {super.key,
+      required this.onTap,
+      required this.dateController,
+      required this.content});
 
   @override
-  State<_subpage2> createState() => _subpage2State();
+  State<_dateSubPage> createState() => _dateSubPageState();
 }
 
-class _subpage2State extends State<_subpage2> {
+class _dateSubPageState extends State<_dateSubPage> {
   final _dateController = TextEditingController();
   DateTime date = DateTime.now();
   DateTime? _selectedDate;
@@ -215,104 +300,62 @@ class _subpage2State extends State<_subpage2> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(contents[2]),
+        Text(widget.content),
         const SizedBox(height: 16.0),
         TextFormField(
-          controller: _dateController,
+          controller: widget.dateController,
           readOnly: true,
-          onTap: () async {
-            await showDatePicker(
-              context: context,
-              initialDate: date,
-              firstDate: DateTime(2000),
-              lastDate: DateTime(2025),
-            ).then((value) {
-              if (value != null) {
-                setState(() {
-                  _selectedDate = value;
-                  _dateController.text = DateFormat('yyyy-MM-dd').format(value);
-                });
-              }
-            });
-          },
+          onTap: widget.onTap,
         ),
       ],
     );
   }
 }
 
-class _subpage3 extends StatefulWidget {
-  const _subpage3({
+class _activitiesSubPage extends StatefulWidget {
+  final ValueChanged onHoursChanged;
+  final ValueChanged onMinutesChanged;
+  final int hour;
+  final int minute;
+  final String content;
+  const _activitiesSubPage({
     super.key,
+    required this.onHoursChanged,
+    required this.onMinutesChanged,
+    required this.hour,
+    required this.minute,
+    required this.content,
   });
 
   @override
-  State<_subpage3> createState() => _subpage3State();
+  State<_activitiesSubPage> createState() => _activitiesSubPageState();
 }
 
-class _subpage3State extends State<_subpage3> {
-  int _hour = 0;
-  int _minute = 0;
-
-  // Future<void> _showTimePickerDialog() async {
-  //   await showDialog(context: context, builder: (BuildContext context){
-  //     return AlertDialog(
-  //       title: Text('시간을 선택해 주세요'),
-  //       content: Container(
-  //         child: Row(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             NumberPicker(
-  //               value: _hour,
-  //               minValue: 0,
-  //               maxValue: 23,
-  //               onChanged: (value) => setState(() => _hour = value),
-  //             ),
-  //             NumberPicker(
-  //               value: _minute,
-  //               minValue: 0,
-  //               maxValue: 59,
-  //               onChanged: (value) => setState(() => _minute = value),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //       actions: <Widget>[
-  //         TextButton(
-  //           child: Text('확인'),
-  //           onPressed: () {
-  //             Navigator.of(context).pop();
-  //             _dateController.text = '$_hour시간 $_minute분';
-  //           }
-  //         )
-  //       ]
-  //     );
-  //   });
-  // }
+class _activitiesSubPageState extends State<_activitiesSubPage> {
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(contents[3]),
+        Text(widget.content),
         const SizedBox(height: 16.0),
         Container(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               NumberPicker(
-                value: _hour,
+                value: widget.hour,
                 minValue: 0,
                 maxValue: 23,
-                onChanged: (value) => setState(() => _hour = value),
+                onChanged: widget.onHoursChanged,
               ),
               Text("시간"),
               NumberPicker(
-                value: _minute,
+                value: widget.minute,
                 minValue: 0,
                 maxValue: 59,
-                onChanged: (value) => setState(() => _minute = value),
+                onChanged: widget.onMinutesChanged,
               ),
               Text("분"),
             ],
@@ -323,28 +366,24 @@ class _subpage3State extends State<_subpage3> {
   }
 }
 
-class _subPage4 extends StatefulWidget {
-  final ValueChanged onChanged;
+class _scheduleSubPage extends StatefulWidget {
+  final List<List<bool>> scheduleData;
+  final String content;
 
-  const _subPage4({
+  const _scheduleSubPage({
     super.key,
-    required this.onChanged,
+    required this.scheduleData,
+    required this.content,
   });
 
   @override
-  State<_subPage4> createState() => _subPage4State();
+  State<_scheduleSubPage> createState() => _scheduleSubPageState();
 }
 
-class _subPage4State extends State<_subPage4> {
-  List<List<bool>> scheduleData = List.generate(
-    24, // 24시간
-    (i) => List.generate(7, (j) => false), // 각 요일에 대한 데이터
-  );
-
-  // 일정을 추가하는 메서드
-  void addSchedule(int hour, int day) {
+class _scheduleSubPageState extends State<_scheduleSubPage> {
+  void onChangeSchedule(int hour, int day) {
     setState(() {
-      scheduleData[hour][day] = !scheduleData[hour][day];
+      widget.scheduleData[hour][day] = !widget.scheduleData[hour][day];
     });
   }
 
@@ -385,10 +424,10 @@ class _subPage4State extends State<_subPage4> {
                   for (var day = 0; day < 7; day++)
                     InkWell(
                       onTap: () {
-                        addSchedule(hour, day);
+                        onChangeSchedule(hour, day);
                       },
                       child: Container(
-                        color: scheduleData[hour][day]
+                        color: widget.scheduleData[hour][day]
                             ? Colors.blue
                             : Colors.transparent,
                         padding: EdgeInsets.all(8),
