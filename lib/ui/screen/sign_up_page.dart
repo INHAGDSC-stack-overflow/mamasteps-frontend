@@ -14,15 +14,20 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _dateController = TextEditingController();
   DateTime date = DateTime.now();
-  List<String> userInformation = ['', '', '', '',];
+  List<String> userInformation = [
+    '',
+    '',
+    '',
+    '',
+  ];
   DateTime? selectedDate;
   PageController _pageController = PageController(initialPage: 0);
-  int user_activity_hours = 0;
-  int user_activity_minutes = 0;
+  String user_activities = '';
   List<List<bool>> scheduleData = List.generate(
     24, // 24시간
     (i) => List.generate(7, (j) => false), // 각 요일에 대한 데이터
   );
+  String phoneNumber = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,16 +62,21 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     _activitiesSubPage(
                       // 활동량 입력 페이지
+                      onhighChanged: onHighActivitesChanged,
+                      onmiddleChanged: onMiddleActivitesChanged,
+                      onlowChanged: onLowActivitesChanged,
                       content: contents[3],
-                      onHoursChanged: onActivitesHourChanged,
-                      onMinutesChanged: onActivitesMinuteChanged,
-                      hour: user_activity_hours,
-                      minute: user_activity_minutes,
                     ),
                     _scheduleSubPage(
                       // 산책 선호 시간 입력 페이지
-                      content: contents[5],
+                      content: contents[4],
                       scheduleData: scheduleData,
+                    ),
+                    _onNumberSubPage(
+                      // 보호자 전화번호 입력 페이지
+                      content: contents[5],
+                      onChanged: onChangeNumber,
+                      dateController: _dateController,
                     ),
                   ],
                 ),
@@ -84,13 +94,16 @@ class _SignUpPageState extends State<SignUpPage> {
                       onPressed: onNextPressed,
                       child: Text('다음'),
                     ),
-                    OutlinedButton(onPressed: (){
-                      print("이름 : " + userInformation[0].toString());
-                      print("나이 : " +userInformation[1].toString());
-                      print("임신 날짜 :" +selectedDate.toString());
-                      print("활동량 : "+ user_activity_hours.toString() + "시간" + user_activity_minutes.toString()+ "분");
-                      print("산책 선호 시간 : $scheduleData");
-                    }, child: Text('출력'))
+                    OutlinedButton(
+                        onPressed: () {
+                          print("이름 : " + userInformation[0].toString());
+                          print("나이 : " + userInformation[1].toString());
+                          print("임신 날짜 :" + selectedDate.toString());
+                          print("활동량 : " + user_activities);
+                          print("산책 선호 시간 : $scheduleData");
+                          print("보호자 전화번호 : " + phoneNumber);
+                        },
+                        child: Text('출력'))
                   ],
                 ),
               ),
@@ -132,15 +145,21 @@ class _SignUpPageState extends State<SignUpPage> {
     };
   }
 
-  void onActivitesHourChanged(value) {
+  void onHighActivitesChanged() {
     setState(() {
-      user_activity_hours = value;
+      user_activities = 'HIGH';
     });
   }
 
-  void onActivitesMinuteChanged(value) {
+  void onMiddleActivitesChanged() {
     setState(() {
-      user_activity_minutes = value;
+      user_activities = 'MIDDLE';
+    });
+  }
+
+  void onLowActivitesChanged() {
+    setState(() {
+      user_activities = 'LOW';
     });
   }
 
@@ -153,6 +172,12 @@ class _SignUpPageState extends State<SignUpPage> {
   void onChangeSchedule(int hour, int day) {
     setState(() {
       scheduleData[hour][day] = !scheduleData[hour][day];
+    });
+  }
+
+  void onChangeNumber(value){
+    setState(() {
+      phoneNumber = value;
     });
   }
 
@@ -251,30 +276,30 @@ class _ageSubPage extends StatelessWidget {
   }
 }
 
-class _subPage1 extends StatelessWidget {
-  final ValueChanged onChanged;
-
-  const _subPage1({
-    super.key,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(contents[0]),
-        const SizedBox(height: 16.0),
-        TextFormField(
-          autofocus: true,
-          onChanged: onChanged,
-        ),
-      ],
-    );
-  }
-}
+// class _subPage1 extends StatelessWidget {
+//   final ValueChanged onChanged;
+//
+//   const _onNumberSubPage({
+//     super.key,
+//     required this.onChanged,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       crossAxisAlignment: CrossAxisAlignment.stretch,
+//       children: [
+//         Text(contents[0]),
+//         const SizedBox(height: 16.0),
+//         TextFormField(
+//           autofocus: true,
+//           onChanged: onChanged,
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class _dateSubPage extends StatefulWidget {
   final String content;
@@ -313,17 +338,15 @@ class _dateSubPageState extends State<_dateSubPage> {
 }
 
 class _activitiesSubPage extends StatefulWidget {
-  final ValueChanged onHoursChanged;
-  final ValueChanged onMinutesChanged;
-  final int hour;
-  final int minute;
+  final VoidCallback onhighChanged;
+  final VoidCallback onmiddleChanged;
+  final VoidCallback onlowChanged;
   final String content;
   const _activitiesSubPage({
     super.key,
-    required this.onHoursChanged,
-    required this.onMinutesChanged,
-    required this.hour,
-    required this.minute,
+    required this.onhighChanged,
+    required this.onmiddleChanged,
+    required this.onlowChanged,
     required this.content,
   });
 
@@ -334,6 +357,7 @@ class _activitiesSubPage extends StatefulWidget {
 class _activitiesSubPageState extends State<_activitiesSubPage> {
   @override
   Widget build(BuildContext context) {
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -341,26 +365,44 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
         Text(widget.content),
         const SizedBox(height: 16.0),
         Container(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              NumberPicker(
-                value: widget.hour,
-                minValue: 0,
-                maxValue: 23,
-                onChanged: widget.onHoursChanged,
-              ),
-              Text("시간"),
-              NumberPicker(
-                value: widget.minute,
-                minValue: 0,
-                maxValue: 59,
-                onChanged: widget.onMinutesChanged,
-              ),
-              Text("분"),
-            ],
-          ),
-        ),
+            child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+          OutlinedButton(
+              onPressed: () {
+                widget.onhighChanged();
+              },
+              child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  side: BorderSide(
+                    width: 2,
+                  ),)),
+          OutlinedButton(
+              onPressed: () {
+                widget.onmiddleChanged();
+              },
+              child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  side: BorderSide(
+                    width: 2,
+                  ))),
+          OutlinedButton(
+              onPressed: () {
+                widget.onlowChanged();
+              },
+              child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  side: BorderSide(
+                    width: 2,
+                  ))),
+        ])),
       ],
     );
   }
@@ -438,6 +480,35 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
               }),
             ],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _onNumberSubPage extends StatelessWidget {
+  final String content;
+  final ValueChanged onChanged;
+  final TextEditingController dateController;
+  const _onNumberSubPage({
+    super.key,
+    required this.content,
+    required this.onChanged,
+    required this.dateController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(content),
+        const SizedBox(height: 16.0),
+        TextFormField(
+          controller: dateController,
+          autofocus: true,
+          onChanged: onChanged,
         ),
       ],
     );
