@@ -25,54 +25,54 @@ class _SignUpPageState extends State<SignUpPage> {
   );
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: PageView(
-                physics: NeverScrollableScrollPhysics(),
-                controller: _pageController,
-                children: [
-                  _nameSubPage(
-                    // 이름 입력 페이지
-                    content: contents[0],
-                    onChanged: onNameChanged,
-                  ),
-                  _ageSubPage(
-                    // 나이 입력 페이지
-                    content: contents[1],
-                    onChanged: onAgeChanged,
-                  ),
-                  _dateSubPage(
-                    // 임신 날짜 입력 페이지
-                    content: contents[2],
-                    dateController: _dateController,
-                    onTap:
-                        onDateChanged(selectedDate, context, _dateController),
-                  ),
-                  _activitiesSubPage(
-                    // 활동량 입력 페이지
-                    content: contents[3],
-                    onHoursChanged: onActivitesHourChanged,
-                    onMinutesChanged: onActivitesMinuteChanged,
-                    hour: user_activity_hours,
-                    minute: user_activity_minutes,
-                  ),
-                  _scheduleSubPage(
-                    // 산책 선호 시간 입력 페이지
-                    content: contents[5],
-                    scheduleData: scheduleData,
-                  ),
-                ],
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: PageView(
+                  physics: NeverScrollableScrollPhysics(),
+                  controller: _pageController,
+                  children: [
+                    _nameSubPage(
+                      // 이름 입력 페이지
+                      content: contents[0],
+                      onChanged: onNameChanged,
+                    ),
+                    _ageSubPage(
+                      // 나이 입력 페이지
+                      content: contents[1],
+                      onChanged: onAgeChanged,
+                    ),
+                    _dateSubPage(
+                      // 임신 날짜 입력 페이지
+                      content: contents[2],
+                      dateController: _dateController,
+                      onTap:
+                          onDateChanged(selectedDate, context, _dateController),
+                    ),
+                    _activitiesSubPage(
+                      // 활동량 입력 페이지
+                      content: contents[3],
+                      onHoursChanged: onActivitesHourChanged,
+                      onMinutesChanged: onActivitesMinuteChanged,
+                      hour: user_activity_hours,
+                      minute: user_activity_minutes,
+                    ),
+                    _scheduleSubPage(
+                      // 산책 선호 시간 입력 페이지
+                      content: contents[5],
+                      scheduleData: scheduleData,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Expanded(
+              Align(
+                alignment: Alignment.bottomCenter,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -85,17 +85,17 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: Text('다음'),
                     ),
                     OutlinedButton(onPressed: (){
-                      print("이름 : $userInformation");
-                      print("나이 : $userInformation");
-                      print("임신 날짜 : $userInformation");
-                      print("활동량 : $user_activity_hours 시간 $user_activity_minutes 분");
+                      print("이름 : " + userInformation[0].toString());
+                      print("나이 : " +userInformation[1].toString());
+                      print("임신 날짜 :" +selectedDate.toString());
+                      print("활동량 : "+ user_activity_hours.toString() + "시간" + user_activity_minutes.toString()+ "분");
                       print("산책 선호 시간 : $scheduleData");
                     }, child: Text('출력'))
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
