@@ -24,6 +24,7 @@ class _GoogleLoginState extends State<GoogleLogin> {
       print('name = ${googleUser.displayName}');
       print('email = ${googleUser.email}');
       print('id = ${googleUser.id}');
+      print('photoUrl = ${googleUser.photoUrl}');
 
       try {
         final response = await sendPostRequest(
