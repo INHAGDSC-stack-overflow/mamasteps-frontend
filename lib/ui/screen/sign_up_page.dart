@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mamasteps_frontend/ui/data/contents.dart';
 import 'package:numberpicker/numberpicker.dart';
-import 'package:calendar_view/calendar_view.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -324,7 +323,7 @@ class _subpage3State extends State<_subpage3> {
   }
 }
 
-class _subPage4 extends StatelessWidget {
+class _subPage4 extends StatefulWidget {
   final ValueChanged onChanged;
 
   const _subPage4({
@@ -333,105 +332,75 @@ class _subPage4 extends StatelessWidget {
   });
 
   @override
+  State<_subPage4> createState() => _subPage4State();
+}
+
+class _subPage4State extends State<_subPage4> {
+  List<List<bool>> scheduleData = List.generate(
+    24, // 24시간
+    (i) => List.generate(7, (j) => false), // 각 요일에 대한 데이터
+  );
+
+  // 일정을 추가하는 메서드
+  void addSchedule(int hour, int day) {
+    setState(() {
+      scheduleData[hour][day] = !scheduleData[hour][day];
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(contents[0]),
-        const SizedBox(height: 16.0),
-        Expanded(
-          child: WeekView(
-            controller: EventController(),
-            eventTileBuilder: (date, events, boundry, start, end) {
-              return Container();
+        Text(contents[4]),
+        SingleChildScrollView(
+          child: Table(
+            // 테이블의 열을 정의합니다. 여기서는 요일을 나타냅니다.
+            columnWidths: {
+              0: FixedColumnWidth(50.0), // 시간을 나타내는 첫번째 열
+              1: FlexColumnWidth(), // 나머지 요일 열
+              2: FlexColumnWidth(),
+              3: FlexColumnWidth(),
+              4: FlexColumnWidth(),
+              5: FlexColumnWidth(),
+              6: FlexColumnWidth(),
             },
-            fullDayEventBuilder: (events, date) {
-              return Container();
-            },
-            width: MediaQuery.of(context).size.width * 0.8,
-            minDay: DateTime.now(),
-            maxDay: DateTime.now(),
-            initialDay: DateTime.now(),
-            heightPerMinute: 1,
-            eventArranger: SideEventArranger(),
-            onEventTap: (events, date) => print(events),
-            onDateLongPress: (date) => print(date),
-            onDateTap: (DateTime date) async {
-              await _showMyDialog(context);
-            },
-            startDay: WeekDays.sunday,
+            border: TableBorder.all(),
+            children: [
+              // 테이블의 행을 정의합니다. 여기서는 각 시간대를 나타냅니다.
+              TableRow(children: [
+                Text('Time'), // 첫 번째 열은 시간을 나타냅니다.
+                Text('Mon'),
+                Text('Tue'),
+                Text('Wed'),
+                Text('Thu'),
+                Text('Fri'),
+                Text('Sat'),
+                Text('Sun'),
+              ]),
+              ...List.generate(24, (hour) {
+                // 24시간을 나타내는 행들을 생성합니다.
+                return TableRow(children: [
+                  Text('${hour}:00'), // 시간을 나타내는 첫 번째 셀
+                  for (var day = 0; day < 7; day++)
+                    InkWell(
+                      onTap: () {
+                        addSchedule(hour, day);
+                      },
+                      child: Container(
+                        color: scheduleData[hour][day]
+                            ? Colors.blue
+                            : Colors.transparent,
+                        padding: EdgeInsets.all(8),
+                        child: Text(''),
+                      ),
+                    ), // 나머지 셀은 비워둡니다.
+                ]);
+              }),
+            ],
           ),
         ),
       ],
-    );
-  }
-
-  Future<void> _showMyDialog(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-          title: Text('요일을 선택해 주세요'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                ListTile(
-                  title: Text('월요일'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  title: Text('화요일'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  title: Text('수요일'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  title: Text('목요일'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  title: Text('금요일'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  title: Text('토요일'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                ListTile(
-                  title: Text('일요일'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

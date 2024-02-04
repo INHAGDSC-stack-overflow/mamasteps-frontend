@@ -1,4 +1,3 @@
-import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mamasteps_frontend/login/widget/google_login_components.dart';
@@ -12,13 +11,10 @@ void main() async {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
       },
-      child: CalendarControllerProvider(
-        controller: EventController(),
-        child: MaterialApp(
-          // 2번코드
-          debugShowCheckedModeBanner: false,
-          home: SignUpPage(),
-        ),
+      child: MaterialApp(
+        // 2번코드
+        debugShowCheckedModeBanner: false,
+        home: SignUpPage(),
       ),
     ),
   );
