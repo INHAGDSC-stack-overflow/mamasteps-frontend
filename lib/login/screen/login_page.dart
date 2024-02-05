@@ -21,27 +21,14 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Icon(Icons.abc, size: 100, color: Colors.white),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => RootTab(),
-                  ),
-                );
-              },
-              child: Text('구글 계정으로 가입'),
+            InkWell(
+              child: Image.asset('asset/image/google_sign_up.png', width: 200),
+              onTap: () {},
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => GoogleLogin(),
-                  ),
-                );
-              },
-              child: Text(
-                '구글 로그인',
-              ),
+            const SizedBox(height: 20),
+            InkWell(
+              child: Image.asset('asset/image/continue_with_google.png', width: 200),
+              onTap: () {},
             ),
           ],
         ),
