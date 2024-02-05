@@ -24,8 +24,8 @@ class _SignUpPageState extends State<SignUpPage> {
   PageController _pageController = PageController(initialPage: 0);
   String user_activities = '';
   List<List<bool>> scheduleData = List.generate(
-    24, // 24시간
-    (i) => List.generate(7, (j) => false), // 각 요일에 대한 데이터
+    7, // 7일
+        (i) => List.generate(24, (j) => false), // 각 요일에 대한 데이터
   );
   String phoneNumber = '';
   @override
@@ -58,7 +58,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       content: contents[2],
                       dateController: _dateController,
                       onTap:
-                          onDateChanged(selectedDate, context, _dateController),
+                      onDateChanged(selectedDate, context, _dateController),
                     ),
                     _activitiesSubPage(
                       // 활동량 입력 페이지
@@ -100,7 +100,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           print("나이 : " + userInformation[1].toString());
                           print("임신 날짜 :" + selectedDate.toString());
                           print("활동량 : " + user_activities);
-                          print("산책 선호 시간 : $scheduleData");
+                          print("월 산책 선호 시간 : " + scheduleData[0].toString());
+                          print("화 산책 선호 시간 : " + scheduleData[1].toString());
+                          print("수 산책 선호 시간 : " + scheduleData[2].toString());
+                          print("목 산책 선호 시간 : " + scheduleData[3].toString());
+                          print("금 산책 선호 시간 : " + scheduleData[4].toString());
+                          print("토 산책 선호 시간 : " + scheduleData[5].toString());
+                          print("일 산책 선호 시간 : " + scheduleData[6].toString());
                           print("보호자 전화번호 : " + phoneNumber);
                         },
                         child: Text('출력'))
@@ -307,9 +313,9 @@ class _dateSubPage extends StatefulWidget {
   final GestureTapCallback onTap;
   const _dateSubPage(
       {super.key,
-      required this.onTap,
-      required this.dateController,
-      required this.content});
+        required this.onTap,
+        required this.dateController,
+        required this.content});
 
   @override
   State<_dateSubPage> createState() => _dateSubPageState();
@@ -366,43 +372,43 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
         const SizedBox(height: 16.0),
         Container(
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          OutlinedButton(
-              onPressed: () {
-                widget.onhighChanged();
-              },
-              child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  side: BorderSide(
-                    width: 2,
-                  ),)),
-          OutlinedButton(
-              onPressed: () {
-                widget.onmiddleChanged();
-              },
-              child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  side: BorderSide(
-                    width: 2,
-                  ))),
-          OutlinedButton(
-              onPressed: () {
-                widget.onlowChanged();
-              },
-              child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  side: BorderSide(
-                    width: 2,
-                  ))),
-        ])),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onhighChanged();
+                  },
+                  child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    side: BorderSide(
+                      width: 2,
+                    ),)),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onmiddleChanged();
+                  },
+                  child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                      ))),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onlowChanged();
+                  },
+                  child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                      ))),
+            ])),
       ],
     );
   }
@@ -423,9 +429,9 @@ class _scheduleSubPage extends StatefulWidget {
 }
 
 class _scheduleSubPageState extends State<_scheduleSubPage> {
-  void onChangeSchedule(int hour, int day) {
+  void onChangeSchedule(int day, int hour) {
     setState(() {
-      widget.scheduleData[hour][day] = !widget.scheduleData[hour][day];
+      widget.scheduleData[day][hour] = !widget.scheduleData[day][hour];
     });
   }
 
@@ -433,7 +439,7 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(contents[4]),
+        Text(widget.content),
         SingleChildScrollView(
           child: Table(
             // 테이블의 열을 정의합니다. 여기서는 요일을 나타냅니다.
@@ -445,6 +451,7 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
               4: FlexColumnWidth(),
               5: FlexColumnWidth(),
               6: FlexColumnWidth(),
+              7: FlexColumnWidth(),
             },
             border: TableBorder.all(),
             children: [
@@ -466,10 +473,10 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
                   for (var day = 0; day < 7; day++)
                     InkWell(
                       onTap: () {
-                        onChangeSchedule(hour, day);
+                        onChangeSchedule(day, hour);
                       },
                       child: Container(
-                        color: widget.scheduleData[hour][day]
+                        color: widget.scheduleData[day][hour]
                             ? Colors.blue
                             : Colors.transparent,
                         padding: EdgeInsets.all(8),
