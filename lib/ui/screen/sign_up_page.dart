@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mamasteps_frontend/ui/data/contents.dart';
-import 'package:mamasteps_frontend/ui/layout/default_layout.dart';
+import 'package:mamasteps_frontend/ui/layout/root_tab_default_layout.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -22,12 +22,12 @@ class _SignUpPageState extends State<SignUpPage> {
   ];
   DateTime? selectedDate;
   PageController _pageController = PageController(initialPage: 0);
-  String user_activities = '';
   List<List<bool>> scheduleData = List.generate(
     7, // 7일
-        (i) => List.generate(24, (j) => false), // 각 요일에 대한 데이터
+    (i) => List.generate(24, (j) => false), // 각 요일에 대한 데이터
   );
-  String phoneNumber = '';
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +58,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       content: contents[2],
                       dateController: _dateController,
                       onTap:
-                      onDateChanged(selectedDate, context, _dateController),
+                          onDateChanged(selectedDate, context, _dateController),
                     ),
                     _activitiesSubPage(
                       // 활동량 입력 페이지
@@ -76,7 +76,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       // 보호자 전화번호 입력 페이지
                       content: contents[5],
                       onChanged: onChangeNumber,
-                      dateController: _dateController,
                     ),
                   ],
                 ),
@@ -99,7 +98,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           print("이름 : " + userInformation[0].toString());
                           print("나이 : " + userInformation[1].toString());
                           print("임신 날짜 :" + selectedDate.toString());
-                          print("활동량 : " + user_activities);
+                          print("활동량 : " + userInformation[2].toString());
                           print("월 산책 선호 시간 : " + scheduleData[0].toString());
                           print("화 산책 선호 시간 : " + scheduleData[1].toString());
                           print("수 산책 선호 시간 : " + scheduleData[2].toString());
@@ -107,7 +106,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           print("금 산책 선호 시간 : " + scheduleData[4].toString());
                           print("토 산책 선호 시간 : " + scheduleData[5].toString());
                           print("일 산책 선호 시간 : " + scheduleData[6].toString());
-                          print("보호자 전화번호 : " + phoneNumber);
+                          print("보호자 전화번호 : " + userInformation[3].toString());
                         },
                         child: Text('출력'))
                   ],
@@ -153,25 +152,19 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void onHighActivitesChanged() {
     setState(() {
-      user_activities = 'HIGH';
+      userInformation[2] = 'HIGH';
     });
   }
 
   void onMiddleActivitesChanged() {
     setState(() {
-      user_activities = 'MIDDLE';
+      userInformation[2] = 'MIDDLE';
     });
   }
 
   void onLowActivitesChanged() {
     setState(() {
-      user_activities = 'LOW';
-    });
-  }
-
-  void onNumberChanged(value) {
-    setState(() {
-      userInformation[5] = value;
+      userInformation[2] = 'LOW';
     });
   }
 
@@ -181,9 +174,9 @@ class _SignUpPageState extends State<SignUpPage> {
     });
   }
 
-  void onChangeNumber(value){
+  void onChangeNumber(value) {
     setState(() {
-      phoneNumber = value;
+      userInformation[3] = value;
     });
   }
 
@@ -199,33 +192,6 @@ class _SignUpPageState extends State<SignUpPage> {
       _pageController.nextPage(
           duration: Duration(milliseconds: 300), curve: Curves.easeIn);
     });
-  }
-}
-
-class _subPage extends StatelessWidget {
-  final ValueChanged onChanged;
-  final String content;
-
-  const _subPage({
-    super.key,
-    required this.content,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(content),
-        const SizedBox(height: 16.0),
-        TextFormField(
-          autofocus: true,
-          onChanged: onChanged,
-        ),
-      ],
-    );
   }
 }
 
@@ -282,49 +248,22 @@ class _ageSubPage extends StatelessWidget {
   }
 }
 
-// class _subPage1 extends StatelessWidget {
-//   final ValueChanged onChanged;
-//
-//   const _onNumberSubPage({
-//     super.key,
-//     required this.onChanged,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       mainAxisAlignment: MainAxisAlignment.center,
-//       crossAxisAlignment: CrossAxisAlignment.stretch,
-//       children: [
-//         Text(contents[0]),
-//         const SizedBox(height: 16.0),
-//         TextFormField(
-//           autofocus: true,
-//           onChanged: onChanged,
-//         ),
-//       ],
-//     );
-//   }
-// }
-
 class _dateSubPage extends StatefulWidget {
   final String content;
   final TextEditingController dateController;
   final GestureTapCallback onTap;
   const _dateSubPage(
       {super.key,
-        required this.onTap,
-        required this.dateController,
-        required this.content});
+      required this.onTap,
+      required this.dateController,
+      required this.content});
 
   @override
   State<_dateSubPage> createState() => _dateSubPageState();
 }
 
 class _dateSubPageState extends State<_dateSubPage> {
-  final _dateController = TextEditingController();
   DateTime date = DateTime.now();
-  DateTime? _selectedDate;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -363,7 +302,6 @@ class _activitiesSubPage extends StatefulWidget {
 class _activitiesSubPageState extends State<_activitiesSubPage> {
   @override
   Widget build(BuildContext context) {
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -372,43 +310,44 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
         const SizedBox(height: 16.0),
         Container(
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              OutlinedButton(
-                  onPressed: () {
-                    widget.onhighChanged();
-                  },
-                  child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    side: BorderSide(
-                      width: 2,
-                    ),)),
-              OutlinedButton(
-                  onPressed: () {
-                    widget.onmiddleChanged();
-                  },
-                  child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
-                  style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                      ))),
-              OutlinedButton(
-                  onPressed: () {
-                    widget.onlowChanged();
-                  },
-                  child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
-                  style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                      ))),
-            ])),
+          OutlinedButton(
+              onPressed: () {
+                widget.onhighChanged();
+              },
+              child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                side: BorderSide(
+                  width: 2,
+                ),
+              )),
+          OutlinedButton(
+              onPressed: () {
+                widget.onmiddleChanged();
+              },
+              child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  side: BorderSide(
+                    width: 2,
+                  ))),
+          OutlinedButton(
+              onPressed: () {
+                widget.onlowChanged();
+              },
+              child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  side: BorderSide(
+                    width: 2,
+                  ))),
+        ])),
       ],
     );
   }
@@ -440,52 +379,56 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
     return Column(
       children: [
         Text(widget.content),
-        SingleChildScrollView(
-          child: Table(
-            // 테이블의 열을 정의합니다. 여기서는 요일을 나타냅니다.
-            columnWidths: {
-              0: FixedColumnWidth(50.0), // 시간을 나타내는 첫번째 열
-              1: FlexColumnWidth(), // 나머지 요일 열
-              2: FlexColumnWidth(),
-              3: FlexColumnWidth(),
-              4: FlexColumnWidth(),
-              5: FlexColumnWidth(),
-              6: FlexColumnWidth(),
-              7: FlexColumnWidth(),
-            },
-            border: TableBorder.all(),
-            children: [
-              // 테이블의 행을 정의합니다. 여기서는 각 시간대를 나타냅니다.
-              TableRow(children: [
-                Text('Time'), // 첫 번째 열은 시간을 나타냅니다.
-                Text('Mon'),
-                Text('Tue'),
-                Text('Wed'),
-                Text('Thu'),
-                Text('Fri'),
-                Text('Sat'),
-                Text('Sun'),
-              ]),
-              ...List.generate(24, (hour) {
-                // 24시간을 나타내는 행들을 생성합니다.
-                return TableRow(children: [
-                  Text('${hour}:00'), // 시간을 나타내는 첫 번째 셀
-                  for (var day = 0; day < 7; day++)
-                    InkWell(
-                      onTap: () {
-                        onChangeSchedule(day, hour);
-                      },
-                      child: Container(
-                        color: widget.scheduleData[day][hour]
-                            ? Colors.blue
-                            : Colors.transparent,
-                        padding: EdgeInsets.all(8),
-                        child: Text(''),
-                      ),
-                    ), // 나머지 셀은 비워둡니다.
-                ]);
-              }),
-            ],
+        Expanded(
+          child: SingleChildScrollView(
+            child: Container(
+              child: Table(
+                // 테이블의 열을 정의합니다. 여기서는 요일을 나타냅니다.
+                columnWidths: {
+                  0: FixedColumnWidth(50.0), // 시간을 나타내는 첫번째 열
+                  1: FlexColumnWidth(), // 나머지 요일 열
+                  2: FlexColumnWidth(),
+                  3: FlexColumnWidth(),
+                  4: FlexColumnWidth(),
+                  5: FlexColumnWidth(),
+                  6: FlexColumnWidth(),
+                  7: FlexColumnWidth(),
+                },
+                border: TableBorder.all(),
+                children: [
+                  // 테이블의 행을 정의합니다. 여기서는 각 시간대를 나타냅니다.
+                  TableRow(children: [
+                    Text('Time'), // 첫 번째 열은 시간을 나타냅니다.
+                    Text('Mon'),
+                    Text('Tue'),
+                    Text('Wed'),
+                    Text('Thu'),
+                    Text('Fri'),
+                    Text('Sat'),
+                    Text('Sun'),
+                  ]),
+                  ...List.generate(24, (hour) {
+                    // 24시간을 나타내는 행들을 생성합니다.
+                    return TableRow(children: [
+                      Text('${hour}:00'), // 시간을 나타내는 첫 번째 셀
+                      for (var day = 0; day < 7; day++)
+                        InkWell(
+                          onTap: () {
+                            onChangeSchedule(day, hour);
+                          },
+                          child: Container(
+                            color: widget.scheduleData[day][hour]
+                                ? Colors.blue
+                                : Colors.transparent,
+                            padding: EdgeInsets.all(8),
+                            child: Text(''),
+                          ),
+                        ), // 나머지 셀은 비워둡니다.
+                    ]);
+                  }),
+                ],
+              ),
+            ),
           ),
         ),
       ],
@@ -496,12 +439,10 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
 class _onNumberSubPage extends StatelessWidget {
   final String content;
   final ValueChanged onChanged;
-  final TextEditingController dateController;
   const _onNumberSubPage({
     super.key,
     required this.content,
     required this.onChanged,
-    required this.dateController,
   });
 
   @override
@@ -513,7 +454,6 @@ class _onNumberSubPage extends StatelessWidget {
         Text(content),
         const SizedBox(height: 16.0),
         TextFormField(
-          controller: dateController,
           autofocus: true,
           onChanged: onChanged,
         ),
