@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mamasteps_frontend/login/widget/google_login_components.dart';
+import 'package:mamasteps_frontend/login/screen/login_page.dart';
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:mamasteps_frontend/ui/screen/home_screen.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -14,10 +15,30 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
 
-  // void initState() {
-  //   super.initState();
-  //   checkToken();
-  // }
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => debugcheck());
+  }
+
+  void debugcheck(){
+    if(ACCESS_TOKEN_KEY == ''){
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => GoogleLogin(),
+        ),
+            (route) => false,
+      );
+    }
+    else {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => HomeScreen(),
+        ),
+            (route) => false,
+      );
+    }
+  }
+
   //
   // void deleteToken() async {
   //   await storage.deleteAll();
@@ -53,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
   //           (route) => false,
   //     );
   //   }
-
+  //
   // }
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.access_alarms_outlined, size: 100, color: Colors.white),
+            Icon(Icons.abc, size: 100, color: Colors.white),
             CircularProgressIndicator(),
           ],
         ),
