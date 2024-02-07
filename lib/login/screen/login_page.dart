@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:mamasteps_frontend/login/const/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -6,6 +5,10 @@ import 'package:dio/dio.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:mamasteps_frontend/storage/login/login_data.dart';
+import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
+import 'package:mamasteps_frontend/ui/screen/sign_up_page.dart';
 
 class GoogleLogin extends StatefulWidget {
   const GoogleLogin({Key? key}) : super(key: key);
@@ -27,27 +30,40 @@ class _GoogleLoginState extends State<GoogleLogin> {
       print('photoUrl = ${googleUser.photoUrl}');
 
       try {
-        final response = await sendPostRequest(
-          email: googleUser.email,
-          id: googleUser.id,
-          name: googleUser.displayName ?? 'DefaultName',
-        );
-
-        print('Server Response: $response');
+        // // final response = await sendPostRequest(
+        // //   email: googleUser.email,
+        // //   id: googleUser.id,
+        // //   name: googleUser.displayName ?? 'DefaultName',
+        // );
+        //
+        // print('Server Response: $response');
+        if (/*response == '성공'*/ REFRESH_TOKEN_KEY != '') {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RootTab(),
+              ));
+        } else {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SignUpPage(userEmail: googleUser.email, userId: googleUser.id, userName: googleUser.displayName, userPhotoUrl: googleUser.photoUrl),
+              ));
+        }
       } catch (error) {
         print('Error sending POST request: $error');
       }
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MapPage(),
-        ),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => MapPage(),
+      //   ),
+      // );
 
-      setState(() {
-        _loginPlatform = LoginPlatform.google;
-      });
+      // setState(() {
+      //   _loginPlatform = LoginPlatform.google;
+      // });
     }
   }
 
@@ -126,19 +142,19 @@ class _GoogleLoginState extends State<GoogleLogin> {
       onTap: onTap,
     );
   }
-
-  Widget _logoutButton() {
-    return ElevatedButton(
-      onPressed: signOut,
-      child: const Text('로그아웃'),
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(
-          const Color(0xff0165E1),
-        ),
-      ),
-    );
-  }
 }
+//   Widget _logoutButton() {
+//     return ElevatedButton(
+//       onPressed: signOut,
+//       child: const Text('로그아웃'),
+//       style: ButtonStyle(
+//         backgroundColor: MaterialStateProperty.all(
+//           const Color(0xff0165E1),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 // Card(
 // elevation: 5.0,

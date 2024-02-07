@@ -5,7 +5,18 @@ import 'package:mamasteps_frontend/ui/layout/root_tab_default_layout.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  final String userEmail;
+  final String userId;
+  final String? userName;
+  final String? userPhotoUrl;
+
+  const SignUpPage({
+    super.key,
+    required this.userEmail,
+    required this.userId,
+    required this.userName,
+    required this.userPhotoUrl,
+  });
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -26,7 +37,6 @@ class _SignUpPageState extends State<SignUpPage> {
     7, // 7일
     (i) => List.generate(24, (j) => false), // 각 요일에 대한 데이터
   );
-
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +105,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     OutlinedButton(
                         onPressed: () {
+                          print("유저구글이메일 : " + widget.userEmail);
+                          print("유저구글아이디 : " + widget.userId);
+                          print("유저구글사진 : " + widget.userPhotoUrl.toString());
+                          print("유저구글이름 : " + widget.userName.toString());
                           print("이름 : " + userInformation[0].toString());
                           print("나이 : " + userInformation[1].toString());
                           print("임신 날짜 :" + selectedDate.toString());
