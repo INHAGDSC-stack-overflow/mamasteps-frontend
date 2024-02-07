@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
+import 'package:mamasteps_frontend/ui/screen/home_screen.dart';
 
 class RootTab extends StatefulWidget {
   const RootTab({super.key});
@@ -57,7 +58,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                 children: [
                   Center(
                     child: Container(
-                      child: Text('홈'),
+                      child: HomeScreen(),
                     ),
                   ),
                   Center(
