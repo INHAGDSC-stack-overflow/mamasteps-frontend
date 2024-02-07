@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class DefaultLayout extends StatelessWidget {
+class SignUpDefaultLayout extends StatelessWidget {
   final Widget child;
 
-  const DefaultLayout({super.key, required this.child});
+  const SignUpDefaultLayout({super.key, required this.child});
   @override
   Widget build(BuildContext context) {
     return Stack(

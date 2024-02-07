@@ -4,7 +4,7 @@ import 'package:mamasteps_frontend/login/screen/login_page.dart';
 import 'package:mamasteps_frontend/login/screen/login_page.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
 import 'package:mamasteps_frontend/map/screen/map_screen.dart';
-import 'package:mamasteps_frontend/ui/layout/root_tab_default_layout.dart';
+import 'package:mamasteps_frontend/ui/layout/sign_up_default_layout.dart';
 import 'package:mamasteps_frontend/ui/screen/home_screen.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 import 'package:mamasteps_frontend/ui/screen/sign_up_page.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mamasteps_frontend/ui/data/contents.dart';
-import 'package:mamasteps_frontend/ui/layout/root_tab_default_layout.dart';
+import 'package:mamasteps_frontend/ui/layout/sign_up_default_layout.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class SignUpPage extends StatefulWidget {
