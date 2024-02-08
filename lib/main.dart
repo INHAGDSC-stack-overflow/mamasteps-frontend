@@ -9,8 +9,11 @@ import 'package:mamasteps_frontend/ui/screen/home_screen.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 import 'package:mamasteps_frontend/ui/screen/sign_up_page.dart';
 import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
+import 'package:intl/date_symbol_data_local.dart' as localedate;
 
 void main() async {
+  await localedate.initializeDateFormatting();
+
   runApp(
     GestureDetector(
       onTap: () {
