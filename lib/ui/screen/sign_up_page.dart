@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mamasteps_frontend/ui/data/contents.dart';
@@ -105,22 +106,19 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     OutlinedButton(
                         onPressed: () {
-                          print("유저구글이메일 : " + widget.userEmail);
-                          print("유저구글아이디 : " + widget.userId);
-                          print("유저구글사진 : " + widget.userPhotoUrl.toString());
-                          print("유저구글이름 : " + widget.userName.toString());
-                          print("이름 : " + userInformation[0].toString());
-                          print("나이 : " + userInformation[1].toString());
-                          print("임신 날짜 :" + selectedDate.toString());
-                          print("활동량 : " + userInformation[2].toString());
-                          print("월 산책 선호 시간 : " + scheduleData[0].toString());
-                          print("화 산책 선호 시간 : " + scheduleData[1].toString());
-                          print("수 산책 선호 시간 : " + scheduleData[2].toString());
-                          print("목 산책 선호 시간 : " + scheduleData[3].toString());
-                          print("금 산책 선호 시간 : " + scheduleData[4].toString());
-                          print("토 산책 선호 시간 : " + scheduleData[5].toString());
-                          print("일 산책 선호 시간 : " + scheduleData[6].toString());
-                          print("보호자 전화번호 : " + userInformation[3].toString());
+                          print({
+                            "profileImage": widget.userPhotoUrl.toString(),
+                            "request": {
+                              "email": widget.userEmail,
+                              "name": userInformation[0].toString(),
+                              "age": int.parse(userInformation[1].toString()),
+                              "pregnancyStartDate": selectedDate.toString(),
+                              "guardianPhoneNumber": userInformation[3].toString(),
+                              "activityLevel": userInformation[2].toString(),
+                              "walkPreferences": convertToWalkPreferencesList(scheduleData),
+                            }
+                          });
+
                         },
                         child: Text('출력'))
                   ],
@@ -474,4 +472,48 @@ class _onNumberSubPage extends StatelessWidget {
       ],
     );
   }
+}
+List<Map<String, dynamic>> convertToWalkPreferencesList(List<List<bool>> scheduleData) {
+  List<Map<String, dynamic>> walkPreferencesList = [];
+
+  for (int day = 0; day < 7; day++) {
+    int? startTime;
+    int? endTime;
+
+    for (int hour = 0; hour < 24; hour++) {
+      if (scheduleData[day][hour]) {
+        if (startTime == null) {
+          startTime = hour;
+        }
+      } else {
+        if (startTime != null) {
+          endTime = hour;
+          walkPreferencesList.add({
+            'dayOfWeek': getDayOfWeek(day),
+            'startTime': startTime,
+            'endTime': endTime,
+          });
+          startTime = null;
+          endTime = null;
+        }
+      }
+    }
+
+    if (startTime != null && endTime == null) {
+      walkPreferencesList.add({
+        'dayOfWeek': getDayOfWeek(day),
+        'startTime': startTime,
+        'endTime': 24,
+      });
+    }
+  }
+
+  return walkPreferencesList;
+}
+
+String getDayOfWeek(int day) {
+  List<String> daysOfWeek = [
+    'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'
+  ];
+  return daysOfWeek[day];
 }
