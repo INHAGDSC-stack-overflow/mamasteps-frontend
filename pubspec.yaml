@@ -41,6 +41,11 @@ dependencies:
   dio: ^5.4.0
   google_sign_in:  ^6.2.1
   flutter_secure_storage: ^9.0.0
+  intl: ^0.18.1
+  numberpicker: ^2.1.2
+  http: ^1.2.0
+  charts_flutter_updated: ^0.13.0
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:

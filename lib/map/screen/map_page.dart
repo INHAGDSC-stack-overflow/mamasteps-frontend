@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:mamasteps_frontend/map/screen/map_screen.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -11,85 +12,209 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  final dio = Dio();
-  PageController _pageController = PageController();
-  final List<Widget> _pages = [];
-  int _currentPage = 0;
-  bool _isLoading = false;
-  // List<String> PageViewList = ['첫번째 페이지', '두번째 페이지', '세번째 페이지'];
-
-  // 아직 미완성 코드
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   _pageController.addListener(_handlePageChange);
-  //   _loadInitialData();
-  //   super.initState();
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   _pageController.dispose();
-  //   super.dispose();
-  // }
-  //
-  // void _handlePageChange(){
-  //   if (_pageController.page == _pages.length - 1){
-  //     _loadMoreData();
-  //   }
-  // }
-  //
-  // Future<void> _loadInitalData() async {
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //
-  //   var initialData = await dio.get(
-  //     'IP 주소를 입력해 주세요',
-  //     options: Options(
-  //       headers: ['authoraization':'Bearer $access_token'];
-  //     )
-  //   );
-  // }
-  //
-  // Future<void> _loadMoreData() async {
-  //   if (_isLoading) return;
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //   var newData = await dio.get(
-  //     'IP 주소를 입력해 주세요',
-  //     options: Options(
-  //       headers: ['authoraization' : 'Bearer $access_token'];
-  //     )
-  //   );
-  // }
-
+  // final dio = Dio();
+  int _currentHour = 0;
+  int _currentMin = 0;
+  int _currentSec = 0;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("산책 경로 만들기"),
-        backgroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          Container(
-            child: Text('산책 시간 설정'),
-          ),
-          //TimePickerDialog(initialTime: TimeOfDay.now()),
-          Container(child: Text('산책 경로 선택')),
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: EdgeInsets.all(25.0),
-              height: MediaQuery.of(context).size.height / 8,
-              //width: MediaQuery.of(context).size.width/2,
-              //alignment: Alignment.center,
-              child: MapScreen(),
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Color(0xFFF5F5F5),
+        body: Column(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Container(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    Positioned(
+                      child: Image.asset(
+                        'asset/image/others_home_screen_back_ground_image.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      top: 40,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          "산책 경로 만들기",
+                          style: TextStyle(
+                            fontSize: 35,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              flex: 3,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 15),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 130,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  child: Text(
+                                    '산책 시간 설정',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: screenWidth,
+                                  height: 100,
+                                  child: Card(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Container(
+                                                alignment: Alignment.center,
+                                                child: NumberPicker(
+                                                  minValue: 0,
+                                                  maxValue: 24,
+                                                  value: _currentHour,
+                                                  onChanged: (value) {
+                                                    setState(
+                                                      () {
+                                                        _currentHour = value;
+                                                      },
+                                                    );
+                                                  },
+                                                  textMapper: (numberText) =>
+                                                      numberText.padLeft(
+                                                          2, '0'),
+                                                ),
+                                              ),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                child: Text(':'),
+                                                width: 10,
+                                              ),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                child: NumberPicker(
+                                                  minValue: 0,
+                                                  maxValue: 59,
+                                                  value: _currentMin,
+                                                  onChanged: (value) {
+                                                    setState(
+                                                      () {
+                                                        _currentMin = value;
+                                                      },
+                                                    );
+                                                  },
+                                                  textMapper: (numberText) =>
+                                                      numberText.padLeft(
+                                                          2, '0'),
+                                                ),
+                                              ),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                child: Text(':'),
+                                                width: 10,
+                                              ),
+                                              Container(
+                                                alignment: Alignment.center,
+                                                child: NumberPicker(
+                                                  minValue: 0,
+                                                  maxValue: 59,
+                                                  value: _currentSec,
+                                                  onChanged: (value) {
+                                                    setState(
+                                                      () {
+                                                        _currentSec = value;
+                                                      },
+                                                    );
+                                                  },
+                                                  textMapper: (numberText) =>
+                                                      numberText.padLeft(
+                                                          2, '0'),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Container(
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  child: Text(
+                                    '산책 경로 설정',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: screenWidth,
+                                  height: 400,
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: MapScreen(),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
