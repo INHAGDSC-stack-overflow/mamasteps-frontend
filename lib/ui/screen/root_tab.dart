@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mamasteps_frontend/calendar/screen/calendar_page.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
 import 'package:mamasteps_frontend/ui/screen/home_screen.dart';
 
@@ -68,7 +69,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   ),
                   Center(
                     child: Container(
-                      child: Text('프로필'),
+                      child: TableCalendarPage(),
                     ),
                   ),
                 ],
