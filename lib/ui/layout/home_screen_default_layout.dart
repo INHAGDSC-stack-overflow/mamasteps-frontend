@@ -19,11 +19,11 @@ class HomeScreenDefaultLayout extends StatelessWidget {
         body: Column(
           children: [
             Expanded(
-              flex: 1,
+              flex: 2,
               child: Header,
             ),
             Expanded(
-              flex: 2,
+              flex: 3,
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
