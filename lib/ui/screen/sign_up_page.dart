@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import 'package:mamasteps_frontend/ui/data/contents.dart';
 import 'package:mamasteps_frontend/ui/layout/sign_up_default_layout.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -35,8 +36,8 @@ class _SignUpPageState extends State<SignUpPage> {
   DateTime? selectedDate;
   PageController _pageController = PageController(initialPage: 0);
   List<List<bool>> scheduleData = List.generate(
-    7, // 7일
-    (i) => List.generate(24, (j) => false), // 각 요일에 대한 데이터
+    7,
+        (i) => List.generate(24, (j) => false),
   );
 
   @override
@@ -55,36 +56,29 @@ class _SignUpPageState extends State<SignUpPage> {
                   controller: _pageController,
                   children: [
                     _nameSubPage(
-                      // 이름 입력 페이지
                       content: contents[0],
                       onChanged: onNameChanged,
                     ),
                     _ageSubPage(
-                      // 나이 입력 페이지
                       content: contents[1],
                       onChanged: onAgeChanged,
                     ),
                     _dateSubPage(
-                      // 임신 날짜 입력 페이지
                       content: contents[2],
                       dateController: _dateController,
-                      onTap:
-                          onDateChanged(selectedDate, context, _dateController),
+                      onTap: onDateChanged(selectedDate, context, _dateController),
                     ),
                     _activitiesSubPage(
-                      // 활동량 입력 페이지
                       onhighChanged: onHighActivitesChanged,
                       onmiddleChanged: onMiddleActivitesChanged,
                       onlowChanged: onLowActivitesChanged,
                       content: contents[3],
                     ),
                     _scheduleSubPage(
-                      // 산책 선호 시간 입력 페이지
                       content: contents[4],
                       scheduleData: scheduleData,
                     ),
                     _onNumberSubPage(
-                      // 보호자 전화번호 입력 페이지
                       content: contents[5],
                       onChanged: onChangeNumber,
                     ),
@@ -105,22 +99,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: Text('다음'),
                     ),
                     OutlinedButton(
-                        onPressed: () {
-                          print({
-                            "profileImage": widget.userPhotoUrl.toString(),
-                            "request": {
-                              "email": widget.userEmail,
-                              "name": userInformation[0].toString(),
-                              "age": int.parse(userInformation[1].toString()),
-                              "pregnancyStartDate": selectedDate.toString(),
-                              "guardianPhoneNumber": userInformation[3].toString(),
-                              "activityLevel": userInformation[2].toString(),
-                              "walkPreferences": convertToWalkPreferencesList(scheduleData),
-                            }
-                          });
-
-                        },
-                        child: Text('출력'))
+                      onPressed: onSubmitPressed,
+                      child: Text('출력'),
+                    )
                   ],
                 ),
               ),
@@ -129,6 +110,44 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
+  }
+
+  void onSubmitPressed() async {
+    final url = 'http://dev.mamasteps.dev/api.v1/auth/signup';
+
+    final Map<String, dynamic> requestData = {
+      "request": {
+        "profileImage": widget.userPhotoUrl,
+        "email": widget.userEmail,
+        "name": userInformation[0],
+        "age": int.parse(userInformation[1]),
+        "pregnancyStartDate": selectedDate?.toString() ?? '',
+        "guardianPhoneNumber": userInformation[3],
+        "activityLevel": userInformation[2],
+        "walkPreferences": convertToWalkPreferencesList(scheduleData),
+      }
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+        // 성공적인 응답 처리, 예를 들어 새로운 화면으로 이동
+        print('Success: ${response.body}');
+      } else {
+        // 에러 응답 처리
+        print('Error: ${response.statusCode}, ${response.body}');
+      }
+    } catch (e) {
+      // 예외 처리
+      print('Exception: $e');
+    }
   }
 
   void onNameChanged(value) {
