@@ -31,6 +31,7 @@ class _MapScreenState extends State<MapScreen> {
     //getinformation();
     drawPolylines(polylines, resultList);
     drawMarkers(markers, resultList);
+    _determinePosition();
     super.initState();
   }
   // getinformation() async {
@@ -65,10 +66,39 @@ class _MapScreenState extends State<MapScreen> {
       mapType: MapType.normal,
       onMapCreated: (controller) {
         setState(
-              () {
+          () {
             mapController = controller;
           },
         );
+      },
+    );
+  }
+
+  void _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.value('위치 서비스가 비활성화되어 있습니다.');
+    }
+    permission = await Geolocator.checkPermission();
+    if(permission == LocationPermission.denied){
+      permission = await Geolocator.requestPermission();
+      if(permission == LocationPermission.denied){
+        return Future.value('위치 권한이 거부되었습니다.');
+      }
+    }
+    if(permission == LocationPermission.deniedForever){
+      return Future.error('위치 권한이 영구적으로 거부되었습니다, 설정에서 변경해주세요.');
+    }
+
+    Geolocator.getPositionStream().listen(
+        (Position position){
+          print(position);
+        },
+      onError: (e){
+          print(e);
       },
     );
   }
