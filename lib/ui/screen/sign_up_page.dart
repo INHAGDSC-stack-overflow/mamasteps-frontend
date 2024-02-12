@@ -113,20 +113,20 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void onSubmitPressed() async {
-    final url = 'http://dev.mamasteps.dev/api.v1/auth/signup';
+    final url = 'https://dev.mamasteps.dev/api/v1/auth/signup';
 
     final Map<String, dynamic> requestData = {
-      "request": {
-        "profileImage": widget.userPhotoUrl,
-        "email": widget.userEmail,
-        "name": userInformation[0],
-        "age": int.parse(userInformation[1]),
-        "pregnancyStartDate": selectedDate?.toString() ?? '',
-        "guardianPhoneNumber": userInformation[3],
-        "activityLevel": userInformation[2],
-        "walkPreferences": convertToWalkPreferencesList(scheduleData),
-      }
+      "email": widget.userEmail,
+      "name": userInformation[0],
+      "age": int.parse(userInformation[1]),
+      "pregnancyStartDate": (selectedDate?.toIso8601String() ?? '') + 'Z',
+      "guardianPhoneNumber": userInformation[3],
+      "profileImage": widget.userPhotoUrl,
+      "activityLevel": "HIGH",
+      "walkPreferences": convertToWalkPreferencesList(scheduleData)
     };
+
+    print(requestData);
 
     try {
       final response = await http.post(
@@ -285,9 +285,9 @@ class _dateSubPage extends StatefulWidget {
   final GestureTapCallback onTap;
   const _dateSubPage(
       {super.key,
-      required this.onTap,
-      required this.dateController,
-      required this.content});
+        required this.onTap,
+        required this.dateController,
+        required this.content});
 
   @override
   State<_dateSubPage> createState() => _dateSubPageState();
@@ -341,44 +341,44 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
         const SizedBox(height: 16.0),
         Container(
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          OutlinedButton(
-              onPressed: () {
-                widget.onhighChanged();
-              },
-              child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                side: BorderSide(
-                  width: 2,
-                ),
-              )),
-          OutlinedButton(
-              onPressed: () {
-                widget.onmiddleChanged();
-              },
-              child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  side: BorderSide(
-                    width: 2,
-                  ))),
-          OutlinedButton(
-              onPressed: () {
-                widget.onlowChanged();
-              },
-              child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  side: BorderSide(
-                    width: 2,
-                  ))),
-        ])),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onhighChanged();
+                  },
+                  child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    side: BorderSide(
+                      width: 2,
+                    ),
+                  )),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onmiddleChanged();
+                  },
+                  child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                      ))),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onlowChanged();
+                  },
+                  child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                      ))),
+            ])),
       ],
     );
   }
