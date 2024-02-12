@@ -113,12 +113,20 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void onSubmitPressed() async {
-    final url = 'http://dev.mamasteps.dev/api.v1/auth/signup';
+    print("profileImage :"+ widget.userPhotoUrl.toString());
+    print("email :"+ widget.userEmail);
+    print("name :"+ userInformation[0]);
+    print("age :"+ userInformation[1]);
+    print("pregnancyStartDate :"+ selectedDate.toString() ?? '');
+    print("guardianPhoneNumber :"+ userInformation[3]);
+    print("activityLevel :"+ userInformation[2]);
+    print("walkPreferences :"+ convertToWalkPreferencesList(scheduleData).toString());
+    final url = 'http://dev.mamasteps.dev/api/v1/auth/signup';
 
     final Map<String, dynamic> requestData = {
       "request": {
         "profileImage": widget.userPhotoUrl,
-        "email": widget.userEmail,
+        "email": 'abc@gmail.com',
         "name": userInformation[0],
         "age": int.parse(userInformation[1]),
         "pregnancyStartDate": selectedDate?.toString() ?? '',

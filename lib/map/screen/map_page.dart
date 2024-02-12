@@ -1,8 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mamasteps_frontend/map/screen/make_path.dart';
 import 'package:mamasteps_frontend/map/screen/map_screen.dart';
+import 'package:mamasteps_frontend/map/screen/tracking_page.dart';
 import 'package:numberpicker/numberpicker.dart';
+
+bool check = false;
+final List<String> resultsString = [
+  '{wqcFov`dW??RFXHDBb@L????YbB????l@T????RF????AFu@xDSbB????DB????EC????RcBt@yD@G????SG????m@U????XcB????c@MECYISG??',
+  '{wqcFov`dW??RFXHDBb@L????YbB????l@T????RF????AFu@xDSbB????DB????EC????RcBt@yD@G????SG????m@U????XcB????c@MECYISG??',
+  '{wqcFov`dW??RFXHDBb@L????YbB????l@T????RF????AFu@xDSbB????DB????EC????RcBt@yD@G????SG????m@U????XcB????c@MECYISG??',
+];
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -17,6 +28,7 @@ class _MapPageState extends State<MapPage> {
   int currentHour = 0;
   int currentMin = 0;
   int currentSec = 0;
+  Set<Marker> wayPoints = {};
 
   @override
   void initState() {
@@ -32,6 +44,23 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TrackingScreen(
+                  Path: resultsString[0],
+                  hour: currentHour,
+                  minute: currentMin,
+                  second: currentSec,
+                ),
+              ),
+            );
+          },
+          child: Text('산책 시작'),
+          backgroundColor: Color(0xFFF5F5F5),
+        ),
         backgroundColor: Color(0xFFF5F5F5),
         body: Column(
           children: [
@@ -40,6 +69,8 @@ class _MapPageState extends State<MapPage> {
                 currentHour: currentHour,
                 currentMin: currentMin,
                 currentSec: currentSec,
+                wayPoint: wayPoints,
+                onWayPointChanged: onWayPointChanged,
                 onHourChanged: onHourChanged,
                 onMinChanged: onMinChanged,
                 onSecChanged: onSecChanged,
@@ -65,6 +96,12 @@ class _MapPageState extends State<MapPage> {
   void onSecChanged(value) {
     setState(() {
       currentSec = value;
+    });
+  }
+
+  void onWayPointChanged(value) {
+    setState(() {
+      wayPoints = value;
     });
   }
 }
@@ -114,6 +151,8 @@ class _Body extends StatefulWidget {
   final int currentHour;
   final int currentMin;
   final int currentSec;
+  final Set<Marker> wayPoint;
+  final ValueChanged onWayPointChanged;
   final ValueChanged onHourChanged;
   final ValueChanged onMinChanged;
   final ValueChanged onSecChanged;
@@ -123,6 +162,8 @@ class _Body extends StatefulWidget {
     required this.currentHour,
     required this.currentMin,
     required this.currentSec,
+    required this.wayPoint,
+    required this.onWayPointChanged,
     required this.onHourChanged,
     required this.onMinChanged,
     required this.onSecChanged,
@@ -249,49 +290,7 @@ class _BodyState extends State<_Body> {
                             ),
                           ),
                         ),
-                        SizedBox(
-                          height: 400,
-                          child: PageView(
-                            physics: BouncingScrollPhysics(),
-                            controller: widget.pageController,
-                            scrollDirection: Axis.horizontal,
-                            children: [
-                              SizedBox(
-                                width: screenWidth,
-                                height: 400,
-                                child: Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: MapScreen(),
-                                  ),
-                                  elevation: 0,
-                                ),
-                              ),
-                              SizedBox(
-                                width: screenWidth,
-                                height: 400,
-                                child: Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: MapScreen(),
-                                  ),
-                                  elevation: 0,
-                                ),
-                              ),
-                              SizedBox(
-                                width: screenWidth,
-                                height: 400,
-                                child: Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: MapScreen(),
-                                  ),
-                                  elevation: 0,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        mapScreenBuilder(context, screenWidth),
                       ],
                     ),
                   ),
@@ -304,29 +303,123 @@ class _BodyState extends State<_Body> {
     );
   }
 
-  void _showTimeSelectDialog(){
-    showDialog(
-      context: context,
-      builder: (BuildContext context){
-        return AlertDialog(
-          title: Text('시간을 선택해주세요'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('시간을 선택해주세요'),
-              ],
+  // void _showTimeSelectDialog() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('시간을 선택해주세요'),
+  //         content: SingleChildScrollView(
+  //           child: ListBody(
+  //             children: <Widget>[
+  //               Text('시간을 선택해주세요'),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             child: Text('확인'),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+
+  Widget mapScreenBuilder(BuildContext context, double screenWidth) {
+    if (check == true) {
+      return SizedBox(
+        height: 400,
+        child: PageView(
+          physics: BouncingScrollPhysics(),
+          controller: widget.pageController,
+          scrollDirection: Axis.horizontal,
+          children: [
+            SizedBox(
+              width: screenWidth,
+              height: 400,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: MapScreen(Path: resultsString[0],),
+                ),
+                elevation: 0,
+              ),
             ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('확인'),
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
+            SizedBox(
+              width: screenWidth,
+              height: 400,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: MapScreen(Path: resultsString[1],),
+                ),
+                elevation: 0,
+              ),
+            ),
+            SizedBox(
+              width: screenWidth,
+              height: 400,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        check = !check;
+                      });
+                    },
+                    child: Text('산책 경로를 설정해주세요'),
+                  ),
+                ),
+                elevation: 0,
+              ),
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+    } else {
+      return SizedBox(
+        width: screenWidth,
+        height: 400,
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  check = !check;
+                });
+              },
+              child: Center(
+                child: IconButton(
+                  onPressed: () async {
+                    setState(
+                      () async {
+                        Set<Marker> wayPoint = await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (__) => MakePath(),
+                          ),
+                        );
+                        widget.onWayPointChanged(wayPoint);
+                        check = true;
+                      },
+                    );
+                  },
+                  icon: Icon(Icons.add),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
+
+  //서버로부터 받은 polyline을 decode한 결과, 더미 데이터
+  final List<PointLatLng> results = PolylinePoints().decodePolyline(
+      '{wqcFov`dW??RFXHDBb@L????YbB????l@T????RF????AFu@xDSbB????DB????EC????RcBt@yD@G????SG????m@U????XcB????c@MECYISG??');
 }

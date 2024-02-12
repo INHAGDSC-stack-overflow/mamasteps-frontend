@@ -30,13 +30,13 @@ class _GoogleLoginState extends State<GoogleLogin> {
       print('photoUrl = ${googleUser.photoUrl}');
 
       try {
-        // // final response = await sendPostRequest(
-        // //   email: googleUser.email,
-        // //   id: googleUser.id,
-        // //   name: googleUser.displayName ?? 'DefaultName',
-        // );
-        //
-        // print('Server Response: $response');
+        // final response = await sendPostRequest(
+        //   email: googleUser.email,
+        //   id: googleUser.id,
+        //   name: googleUser.displayName ?? 'DefaultName',
+        //);
+
+        //print('Server Response: $response');
         if (/*response == '성공'*/ REFRESH_TOKEN_KEY != '') {
           Navigator.push(
               context,
