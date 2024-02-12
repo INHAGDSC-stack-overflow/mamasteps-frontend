@@ -116,15 +116,17 @@ class _SignUpPageState extends State<SignUpPage> {
     final url = 'https://dev.mamasteps.dev/api/v1/auth/signup';
 
     final Map<String, dynamic> requestData = {
-      "profileImage": widget.userPhotoUrl,
       "email": widget.userEmail,
       "name": userInformation[0],
       "age": int.parse(userInformation[1]),
-      "pregnancyStartDate": selectedDate?.toString() ?? '',
+      "pregnancyStartDate": (selectedDate?.toIso8601String() ?? '') + 'Z',
       "guardianPhoneNumber": userInformation[3],
-      "activityLevel": userInformation[2],
+      "profileImage": widget.userPhotoUrl,
+      "activityLevel": "HIGH",
       "walkPreferences": convertToWalkPreferencesList(scheduleData)
     };
+
+    print(requestData);
 
     try {
       final response = await http.post(
