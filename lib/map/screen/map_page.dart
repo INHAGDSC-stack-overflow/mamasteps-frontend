@@ -1,8 +1,11 @@
+
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/http.dart';
 import 'package:mamasteps_frontend/map/screen/make_path.dart';
 import 'package:mamasteps_frontend/map/screen/map_screen.dart';
 import 'package:mamasteps_frontend/map/screen/tracking_page.dart';
@@ -28,7 +31,9 @@ class _MapPageState extends State<MapPage> {
   int currentHour = 0;
   int currentMin = 0;
   int currentSec = 0;
+  int totalSec = 0;
   Set<Marker> wayPoints = {};
+  List<String> resultsString=[];
 
   @override
   void initState() {
@@ -46,17 +51,18 @@ class _MapPageState extends State<MapPage> {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TrackingScreen(
-                  Path: resultsString[0],
-                  hour: currentHour,
-                  minute: currentMin,
-                  second: currentSec,
-                ),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => TrackingScreen(
+            //       Path: resultsString[0],
+            //       hour: currentHour,
+            //       minute: currentMin,
+            //       second: currentSec,
+            //     ),
+            //   ),
+            // );
+
           },
           child: Text('산책 시작'),
           backgroundColor: Color(0xFFF5F5F5),
@@ -103,6 +109,57 @@ class _MapPageState extends State<MapPage> {
     setState(() {
       wayPoints = value;
     });
+  }
+
+  void serverToClientTimeConvert(value) {
+    setState(() {
+      totalSec = value;
+      currentHour = value ~/ 3600;
+      currentMin = (value % 3600) ~/ 60;
+      currentSec = value % 60;
+    });
+  }
+
+  void clientToServerTimeConvert(value) {
+    setState(() {
+      totalSec += currentHour * 3600;
+      totalSec += currentMin * 60;
+      totalSec += currentSec;
+    });
+  }
+
+  void makeRequest() async {}
+
+  Future<String> sendPostRequest({
+    required Set<Marker> wayPoints,
+    required int totalSec,
+  }) async {
+    final String apiUrl = 'http://3.38.34.206:8080/api/v1/auth/login';
+
+    Map<String, dynamic> requestData = {
+      "wayPoints": wayPoints,
+      "totalSec": totalSec,
+    };
+
+    String requestBody = json.encode(requestData);
+
+    try {
+      final http.Response response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        return 'POST request successful! Response: ${utf8.decode(response.bodyBytes)}';
+      } else {
+        return 'Failed to send POST request. Status code: ${response.statusCode}\nResponse: ${utf8.decode(response.bodyBytes)}';
+      }
+    } catch (error) {
+      return 'Error sending POST request: $error';
+    }
   }
 }
 
@@ -344,7 +401,9 @@ class _BodyState extends State<_Body> {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: MapScreen(Path: resultsString[0],),
+                  child: MapScreen(
+                    Path: resultsString[0],
+                  ),
                 ),
                 elevation: 0,
               ),
@@ -355,7 +414,9 @@ class _BodyState extends State<_Body> {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: MapScreen(Path: resultsString[1],),
+                  child: MapScreen(
+                    Path: resultsString[1],
+                  ),
                 ),
                 elevation: 0,
               ),
@@ -388,29 +449,22 @@ class _BodyState extends State<_Body> {
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextButton(
-              onPressed: () {
-                setState(() {
-                  check = !check;
-                });
-              },
-              child: Center(
-                child: IconButton(
-                  onPressed: () async {
-                    setState(
-                      () async {
-                        Set<Marker> wayPoint = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (__) => MakePath(),
-                          ),
-                        );
-                        widget.onWayPointChanged(wayPoint);
-                        check = true;
-                      },
-                    );
-                  },
-                  icon: Icon(Icons.add),
-                ),
+            child: Center(
+              child: IconButton(
+                onPressed: () async {
+                  setState(
+                    () async {
+                      Set<Marker> wayPoint = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (__) => MakePath(),
+                        ),
+                      );
+                      widget.onWayPointChanged(wayPoint);
+                      check = true;
+                    },
+                  );
+                },
+                icon: Icon(Icons.add),
               ),
             ),
           ),
@@ -418,8 +472,4 @@ class _BodyState extends State<_Body> {
       );
     }
   }
-
-  //서버로부터 받은 polyline을 decode한 결과, 더미 데이터
-  final List<PointLatLng> results = PolylinePoints().decodePolyline(
-      '{wqcFov`dW??RFXHDBb@L????YbB????l@T????RF????AFu@xDSbB????DB????EC????RcBt@yD@G????SG????m@U????XcB????c@MECYISG??');
 }

@@ -19,7 +19,7 @@ class GoogleLogin extends StatefulWidget {
 
 class _GoogleLoginState extends State<GoogleLogin> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
-  final dio = Dio();
+
 
   void signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
