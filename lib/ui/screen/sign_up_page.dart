@@ -113,7 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void onSubmitPressed() async {
-    final url = 'http://dev.mamasteps.dev/api.v1/auth/signup';
+    final url = 'http://dev.mamasteps.dev/api/v1/auth/signup';
 
     final Map<String, dynamic> requestData = {
       "request": {
