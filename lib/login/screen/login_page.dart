@@ -20,24 +20,39 @@ class GoogleLogin extends StatefulWidget {
 class _GoogleLoginState extends State<GoogleLogin> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
 
-
   void signInWithGoogle() async {
+    await GoogleSignIn().signOut();
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     if (googleUser != null) {
-      print('name = ${googleUser.displayName}');
+      print('name = ${googleUser.email}');
       print('email = ${googleUser.email}');
-      print('id = ${googleUser.id}');
+      print('id = ${googleUser.displayName}');
       print('photoUrl = ${googleUser.photoUrl}');
 
-      try {
-        // final response = await sendPostRequest(
-        //   email: googleUser.email,
-        //   id: googleUser.id,
-        //   name: googleUser.displayName ?? 'DefaultName',
-        //);
+      final url = 'https://dev.mamasteps.dev/api/v1/auth/google-login';
 
-        //print('Server Response: $response');
-        if (/*response == '성공'*/ REFRESH_TOKEN_KEY != '') {
+      final Map<String, dynamic> requestData = {
+        "email": "string@naver.com",
+        "name": "${googleUser.email}",
+        "id": "${googleUser.displayName}",
+      };
+
+      print(requestData);
+
+      try {
+        final response = await http.post(
+          Uri.parse(url),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(requestData),
+        );
+
+        print('Server Response: ${response.statusCode}');
+        print('Exception: ${response.body}');
+
+        if (response.statusCode == 200) {
+          storage.write(key: ACCESS_TOKEN_KEY, value: response.body);
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -47,7 +62,11 @@ class _GoogleLoginState extends State<GoogleLogin> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SignUpPage(userEmail: googleUser.email, userId: googleUser.id, userName: googleUser.displayName, userPhotoUrl: googleUser.photoUrl),
+                builder: (context) => SignUpPage(
+                    userEmail: googleUser.email,
+                    userId: googleUser.id,
+                    userName: googleUser.displayName,
+                    userPhotoUrl: googleUser.photoUrl),
               ));
         }
       } catch (error) {
@@ -64,39 +83,6 @@ class _GoogleLoginState extends State<GoogleLogin> {
       // setState(() {
       //   _loginPlatform = LoginPlatform.google;
       // });
-    }
-  }
-
-  Future<String> sendPostRequest({
-    required String email,
-    required String id,
-    required String name,
-  }) async {
-    final String apiUrl = 'http://3.38.34.206:8080/api/v1/auth/login';
-
-    Map<String, dynamic> requestData = {
-      "email": "hjg000223@gmail.com",
-      "password": "password"
-    };
-
-    String requestBody = json.encode(requestData);
-
-    try {
-      final http.Response response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: requestBody,
-      );
-
-      if (response.statusCode == 200) {
-        return 'POST request successful! Response: ${utf8.decode(response.bodyBytes)}';
-      } else {
-        return 'Failed to send POST request. Status code: ${response.statusCode}\nResponse: ${utf8.decode(response.bodyBytes)}';
-      }
-    } catch (error) {
-      return 'Error sending POST request: $error';
     }
   }
 
