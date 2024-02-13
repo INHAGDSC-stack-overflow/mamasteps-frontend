@@ -32,7 +32,7 @@ class _GoogleLoginState extends State<GoogleLogin> {
       final url = 'https://dev.mamasteps.dev/api/v1/auth/google-login';
 
       final Map<String, dynamic> requestData = {
-        "email": "string@naver.com",
+        "email": "${googleUser.email}",
         "name": "${googleUser.email}",
         "id": "${googleUser.displayName}",
       };
