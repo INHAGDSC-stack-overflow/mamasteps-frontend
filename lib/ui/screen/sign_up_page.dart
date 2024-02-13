@@ -141,8 +141,7 @@ class _SignUpPageState extends State<SignUpPage> {
         // 성공적인 응답 처리, 예를 들어 새로운 화면으로 이동
         print('Success: ${response.body}');
       } else {
-        // 에러 응답 처리
-        print('Error: ${response.statusCode}, ${response.body}');
+        // 에러 응답 처리        print('Error: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
       // 예외 처리
