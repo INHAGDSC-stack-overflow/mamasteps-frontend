@@ -46,6 +46,7 @@ dependencies:
   http: ^1.2.0
   charts_flutter_updated: ^0.13.0
   table_calendar: ^3.0.9
+  flutter_sms: ^2.3.3
 
 dev_dependencies:
   flutter_test:
