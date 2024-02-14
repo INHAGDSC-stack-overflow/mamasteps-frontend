@@ -21,9 +21,13 @@ import 'package:http/http.dart' as http;
 class MakePath extends StatefulWidget {
   final int targetTime;
   final Position currentPosition;
+  final Set<Marker> startClosewayPoints;
+  final Set<Marker> endClosewayPoints;
   const MakePath({
     required this.targetTime,
     required this.currentPosition,
+    required this.startClosewayPoints,
+    required this.endClosewayPoints,
     super.key,
   });
 
@@ -36,8 +40,6 @@ class _MakePathState extends State<MakePath> {
   late BitmapDescriptor blue_marker;
   late GoogleMapController mapController;
   late Position currentPosition;
-  Set<Marker> startClosewayPoints = {};
-  Set<Marker> endClosewayPoints = {};
   CameraPosition? currentCameraPosition;
   int currentMarkerIndex = 0;
 
@@ -65,7 +67,7 @@ class _MakePathState extends State<MakePath> {
                     LatLng(widget.currentPosition.latitude, widget.currentPosition.longitude),
                 zoom: 14.0,
               ),
-              markers: startClosewayPoints.union(endClosewayPoints),
+              markers: widget.startClosewayPoints.union(widget.endClosewayPoints),
               mapType: MapType.normal,
               onMapCreated: _onMapCreated,
               onCameraMove: _onCameraMove,
@@ -85,8 +87,7 @@ class _MakePathState extends State<MakePath> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _makeRequest(widget.targetTime, widget.currentPosition,
-                              startClosewayPoints, endClosewayPoints);
+                          Navigator.pop(context);
                         });
                       },
                       child: Text('경로 검색'),
@@ -114,8 +115,8 @@ class _MakePathState extends State<MakePath> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          startClosewayPoints.clear();
-                          endClosewayPoints.clear();
+                          widget.startClosewayPoints.clear();
+                          widget.endClosewayPoints.clear();
                         });
                       },
                       child: Icon(Icons.delete),
@@ -149,7 +150,7 @@ class _MakePathState extends State<MakePath> {
     final markerId = MarkerId(center.toString());
     setState(
       () {
-        startClosewayPoints.add(
+        widget.startClosewayPoints.add(
           Marker(
             markerId: markerId,
             position: center,
@@ -163,7 +164,7 @@ class _MakePathState extends State<MakePath> {
             ),
           ),
         );
-        currentMarkerIndex = startClosewayPoints.length - 1;
+        currentMarkerIndex = widget.startClosewayPoints.length - 1;
       },
     );
   }
@@ -173,7 +174,7 @@ class _MakePathState extends State<MakePath> {
     final markerId = MarkerId(center.toString());
     setState(
       () {
-        endClosewayPoints.add(
+        widget.endClosewayPoints.add(
           Marker(
             markerId: markerId,
             position: center,
@@ -187,7 +188,7 @@ class _MakePathState extends State<MakePath> {
             ),
           ),
         );
-        currentMarkerIndex = endClosewayPoints.length - 1;
+        currentMarkerIndex = widget.endClosewayPoints.length - 1;
       },
     );
   }
@@ -195,10 +196,10 @@ class _MakePathState extends State<MakePath> {
   void _removeRedMarker(MarkerId markerId) {
     setState(
       () {
-        startClosewayPoints
+        widget.startClosewayPoints
             .removeWhere((marker) => marker.markerId == markerId);
-        if (currentMarkerIndex >= startClosewayPoints.length) {
-          currentMarkerIndex = startClosewayPoints.length - 1;
+        if (currentMarkerIndex >= widget.startClosewayPoints.length) {
+          currentMarkerIndex = widget.startClosewayPoints.length - 1;
         }
       },
     );
@@ -207,10 +208,10 @@ class _MakePathState extends State<MakePath> {
   void _removeBlueMarker(MarkerId markerId) {
     setState(
       () {
-        startClosewayPoints
+        widget.startClosewayPoints
             .removeWhere((marker) => marker.markerId == markerId);
-        if (currentMarkerIndex >= endClosewayPoints.length) {
-          currentMarkerIndex = endClosewayPoints.length - 1;
+        if (currentMarkerIndex >= widget.endClosewayPoints.length) {
+          currentMarkerIndex = widget.endClosewayPoints.length - 1;
         }
       },
     );
@@ -263,133 +264,4 @@ class _MakePathState extends State<MakePath> {
   void _onCameraMove(CameraPosition position) {
     currentCameraPosition = position;
   }
-
-  void _makeRequest(int totalSec, Position currentPosition,
-      Set<Marker> redMarker, Set<Marker> blueMarker) async {
-    final url = 'https://dev.mamasteps.dev/api/v1/routes/computeRoutes';
-    final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
-    List<Coordinate> redMarker = convertMarkersToList(startClosewayPoints);
-    List<Coordinate> blueMarker = convertMarkersToList(endClosewayPoints);
-
-    var requestData = RequestData(
-        targetTime: totalSec,
-        origin: Coordinate(
-            latitude: currentPosition.latitude,
-            longitude: currentPosition.longitude),
-        startCloseIntermediates: redMarker,
-        endCloseIntermediates: blueMarker);
-
-    Map<String, dynamic> jsonData = requestData.toJson();
-    String jsonString = jsonEncode(jsonData);
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $AccessToken',
-        },
-        body: jsonString,
-      );
-
-      print('Server Response: ${response.statusCode}');
-      print('Exception: ${response.body}');
-
-      if (response.statusCode == 200) {
-        Navigator.pop(context, response.body);
-      } else {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GoogleLogin(),
-          ),
-          (route) => false,
-        );
-      }
-    } catch (error) {
-      print('Error sending POST request: $error');
-    }
-  }
-
-  List<Coordinate> convertMarkersToList(Set<Marker> markers) {
-    return markers.map((marker) {
-      return Coordinate(
-        latitude: marker.position.latitude,
-        longitude: marker.position.longitude,
-      );
-    }).toList();
-  }
 }
-
-class RequestData {
-  final int targetTime;
-  final Coordinate origin;
-  final List<Coordinate> startCloseIntermediates;
-  final List<Coordinate> endCloseIntermediates;
-
-  RequestData({
-    required this.targetTime,
-    required this.origin,
-    required this.startCloseIntermediates,
-    required this.endCloseIntermediates,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'targetTime': targetTime,
-        'origin': origin.toJson(),
-        'startCloseIntermediates':
-            startCloseIntermediates.map((i) => i.toJson()).toList(),
-        'endCloseIntermediates':
-            endCloseIntermediates.map((i) => i.toJson()).toList(),
-      };
-}
-
-class Coordinate {
-  final double latitude;
-  final double longitude;
-
-  Coordinate({
-    required this.latitude,
-    required this.longitude,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'latitude': latitude,
-        'longitude': longitude,
-      };
-}
-
-// void _goToNextMarker() {
-//   if (markers.isNotEmpty) {
-//     setState(() {
-//       currentMarkerIndex = (currentMarkerIndex + 1) % markers.length;
-//     });
-//     final Marker nextmarker = markers.elementAt(currentMarkerIndex);
-//     mapController.animateCamera(
-//       CameraUpdate.newCameraPosition(
-//         CameraPosition(
-//           target: nextmarker.position,
-//           zoom: 14.0,
-//         ),
-//       ),
-//     );
-//   }
-// }
-//
-// void _goToPrevMarker() {
-//   if (markers.isNotEmpty) {
-//     setState(() {
-//       currentMarkerIndex =
-//           (currentMarkerIndex - 1 + markers.length) % markers.length;
-//     });
-//     final Marker prevMarker = markers.elementAt(currentMarkerIndex);
-//     mapController.animateCamera(
-//       CameraUpdate.newCameraPosition(
-//         CameraPosition(
-//           target: prevMarker.position,
-//           zoom: 14.0,
-//         ),
-//       ),
-//     );
-//   }
-// }

@@ -37,23 +37,6 @@ class _MapScreenState extends State<MapScreen> {
     //_determinePosition();
     super.initState();
   }
-  // getinformation() async {
-  //   final dio = Dio();
-  //   final resp = await dio.get(
-  //     'ip 주소 입력',
-  //     options: Options(
-  //       headers: {
-  //         'authorization': 'Bearer $accessToken',
-  //       },
-  //     ),
-  //   );
-  //   final before_convert = PolylinePoints().decodePolyline(resp.data);
-  //   final after_convert = before_convert.map((point) {
-  //     return LatLng(point.latitude, point.longitude);
-  //   }).toList();
-  //   drawPolylines();
-  //   drawMarkers();
-  // }
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -6,11 +7,15 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart';
+import 'package:mamasteps_frontend/login/widget/google_login_components.dart';
 import 'package:mamasteps_frontend/map/component/google_map/pointlatlng_to_latlng.dart';
+import 'package:mamasteps_frontend/map/component/timer/convert.dart';
 import 'package:mamasteps_frontend/map/screen/make_path.dart';
 import 'package:mamasteps_frontend/map/screen/map_screen.dart';
 import 'package:mamasteps_frontend/map/screen/tracking_page.dart';
+import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:http/http.dart' as http;
 
 bool check = false;
 final List<String> resultsString = [
@@ -33,8 +38,21 @@ class _MapPageState extends State<MapPage> {
   int currentMin = 0;
   int currentSec = 0;
   int totalSec = 0;
+  Set<Marker> startClosewayPoints = {};
+  Set<Marker> endClosewayPoints = {};
   late Position currentPosition;
-  List<String> resultsString = [];
+  RequestData requestData = RequestData(
+    targetTime: 0,
+    origin: Coordinate(latitude: 0, longitude: 0),
+    startCloseIntermediates: [],
+    endCloseIntermediates: [],
+  );
+  ApiResponse apiResponse = ApiResponse(
+    isSuccess: false,
+    code: '',
+    message: '',
+    result: [],
+  );
 
   @override
   void initState() {
@@ -86,8 +104,12 @@ class _MapPageState extends State<MapPage> {
                 onHourChanged: onHourChanged,
                 onMinChanged: onMinChanged,
                 onSecChanged: onSecChanged,
+                apiResponse: apiResponse,
+                endClosewayPoints: endClosewayPoints,
+                startClosewayPoints: startClosewayPoints,
                 pageController: pageController,
-                currentPosition: currentPosition),
+                currentPosition: currentPosition,
+                makeRequest: makeRequest),
           ],
         ),
       ),
@@ -151,7 +173,7 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void clientToServerTimeConvert(value) {
+  void clientToServerTimeConvert() {
     setState(() {
       totalSec += currentHour * 3600;
       totalSec += currentMin * 60;
@@ -161,8 +183,74 @@ class _MapPageState extends State<MapPage> {
 
   void acceptResponse(value) {
     setState(() {
-      resultsString = value;
+      apiResponse = ApiResponse.fromJson(value);
+      if (apiResponse.isSuccess) {
+        final List<String> results =
+            apiResponse.result.map((route) => route.polyLine).toList();
+        acceptResponse(results);
+      } else {
+        print('Server Error');
+      }
     });
+  }
+
+  void makeRequest() async {
+    final url = 'https://dev.mamasteps.dev/api/v1/routes/computeRoutes';
+    final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
+
+    List<Coordinate> redMarker = convertMarkersToList(startClosewayPoints);
+    List<Coordinate> blueMarker = convertMarkersToList(endClosewayPoints);
+
+    clientToServerTimeConvert();
+
+    var requestData = RequestData(
+        targetTime: totalSec,
+        origin: Coordinate(
+            latitude: currentPosition.latitude,
+            longitude: currentPosition.longitude),
+        startCloseIntermediates: redMarker,
+        endCloseIntermediates: blueMarker);
+
+    Map<String, dynamic> jsonData = requestData.toJson();
+    String jsonString = jsonEncode(jsonData);
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $AccessToken',
+        },
+        body: jsonString,
+      );
+
+      print('Server Response: ${response.statusCode}');
+      print('Exception: ${response.body}');
+
+      if (response.statusCode == 200) {
+        acceptResponse(response.body);
+      } else {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GoogleLogin(),
+          ),
+          (route) => false,
+        );
+        print('Server Error');
+      }
+    } catch (error) {
+      print('Server Error');
+    }
+  }
+
+  List<Coordinate> convertMarkersToList(Set<Marker> markers) {
+    return markers.map((marker) {
+      return Coordinate(
+        latitude: marker.position.latitude,
+        longitude: marker.position.longitude,
+      );
+    }).toList();
   }
 }
 
@@ -214,7 +302,11 @@ class _Body extends StatefulWidget {
   final ValueChanged onHourChanged;
   final ValueChanged onMinChanged;
   final ValueChanged onSecChanged;
+  final Set<Marker> startClosewayPoints;
+  final Set<Marker> endClosewayPoints;
   final Position currentPosition;
+  final void makeRequest;
+  final ApiResponse apiResponse;
   const _Body({
     super.key,
     required this.pageController,
@@ -224,7 +316,11 @@ class _Body extends StatefulWidget {
     required this.onHourChanged,
     required this.onMinChanged,
     required this.onSecChanged,
+    required this.startClosewayPoints,
+    required this.endClosewayPoints,
     required this.currentPosition,
+    required this.makeRequest,
+    required this.apiResponse,
   });
 
   @override
@@ -233,6 +329,7 @@ class _Body extends StatefulWidget {
 
 class _BodyState extends State<_Body> {
   late int totalSec;
+  List<String> resultsString = [];
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -245,65 +342,44 @@ class _BodyState extends State<_Body> {
   }
 
   Widget mapScreenBuilder(BuildContext context, double screenWidth) {
-    if (check == true) {
+    if (widget.apiResponse.isSuccess == true) {
+      // 서버에 요청하여 경로가 생성되었을 때
       return Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: SizedBox(
           height: 500,
-          child: PageView(
-            physics: BouncingScrollPhysics(),
-            controller: widget.pageController,
-            scrollDirection: Axis.horizontal,
-            children: [
-              SizedBox(
-                width: screenWidth,
-                height: 400,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MapScreen(
-                      Path: resultsString[0],
+          child: PageView.builder(
+              physics: BouncingScrollPhysics(),
+              controller: widget.pageController,
+              scrollDirection: Axis.horizontal,
+              itemCount: resultsString.length + 1,
+              itemBuilder: (context, index) {
+                if (index == resultsString.length) {
+                  // 마지막 페이지에 도달 했을 때
+                  return Container(
+                    child: Text('마지막 페이지'),
+                  );
+                } else {
+                  // 마지막 페이지가 아닐 때
+                  return SizedBox(
+                    width: screenWidth,
+                    height: 400,
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: MapScreen(
+                          Path: widget.apiResponse.result[index].polyLine,
+                        ),
+                      ),
+                      elevation: 0,
                     ),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-              SizedBox(
-                width: screenWidth,
-                height: 400,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MapScreen(
-                      Path: resultsString[1],
-                    ),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-              SizedBox(
-                width: screenWidth,
-                height: 400,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextButton(
-                      onPressed: () {
-                        setState(() {
-                          check = !check;
-                        });
-                      },
-                      child: Text('산책 경로를 설정해주세요'),
-                    ),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-            ],
-          ),
+                  );
+                }
+              }),
         ),
       );
     } else {
+      // 경로가 없어서 서버에 페이지 요청하기 위해 정보를 입력하는 페이지
       return Column(
         children: [
           const SizedBox(height: 15),
@@ -435,10 +511,13 @@ class _BodyState extends State<_Body> {
                                   builder: (context) => MakePath(
                                     currentPosition: widget.currentPosition,
                                     targetTime: totalSec,
-                                    // onWayPointChanged: widget.onWayPointChanged,
+                                    endClosewayPoints: widget.endClosewayPoints,
+                                    startClosewayPoints:
+                                        widget.startClosewayPoints,
                                   ),
                                 ),
                               );
+                              widget.makeRequest;
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: (widget.currentHour == 0 &&
@@ -519,6 +598,114 @@ class _BodyState extends State<_Body> {
           widget.currentSec;
     });
   }
+}
+
+class RequestData {
+  final int targetTime;
+  final Coordinate origin;
+  final List<Coordinate> startCloseIntermediates;
+  final List<Coordinate> endCloseIntermediates;
+
+  RequestData({
+    required this.targetTime,
+    required this.origin,
+    required this.startCloseIntermediates,
+    required this.endCloseIntermediates,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'targetTime': targetTime,
+        'origin': origin.toJson(),
+        'startCloseIntermediates':
+            startCloseIntermediates.map((i) => i.toJson()).toList(),
+        'endCloseIntermediates':
+            endCloseIntermediates.map((i) => i.toJson()).toList(),
+      };
+}
+
+class Coordinate {
+  final double latitude;
+  final double longitude;
+
+  Coordinate({
+    required this.latitude,
+    required this.longitude,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'latitude': latitude,
+        'longitude': longitude,
+      };
+}
+
+class ApiResponse {
+  final bool isSuccess;
+  final String code;
+  final String message;
+  final List<Route> result;
+
+  ApiResponse({
+    required this.isSuccess,
+    required this.code,
+    required this.message,
+    required this.result,
+  });
+
+  factory ApiResponse.fromJson(Map<String, dynamic> json) => ApiResponse(
+        isSuccess: json['isSuccess'],
+        code: json['code'],
+        message: json['message'],
+        result: List<Route>.from(json['result'].map((x) => Route.fromJson(x))),
+      );
+}
+
+class Route {
+  final int routeId;
+  final int routesProfileId;
+  final CreatedWaypoint createdWaypoint;
+  final String polyLine;
+  final int totalDistanceMeters;
+  final int totalTimeSeconds;
+  final String createdAt;
+  final String updatedAt;
+
+  Route({
+    required this.routeId,
+    required this.routesProfileId,
+    required this.createdWaypoint,
+    required this.polyLine,
+    required this.totalDistanceMeters,
+    required this.totalTimeSeconds,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Route.fromJson(Map<String, dynamic> json) => Route(
+        routeId: json['routeId'],
+        routesProfileId: json['routesProfileId'],
+        createdWaypoint: CreatedWaypoint.fromJson(json['createdWaypoint']),
+        polyLine: json['polyLine'],
+        totalDistanceMeters: json['totalDistanceMeters'],
+        totalTimeSeconds: json['totalTimeSeconds'],
+        createdAt: json['createdAt'],
+        updatedAt: json['updatedAt'],
+      );
+}
+
+class CreatedWaypoint {
+  final double latitude;
+  final double longitude;
+
+  CreatedWaypoint({
+    required this.latitude,
+    required this.longitude,
+  });
+
+  factory CreatedWaypoint.fromJson(Map<String, dynamic> json) =>
+      CreatedWaypoint(
+        latitude: json['latitude'].toDouble(),
+        longitude: json['longitude'].toDouble(),
+      );
 }
 
 // void _showTimeSelectDialog() {
