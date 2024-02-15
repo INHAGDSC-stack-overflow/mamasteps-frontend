@@ -14,18 +14,18 @@ import 'package:mamasteps_frontend/map/screen/map_page.dart';
 class TrackingScreen extends StatefulWidget {
   // final List<List<PointLatLng>> results;
   final String Path;
-  final int hour;
-  final int minute;
-  final int second;
+  // final int hour;
+  // final int minute;
+  // final int second;
   final int totalSeconds;
   final Position currentInitPosition;
   const TrackingScreen({
     super.key,
     // required this.results,
     required this.Path,
-    required this.hour,
-    required this.minute,
-    required this.second,
+    // required this.hour,
+    // required this.minute,
+    // required this.second,
     required this.currentInitPosition,
     required this.totalSeconds,
   });
@@ -64,23 +64,6 @@ class _TrackingScreenState extends State<TrackingScreen> {
     initTimeSet(widget.totalSeconds, numbers, hour, minute, second);
     super.initState();
   }
-  // getinformation() async {
-  //   final dio = Dio();
-  //   final resp = await dio.get(
-  //     'ip 주소 입력',
-  //     options: Options(
-  //       headers: {
-  //         'authorization': 'Bearer $accessToken',
-  //       },
-  //     ),
-  //   );
-  //   final before_convert = PolylinePoints().decodePolyline(resp.data);
-  //   final after_convert = before_convert.map((point) {
-  //     return LatLng(point.latitude, point.longitude);
-  //   }).toList();
-  //   drawPolylines();
-  //   drawMarkers();
-  // }
 
   @override
   void dispose() {
@@ -199,7 +182,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           position.latitude,
           position.longitude,
         );
-        if(widget.minute == 0 && widget.second == 0 && widget.hour == 0 && distance < 10){// 목적지에 도착했을 때, 시간과 거리로 판단
+        if(minute == 0 && second == 0 && hour == 0 && distance < 10){// 목적지에 도착했을 때, 시간과 거리로 판단
           movementTimer?.cancel();
           movementTimer = null;
           // 위치 구독 해제 코드 추가해야함

@@ -6,28 +6,25 @@
   - undo 기능과(보류) 경유지 전체 삭제 기능이 존재해야함
 */
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:mamasteps_frontend/login/screen/login_page.dart';
-import 'package:mamasteps_frontend/map/component/google_map/pointlatlng_to_latlng.dart';
-import 'package:mamasteps_frontend/map/screen/map_screen.dart';
-import 'package:mamasteps_frontend/storage/login/login_data.dart';
-import 'package:http/http.dart' as http;
+
 
 class MakePath extends StatefulWidget {
   final int targetTime;
   final Position currentPosition;
   final Set<Marker> startClosewayPoints;
   final Set<Marker> endClosewayPoints;
+  final void Function(Function(String), BuildContext) makeRequest;
+  final void Function(String) callback;
   const MakePath({
     required this.targetTime,
     required this.currentPosition,
     required this.startClosewayPoints,
     required this.endClosewayPoints,
+    required this.makeRequest,
+    required this.callback,
     super.key,
   });
 
@@ -87,7 +84,12 @@ class _MakePathState extends State<MakePath> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          Navigator.pop(context);
+                          widget.makeRequest(
+                            (String response) {
+                              widget.callback(response);
+                            },
+                            context,
+                          );
                         });
                       },
                       child: Text('경로 검색'),
@@ -265,3 +267,12 @@ class _MakePathState extends State<MakePath> {
     currentCameraPosition = position;
   }
 }
+
+
+// import 'package:mamasteps_frontend/login/screen/login_page.dart';
+// import 'package:mamasteps_frontend/map/component/google_map/pointlatlng_to_latlng.dart';
+// import 'package:mamasteps_frontend/map/screen/map_screen.dart';
+// import 'package:mamasteps_frontend/storage/login/login_data.dart';
+// import 'package:http/http.dart' as http;
+// import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+// import 'dart:convert';
