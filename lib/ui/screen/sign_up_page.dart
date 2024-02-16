@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import 'package:mamasteps_frontend/ui/data/contents.dart';
 import 'package:mamasteps_frontend/ui/layout/sign_up_default_layout.dart';
 import 'package:numberpicker/numberpicker.dart';
@@ -34,8 +36,8 @@ class _SignUpPageState extends State<SignUpPage> {
   DateTime? selectedDate;
   PageController _pageController = PageController(initialPage: 0);
   List<List<bool>> scheduleData = List.generate(
-    7, // 7일
-    (i) => List.generate(24, (j) => false), // 각 요일에 대한 데이터
+    7,
+        (i) => List.generate(24, (j) => false),
   );
 
   @override
@@ -54,36 +56,29 @@ class _SignUpPageState extends State<SignUpPage> {
                   controller: _pageController,
                   children: [
                     _nameSubPage(
-                      // 이름 입력 페이지
                       content: contents[0],
                       onChanged: onNameChanged,
                     ),
                     _ageSubPage(
-                      // 나이 입력 페이지
                       content: contents[1],
                       onChanged: onAgeChanged,
                     ),
                     _dateSubPage(
-                      // 임신 날짜 입력 페이지
                       content: contents[2],
                       dateController: _dateController,
-                      onTap:
-                          onDateChanged(selectedDate, context, _dateController),
+                      onTap: onDateChanged(selectedDate, context, _dateController),
                     ),
                     _activitiesSubPage(
-                      // 활동량 입력 페이지
                       onhighChanged: onHighActivitesChanged,
                       onmiddleChanged: onMiddleActivitesChanged,
                       onlowChanged: onLowActivitesChanged,
                       content: contents[3],
                     ),
                     _scheduleSubPage(
-                      // 산책 선호 시간 입력 페이지
                       content: contents[4],
                       scheduleData: scheduleData,
                     ),
                     _onNumberSubPage(
-                      // 보호자 전화번호 입력 페이지
                       content: contents[5],
                       onChanged: onChangeNumber,
                     ),
@@ -104,25 +99,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: Text('다음'),
                     ),
                     OutlinedButton(
-                        onPressed: () {
-                          print("유저구글이메일 : " + widget.userEmail);
-                          print("유저구글아이디 : " + widget.userId);
-                          print("유저구글사진 : " + widget.userPhotoUrl.toString());
-                          print("유저구글이름 : " + widget.userName.toString());
-                          print("이름 : " + userInformation[0].toString());
-                          print("나이 : " + userInformation[1].toString());
-                          print("임신 날짜 :" + selectedDate.toString());
-                          print("활동량 : " + userInformation[2].toString());
-                          print("월 산책 선호 시간 : " + scheduleData[0].toString());
-                          print("화 산책 선호 시간 : " + scheduleData[1].toString());
-                          print("수 산책 선호 시간 : " + scheduleData[2].toString());
-                          print("목 산책 선호 시간 : " + scheduleData[3].toString());
-                          print("금 산책 선호 시간 : " + scheduleData[4].toString());
-                          print("토 산책 선호 시간 : " + scheduleData[5].toString());
-                          print("일 산책 선호 시간 : " + scheduleData[6].toString());
-                          print("보호자 전화번호 : " + userInformation[3].toString());
-                        },
-                        child: Text('출력'))
+                      onPressed: onSubmitPressed,
+                      child: Text('출력'),
+                    )
                   ],
                 ),
               ),
@@ -131,6 +110,43 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
+  }
+
+  void onSubmitPressed() async {
+    final url = 'https://dev.mamasteps.dev/api/v1/auth/signup';
+
+    final Map<String, dynamic> requestData = {
+      "email": widget.userEmail,
+      "name": userInformation[0],
+      "age": int.parse(userInformation[1]),
+      "pregnancyStartDate": (selectedDate?.toIso8601String() ?? '') + 'Z',
+      "guardianPhoneNumber": userInformation[3],
+      "profileImage": widget.userPhotoUrl,
+      "activityLevel": "HIGH",
+      "walkPreferences": convertToWalkPreferencesList(scheduleData)
+    };
+
+    print(requestData);
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+        // 성공적인 응답 처리, 예를 들어 새로운 화면으로 이동
+        print('Success: ${response.body}');
+      } else {
+        // 에러 응답 처리        print('Error: ${response.statusCode}, ${response.body}');
+      }
+    } catch (e) {
+      // 예외 처리
+      print('Exception: $e');
+    }
   }
 
   void onNameChanged(value) {
@@ -268,9 +284,9 @@ class _dateSubPage extends StatefulWidget {
   final GestureTapCallback onTap;
   const _dateSubPage(
       {super.key,
-      required this.onTap,
-      required this.dateController,
-      required this.content});
+        required this.onTap,
+        required this.dateController,
+        required this.content});
 
   @override
   State<_dateSubPage> createState() => _dateSubPageState();
@@ -324,44 +340,44 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
         const SizedBox(height: 16.0),
         Container(
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          OutlinedButton(
-              onPressed: () {
-                widget.onhighChanged();
-              },
-              child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                side: BorderSide(
-                  width: 2,
-                ),
-              )),
-          OutlinedButton(
-              onPressed: () {
-                widget.onmiddleChanged();
-              },
-              child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  side: BorderSide(
-                    width: 2,
-                  ))),
-          OutlinedButton(
-              onPressed: () {
-                widget.onlowChanged();
-              },
-              child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  side: BorderSide(
-                    width: 2,
-                  ))),
-        ])),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onhighChanged();
+                  },
+                  child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    side: BorderSide(
+                      width: 2,
+                    ),
+                  )),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onmiddleChanged();
+                  },
+                  child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                      ))),
+              OutlinedButton(
+                  onPressed: () {
+                    widget.onlowChanged();
+                  },
+                  child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
+                  style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                      ))),
+            ])),
       ],
     );
   }
@@ -474,4 +490,48 @@ class _onNumberSubPage extends StatelessWidget {
       ],
     );
   }
+}
+List<Map<String, dynamic>> convertToWalkPreferencesList(List<List<bool>> scheduleData) {
+  List<Map<String, dynamic>> walkPreferencesList = [];
+
+  for (int day = 0; day < 7; day++) {
+    int? startTime;
+    int? endTime;
+
+    for (int hour = 0; hour < 24; hour++) {
+      if (scheduleData[day][hour]) {
+        if (startTime == null) {
+          startTime = hour;
+        }
+      } else {
+        if (startTime != null) {
+          endTime = hour;
+          walkPreferencesList.add({
+            'dayOfWeek': getDayOfWeek(day),
+            'startTime': startTime,
+            'endTime': endTime,
+          });
+          startTime = null;
+          endTime = null;
+        }
+      }
+    }
+
+    if (startTime != null && endTime == null) {
+      walkPreferencesList.add({
+        'dayOfWeek': getDayOfWeek(day),
+        'startTime': startTime,
+        'endTime': 24,
+      });
+    }
+  }
+
+  return walkPreferencesList;
+}
+
+String getDayOfWeek(int day) {
+  List<String> daysOfWeek = [
+    'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'
+  ];
+  return daysOfWeek[day];
 }

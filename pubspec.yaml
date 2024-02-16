@@ -45,6 +45,7 @@ dependencies:
   numberpicker: ^2.1.2
   http: ^1.2.0
   charts_flutter_updated: ^0.13.0
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:
