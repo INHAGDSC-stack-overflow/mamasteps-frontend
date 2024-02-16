@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void debugcheck(){
-    if(ACCESS_TOKEN_KEY == ''){
+    if(ACCESS_TOKEN_KEY == ''){// 토큰이 없는 경우
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => GoogleLogin(),
@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
             (route) => false,
       );
     }
-    else {
+    else {// 토큰이 있는 경우
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => HomeScreen(),
