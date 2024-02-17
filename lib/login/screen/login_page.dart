@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 import 'package:mamasteps_frontend/ui/screen/sign_up_page.dart';
+import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
 
 class GoogleLogin extends StatefulWidget {
   const GoogleLogin({Key? key}) : super(key: key);
@@ -21,6 +22,7 @@ class _GoogleLoginState extends State<GoogleLogin> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
 
   void signInWithGoogle() async {
+    deleteAll();
     await GoogleSignIn().signOut();
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     if (googleUser != null) {
@@ -52,12 +54,15 @@ class _GoogleLoginState extends State<GoogleLogin> {
         print('Exception: ${response.body}');
 
         if (response.statusCode == 200) {
-          storage.write(key: ACCESS_TOKEN_KEY, value: response.body);
-          Navigator.push(
+          Map<String, dynamic> data = jsonDecode(response.body);
+          String accessToken = data['result']['access_token'];
+          await storage.write(key: 'access_token', value: accessToken);
+          Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (context) => RootTab(),
-              ));
+                builder: (context) => SplashScreen(),
+              ),
+              (route) => false);
         } else {
           Navigator.push(
               context,
@@ -104,16 +109,16 @@ class _GoogleLoginState extends State<GoogleLogin> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.blue,
+        color: Color(0xffa412db),
         width: double.infinity,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.abc, size: 100, color: Colors.white),
-              const SizedBox(height: 20),
+              Image.asset('asset/image/mamasteps_logo.png', width: 200,),
+              const SizedBox(height: 24),
               _loginButton('continue_with_google', signInWithGoogle),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               _loginButton('google_sign_up', signInWithGoogle),
             ],
           ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mamasteps_frontend/login/widget/google_login_components.dart';
+import 'package:mamasteps_frontend/login/screen/login_page.dart';
 import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:mamasteps_frontend/storage/login/login_data.dart';

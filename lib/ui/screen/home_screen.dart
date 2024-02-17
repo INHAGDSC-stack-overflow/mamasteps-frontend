@@ -89,7 +89,7 @@ class _Header extends StatelessWidget {
                 child: Text(
                   weeks.toString(),
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 52,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -114,11 +114,11 @@ class _Header extends StatelessWidget {
   }
 }
 
-class OrdinalSales {
-  final String year;
+class walkTime {
+  final String day_of_week;
   final int sales;
 
-  OrdinalSales(this.year, this.sales);
+  walkTime(this.day_of_week, this.sales);
 }
 
 class SimpleBarChart extends StatelessWidget {
@@ -126,31 +126,43 @@ class SimpleBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<OrdinalSales> seriesList = [
-      OrdinalSales(
-        '2014',
+    final List<walkTime> seriesList = [
+      walkTime(
+        '월',
         1,
       ),
-      OrdinalSales(
-        '2015',
+      walkTime(
+        '화',
         2,
       ),
-      OrdinalSales(
-        '2016',
+      walkTime(
+        '수',
         3,
       ),
-      OrdinalSales(
-        '2017',
+      walkTime(
+        '목',
         4,
+      ),
+      walkTime(
+        '금',
+        5,
+      ),
+      walkTime(
+        '토',
+        6,
+      ),
+      walkTime(
+        '일',
+        7,
       ),
     ];
 
-    List<charts.Series<OrdinalSales, String>> series = [
+    List<charts.Series<walkTime, String>> series = [
       charts.Series(
         id: 'Sales',
         data: seriesList,
-        domainFn: (OrdinalSales sales, _) => sales.year,
-        measureFn: (OrdinalSales sales, _) => sales.sales,
+        domainFn: (walkTime day_of_week, _) => day_of_week.day_of_week,
+        measureFn: (walkTime time, _) => time.sales,
       ),
     ];
 
@@ -166,6 +178,8 @@ class SimpleBarChart extends StatelessWidget {
               charts.RangeAnnotationAxisType.measure,
               color: charts.MaterialPalette.gray.shadeDefault,
               startLabel: 'recommended',
+              labelDirection: charts.AnnotationLabelDirection.horizontal,
+              labelAnchor: charts.AnnotationLabelAnchor.start,
             ),
           ],
         ),
@@ -208,7 +222,7 @@ List<Widget> buildWidgetsList(
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Color(0xffa412db),
                 ),
               ),
             ),
@@ -242,7 +256,7 @@ List<Widget> buildWidgetsList(
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Color(0xffa412db),
                 ),
               ),
             ),
@@ -314,7 +328,7 @@ List<Widget> buildWidgetsList(
                       height: 20,
                       width: progressBarWidth,
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: Color(0xffa412db),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),

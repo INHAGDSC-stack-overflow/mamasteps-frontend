@@ -73,74 +73,81 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
             const SizedBox(height: 15),
             Expanded(
               flex: 3,
-              child: Column(
-                children: [
-                  TableCalendar(
-                    // 캘린더
-                    locale: 'ko_KR',
-                    firstDay: DateTime.utc(2010, 10, 16),
-                    lastDay: DateTime.utc(2030, 3, 14),
-                    focusedDay: focusedDay,
-                    onDaySelected: _onDaySelected,
-                    selectedDayPredicate: (DateTime day) {
-                      return isSameDay(selectedDay, day);
-                    },
-                    eventLoader: _getEventsForDay,
-                  ),
-                  Padding(
-                    //날짜 출력부
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        DateFormat('yyyy년 MM월 dd일 산책일정').format(selectedDay),
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.normal),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Card(
+                      child: TableCalendar(
+                        // 캘린더
+                        locale: 'ko_KR',
+                        firstDay: DateTime.utc(2010, 10, 16),
+                        lastDay: DateTime.utc(2030, 3, 14),
+                        focusedDay: focusedDay,
+                        onDaySelected: _onDaySelected,
+                        selectedDayPredicate: (DateTime day) {
+                          return isSameDay(selectedDay, day);
+                        },
+                        eventLoader: _getEventsForDay,
                       ),
                     ),
-                  ),
-                  Expanded(
-                    // 이벤트 리스트 출력부
-                    child: ValueListenableBuilder<List<Event>>(
-                      valueListenable: selectedEvents,
-                      builder: (context, value, _) {
-                        return ListView.builder(
-                          itemCount: value.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: InkWell(
-                                onTap: () {
-                                  _showEditDialog(index);
-                                },
-                                child: SizedBox(
-                                  height: 50,
-                                  child: Card(
-                                    color: Colors.white,
-                                    elevation: 0,
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: Align(
-                                          child: Text(
-                                            value[index].title,
-                                            style: TextStyle(
-                                              color: Colors.blue,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w600,
+                    const SizedBox(height: 15),
+                    Padding(
+                      //날짜 출력부
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          DateFormat('yyyy년 MM월 dd일 산책일정').format(selectedDay),
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.normal),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Expanded(
+                      // 이벤트 리스트 출력부
+                      child: ValueListenableBuilder<List<Event>>(
+                        valueListenable: selectedEvents,
+                        builder: (context, value, _) {
+                          return ListView.builder(
+                            itemCount: value.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: InkWell(
+                                  onTap: () {
+                                    _showEditDialog(index);
+                                  },
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: Card(
+                                      color: Colors.white,
+                                      elevation: 0,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: Align(
+                                            child: Text(
+                                              value[index].title,
+                                              style: TextStyle(
+                                                color: Color(0xffa412db),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
-                                          ),
-                                          alignment: Alignment.centerLeft),
+                                            alignment: Alignment.centerLeft),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

@@ -20,8 +20,9 @@ class _SplashScreenState extends State<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => debugcheck());
   }
 
-  void debugcheck(){
-    if(ACCESS_TOKEN_KEY == ''){// 토큰이 없는 경우
+  void debugcheck() async {
+    String? accessToken = await storage.read(key: 'access_token');
+    if(accessToken==null){// 토큰이 없는 경우
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => GoogleLogin(),
@@ -32,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
     else {// 토큰이 있는 경우
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (_) => HomeScreen(),
+          builder: (_) => RootTab(),
         ),
             (route) => false,
       );
