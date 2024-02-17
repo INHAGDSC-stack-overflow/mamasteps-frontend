@@ -43,6 +43,7 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   late int totalSec;
+  bool check = false;
   List<String> resultsString = [];
   @override
   Widget build(BuildContext context) {
@@ -51,12 +52,12 @@ class _BodyState extends State<Body> {
     return Expanded(
       flex: 3,
       child:
-      SingleChildScrollView(child: mapScreenBuilder(context, screenWidth)),
+          SingleChildScrollView(child: mapScreenBuilder(context, screenWidth)),
     );
   }
 
   Widget mapScreenBuilder(BuildContext context, double screenWidth) {
-    if (widget.apiResponse.isSuccess == true) {
+    if (check) {
       // 서버에 요청하여 경로가 생성되었을 때
       return Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -130,7 +131,7 @@ class _BodyState extends State<Body> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceEvenly,
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Container(
                                       alignment: Alignment.center,
@@ -227,18 +228,19 @@ class _BodyState extends State<Body> {
                                     targetTime: totalSec,
                                     endClosewayPoints: widget.endClosewayPoints,
                                     startClosewayPoints:
-                                    widget.startClosewayPoints,
+                                        widget.startClosewayPoints,
                                     makeRequest: widget.makeRequest,
                                     callback: widget.callBack,
+                                    onCheckChange: onCheckChange,
                                   ),
                                 ),
                               );
-                              widget.makeRequest;
+                              //widget.makeRequest;
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: (widget.currentHour == 0 &&
-                                  widget.currentMin == 0 &&
-                                  widget.currentSec == 0)
+                                      widget.currentMin == 0 &&
+                                      widget.currentSec == 0)
                                   ? Colors.grey
                                   : Colors.blue,
                             ),
@@ -279,7 +281,7 @@ class _BodyState extends State<Body> {
                         ),
                         SizedBox(
                           child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               setState(() {
                                 timeConvert();
                               });
@@ -289,6 +291,7 @@ class _BodyState extends State<Body> {
                                 },
                                 context,
                               );
+                              onCheckChange();
                             },
                             child: Text(
                               '경유지 없이 경로 만들기',
@@ -298,8 +301,8 @@ class _BodyState extends State<Body> {
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: (widget.currentHour == 0 &&
-                                  widget.currentMin == 0 &&
-                                  widget.currentSec == 0)
+                                      widget.currentMin == 0 &&
+                                      widget.currentSec == 0)
                                   ? Colors.grey
                                   : Colors.blue,
                             ),
@@ -322,6 +325,13 @@ class _BodyState extends State<Body> {
       totalSec = widget.currentHour * 3600 +
           widget.currentMin * 60 +
           widget.currentSec;
+    });
+  }
+
+  void onCheckChange() {
+    setState(() {
+      check = !check;
+      print("check 확인용 로그 :$check");
     });
   }
 }

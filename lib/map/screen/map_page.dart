@@ -22,6 +22,7 @@ import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:mamasteps_frontend/map/component/util/map_server_communication.dart';
 
+
 bool check = false;
 final List<String> resultsString = [
   '{wqcFov`dW??RFXHDBb@L????YbB????l@T????RF????AFu@xDSbB????DB????EC????RcBt@yD@G????SG????m@U????XcB????c@MECYISG??',
@@ -130,18 +131,13 @@ class _MapPageState extends State<MapPage> {
 
   void serverToClientTimeConvert(value) {
     setState(() {
-      totalSec = value;
-      currentHour = value ~/ 3600;
-      currentMin = (value % 3600) ~/ 60;
-      currentSec = value % 60;
+      totalToHMS(currentHour, currentMin, currentSec, totalSec);
     });
   }
 
   void clientToServerTimeConvert() {
     setState(() {
-      totalSec += currentHour * 3600;
-      totalSec += currentMin * 60;
-      totalSec += currentSec;
+      HMSToTotal(currentHour, currentMin, currentSec, totalSec);
     });
   }
 

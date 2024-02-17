@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mamasteps_frontend/login/widget/google_login_components.dart';
 import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:http/http.dart' as http;
@@ -54,32 +57,44 @@ import 'package:mamasteps_frontend/storage/login/login_data.dart';
 //   }
 // }
 
+// void makeRequest(Function(String) callBack, BuildContext context) async {
+//   final url = 'https://dev.mamasteps.dev/api/v1/routes/getRoutes';
+//   final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
+//
+//   try {
+//     final response = await http.get(
+//       Uri.parse(url),
+//       headers: <String, String>{
+//         'Authorization': 'Bearer $AccessToken',
+//       },
+//     );
+//
+//     print('Server Response: ${response.statusCode}');
+//     print('Exception: ${response.body}');
+//
+//     if (response.statusCode == 200) {
+//       callBack(response.body);
+//     } else {
+//       Navigator.pushAndRemoveUntil(
+//         context,
+//         MaterialPageRoute(
+//           builder: (context) => GoogleLogin(),
+//         ),
+//         (route) => false,
+//       );
+//     }
+//   } catch (error) {
+//     print(error);
+//   }
+// }
+
 void makeRequest(Function(String) callBack, BuildContext context) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/routes/getRoutes';
-  final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
 
   try {
-    final response = await http.get(
-      Uri.parse(url),
-      headers: <String, String>{
-        'Authorization': 'Bearer $AccessToken',
-      },
-    );
+    String jsonString = await rootBundle.loadString('asset/image/test.json');
+    final jsonResponse = jsonDecode(jsonString);
+    callBack(jsonResponse);
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
-
-    if (response.statusCode == 200) {
-      callBack(response.body);
-    } else {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => GoogleLogin(),
-        ),
-        (route) => false,
-      );
-    }
   } catch (error) {
     print(error);
   }

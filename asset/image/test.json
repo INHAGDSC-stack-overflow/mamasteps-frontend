@@ -1,0 +1,46 @@
+{
+  "isSuccess": true,
+  "code": "200",
+  "message": "Routes successfully retrieved.",
+  "result": [
+    {
+      "routeId": 1,
+      "routesProfileId": 101,
+      "createdWaypoint": {
+        "latitude": 37.7749,
+        "longitude": -122.4194
+      },
+      "polyLine": "{hacFmf`dWcoAglAeWxo@pU|ZnMiRnj@~j@tVeW",
+      "totalDistanceMeters": 5000,
+      "totalTimeSeconds": 2000,
+      "createdAt": "2021-01-01T00:00:00Z",
+      "updatedAt": "2021-01-02T00:00:00Z"
+    },
+    {
+      "routeId": 2,
+      "routesProfileId": 102,
+      "createdWaypoint": {
+        "latitude": 40.7128,
+        "longitude": -74.0060
+      },
+      "polyLine": "exqcFod`dWgAhGfAdZdRqGzFmReEtAkI}CgBaEgFF",
+      "totalDistanceMeters": 500,
+      "totalTimeSeconds": 2400,
+      "createdAt": "2021-02-01T00:00:00Z",
+      "updatedAt": "2021-02-02T00:00:00Z"
+    },
+    {
+      "routeId": 1,
+      "routesProfileId": 101,
+      "createdWaypoint": {
+        "latitude": 37.7749,
+        "longitude": -122.4194
+      },
+      "polyLine": "spqcFi_adWlF{/W@bBeEuAuCfQ`EtA_AvF",
+      "totalDistanceMeters": 5000,
+      "totalTimeSeconds": 1800,
+      "createdAt": "2021-01-01T00:00:00Z",
+      "updatedAt": "2021-01-02T00:00:00Z"
+    }
+  ]
+}

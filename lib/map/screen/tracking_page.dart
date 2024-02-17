@@ -61,7 +61,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     drawPolylines(polylines, resultList);
     drawMarkers(markers, resultList);
     _determinePosition();
-    initTimeSet(widget.totalSeconds, numbers, hour, minute, second);
+    totalToHMS(hour, minute, second, widget.totalSeconds);
     super.initState();
   }
 
@@ -102,13 +102,6 @@ class _TrackingScreenState extends State<TrackingScreen> {
         ),
       ),
     );
-  }
-
-  void initTimeSet(int totalsec,List<int> numbers, int hour, int min, int sec){
-    numbers = totalToHMS(totalsec);
-    hour = numbers[0];
-    min = numbers[1];
-    sec = numbers[2];
   }
   
   void currentMarker(){

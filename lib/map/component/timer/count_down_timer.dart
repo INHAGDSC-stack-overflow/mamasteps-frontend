@@ -28,7 +28,7 @@ class _countDownTimerState extends State<countDownTimer> {
   void initState() {
     super.initState();
     initTimer();
-    totalToHMS(widget.totalSeconds);
+    totalToHMS(hour, minute, second, widget.totalSeconds);
   }
 
   void initTimer() {
