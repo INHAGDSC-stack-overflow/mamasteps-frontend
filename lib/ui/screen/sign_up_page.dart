@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/ui/data/contents.dart';
 import 'package:mamasteps_frontend/ui/layout/sign_up_default_layout.dart';
+import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -25,6 +27,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  int currentPage = 0;
   final _dateController = TextEditingController();
   DateTime date = DateTime.now();
   List<String> userInformation = [
@@ -37,79 +40,127 @@ class _SignUpPageState extends State<SignUpPage> {
   PageController _pageController = PageController(initialPage: 0);
   List<List<bool>> scheduleData = List.generate(
     7,
-        (i) => List.generate(24, (j) => false),
+    (i) => List.generate(24, (j) => false),
   );
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: PageView(
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: _pageController,
-                  children: [
-                    _nameSubPage(
-                      content: contents[0],
-                      onChanged: onNameChanged,
-                    ),
-                    _ageSubPage(
-                      content: contents[1],
-                      onChanged: onAgeChanged,
-                    ),
-                    _dateSubPage(
-                      content: contents[2],
-                      dateController: _dateController,
-                      onTap: onDateChanged(selectedDate, context, _dateController),
-                    ),
-                    _activitiesSubPage(
-                      onhighChanged: onHighActivitesChanged,
-                      onmiddleChanged: onMiddleActivitesChanged,
-                      onlowChanged: onLowActivitesChanged,
-                      content: contents[3],
-                    ),
-                    _scheduleSubPage(
-                      content: contents[4],
-                      scheduleData: scheduleData,
-                    ),
-                    _onNumberSubPage(
-                      content: contents[5],
-                      onChanged: onChangeNumber,
-                    ),
-                  ],
-                ),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: Image.asset(
+                    'asset/image/sign_up_back_ground_image.png',
+                    fit: BoxFit.fill,
+                  )),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    OutlinedButton(
-                      onPressed: onPrevPressed,
-                      child: Text('이전'),
+                    Expanded(
+                      child: PageView(
+                        onPageChanged: onPageChanged,
+                        physics: NeverScrollableScrollPhysics(),
+                        controller: _pageController,
+                        children: [
+                          _nameSubPage(
+                            content: contents[0],
+                            onChanged: onNameChanged,
+                          ),
+                          _ageSubPage(
+                            content: contents[1],
+                            onChanged: onAgeChanged,
+                          ),
+                          _dateSubPage(
+                            content: contents[2],
+                            dateController: _dateController,
+                            onTap: onDateChanged(
+                                selectedDate, context, _dateController),
+                          ),
+                          _activitiesSubPage(
+                            onhighChanged: onHighActivitesChanged,
+                            onmiddleChanged: onMiddleActivitesChanged,
+                            onlowChanged: onLowActivitesChanged,
+                            content: contents[3],
+                          ),
+                          _scheduleSubPage(
+                            content: contents[4],
+                            scheduleData: scheduleData,
+                          ),
+                          _onNumberSubPage(
+                            content: contents[5],
+                            onChanged: onChangeNumber,
+                          ),
+                        ],
+                      ),
                     ),
-                    OutlinedButton(
-                      onPressed: onNextPressed,
-                      child: Text('다음'),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed:
+                                currentPage > 0 ? onPrevPressed : null,
+                            child: Text(
+                              '이전',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: currentPage > 0
+                                  ? Color(0xffa412db)
+                                  : Colors.grey,
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: currentPage < 5
+                                ? onNextPressed
+                                : onSubmitPressed,
+                            child: Text(
+                              currentPage < 5 ? '다음' : '제출',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: currentPage < 6
+                                  ? Color(0xffa412db)
+                                  : Colors.grey,
+                            ),
+                          ),
+                          // OutlinedButton(
+                          //   onPressed: onSubmitPressed,
+                          //   child: Text('출력'),
+                          // )
+                        ],
+                      ),
                     ),
-                    OutlinedButton(
-                      onPressed: onSubmitPressed,
-                      child: Text('출력'),
-                    )
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  void onPageChanged(int index) {
+    setState(() {
+      currentPage = index;
+    });
   }
 
   void onSubmitPressed() async {
@@ -140,8 +191,18 @@ class _SignUpPageState extends State<SignUpPage> {
       if (response.statusCode == 200) {
         // 성공적인 응답 처리, 예를 들어 새로운 화면으로 이동
         print('Success: ${response.body}');
+        Map<String, dynamic> data = jsonDecode(response.body);
+        String accessToken = data['result']['accessToken'];
+        storage.write(key: 'access_token', value: accessToken);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SplashScreen(),),
+          (route) => false,
+        );
       } else {
-        // 에러 응답 처리        print('Error: ${response.statusCode}, ${response.body}');
+        // 에러 응답 처리
+        print('Error: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
       // 예외 처리
@@ -238,13 +299,25 @@ class _nameSubPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(content),
+        Text(
+          content,
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
         const SizedBox(height: 16.0),
         TextFormField(
           autofocus: true,
           onChanged: onChanged,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+          ),
         ),
       ],
     );
@@ -265,13 +338,25 @@ class _ageSubPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(content),
+        Text(
+          content,
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
         const SizedBox(height: 16.0),
         TextFormField(
           autofocus: true,
           onChanged: onChanged,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+          ),
         ),
       ],
     );
@@ -284,9 +369,9 @@ class _dateSubPage extends StatefulWidget {
   final GestureTapCallback onTap;
   const _dateSubPage(
       {super.key,
-        required this.onTap,
-        required this.dateController,
-        required this.content});
+      required this.onTap,
+      required this.dateController,
+      required this.content});
 
   @override
   State<_dateSubPage> createState() => _dateSubPageState();
@@ -298,14 +383,26 @@ class _dateSubPageState extends State<_dateSubPage> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(widget.content),
+        Text(
+          widget.content,
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
         const SizedBox(height: 16.0),
         TextFormField(
           controller: widget.dateController,
           readOnly: true,
           onTap: widget.onTap,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+          ),
         ),
       ],
     );
@@ -336,48 +433,51 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(widget.content),
+        Text(
+          widget.content,
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
         const SizedBox(height: 16.0),
         Container(
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              OutlinedButton(
-                  onPressed: () {
-                    widget.onhighChanged();
-                  },
-                  child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    side: BorderSide(
-                      width: 2,
-                    ),
-                  )),
-              OutlinedButton(
-                  onPressed: () {
-                    widget.onmiddleChanged();
-                  },
-                  child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
-                  style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                      ))),
-              OutlinedButton(
-                  onPressed: () {
-                    widget.onlowChanged();
-                  },
-                  child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
-                  style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                      ))),
-            ])),
+          OutlinedButton(
+              onPressed: () {
+                widget.onhighChanged();
+              },
+              child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                side: BorderSide(
+                  width: 2,
+                ),
+              )),
+          OutlinedButton(
+              onPressed: () {
+                widget.onmiddleChanged();
+              },
+              child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  side: BorderSide(
+                    width: 2,
+                  ))),
+          OutlinedButton(
+              onPressed: () {
+                widget.onlowChanged();
+              },
+              child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
+              style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  side: BorderSide(
+                    width: 2,
+                  ))),
+        ])),
       ],
     );
   }
@@ -408,7 +508,10 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(widget.content),
+        Text(
+          widget.content,
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
         Expanded(
           child: SingleChildScrollView(
             child: Container(
@@ -479,19 +582,33 @@ class _onNumberSubPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(content),
+        Text(
+          content,
+          style: TextStyle(fontSize: 20, color: Colors.white),
+        ),
         const SizedBox(height: 16.0),
         TextFormField(
           autofocus: true,
           onChanged: onChanged,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+          ),
         ),
       ],
     );
   }
 }
-List<Map<String, dynamic>> convertToWalkPreferencesList(List<List<bool>> scheduleData) {
+
+List<Map<String, dynamic>> convertToWalkPreferencesList(
+    List<List<bool>> scheduleData) {
   List<Map<String, dynamic>> walkPreferencesList = [];
 
   for (int day = 0; day < 7; day++) {
@@ -531,7 +648,13 @@ List<Map<String, dynamic>> convertToWalkPreferencesList(List<List<bool>> schedul
 
 String getDayOfWeek(int day) {
   List<String> daysOfWeek = [
-    'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY',
+    'SUNDAY'
   ];
   return daysOfWeek[day];
 }
