@@ -89,7 +89,7 @@ class _Header extends StatelessWidget {
                 child: Text(
                   weeks.toString(),
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 52,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -222,7 +222,7 @@ List<Widget> buildWidgetsList(
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Color(0xffa412db),
                 ),
               ),
             ),
@@ -256,7 +256,7 @@ List<Widget> buildWidgetsList(
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: Color(0xffa412db),
                 ),
               ),
             ),
@@ -328,7 +328,7 @@ List<Widget> buildWidgetsList(
                       height: 20,
                       width: progressBarWidth,
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: Color(0xffa412db),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),

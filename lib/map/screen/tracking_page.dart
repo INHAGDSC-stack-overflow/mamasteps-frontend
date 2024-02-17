@@ -10,6 +10,7 @@ import 'package:mamasteps_frontend/map/component/google_map/pointlatlng_to_latln
 import 'package:mamasteps_frontend/map/component/timer/convert.dart';
 import 'package:mamasteps_frontend/map/component/timer/count_down_timer.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
+import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 
 class TrackingScreen extends StatefulWidget {
   // final List<List<PointLatLng>> results;
@@ -188,7 +189,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           // 위치 구독 해제 코드 추가해야함
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (_) => MapPage(),
+              builder: (_) => RootTab(),
             ),
                 (route) => false,
           );
@@ -222,7 +223,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MapPage(),
+                    builder: (context) => RootTab(),
                   ),
                       (route) => false,
                 );

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
+import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 
 Future<Position> getInitPosition() async {
   bool serviceEnabled;
