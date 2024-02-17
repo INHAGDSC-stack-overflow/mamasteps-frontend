@@ -17,7 +17,7 @@ class MakePath extends StatefulWidget {
   final Set<Marker> startClosewayPoints;
   final Set<Marker> endClosewayPoints;
   final void Function(Function(String), BuildContext) makeRequest;
-  final void Function(String) callback;
+  final void callback;
   final VoidCallback onCheckChange;
   const MakePath({
     required this.targetTime,

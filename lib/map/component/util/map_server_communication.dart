@@ -88,14 +88,15 @@ import 'package:mamasteps_frontend/storage/login/login_data.dart';
 //   }
 // }
 
-void makeRequest(Function(String) callBack, BuildContext context) async {
+Future<ApiResponse> makeRequest() async {
 
   try {
     String jsonString = await rootBundle.loadString('asset/image/test.json');
     final jsonResponse = jsonDecode(jsonString);
-    callBack(jsonResponse);
-
+    final ApiResponse apiResponse = ApiResponse.fromJson(jsonResponse);
+    return apiResponse;
   } catch (error) {
     print(error);
+    return Future.error(error);
   }
 }

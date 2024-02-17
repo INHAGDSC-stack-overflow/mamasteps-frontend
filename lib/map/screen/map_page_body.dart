@@ -17,9 +17,10 @@ class Body extends StatefulWidget {
   final Set<Marker> startClosewayPoints;
   final Set<Marker> endClosewayPoints;
   final Position currentPosition;
-  final void Function(Function(String), BuildContext) makeRequest;
-  final void Function(String) callBack;
+  final dynamic makeRequest;
+  final void callBack;
   final ApiResponse apiResponse;
+  // final dynamic acceptResponse;
   const Body({
     super.key,
     required this.pageController,
@@ -35,6 +36,7 @@ class Body extends StatefulWidget {
     required this.makeRequest,
     required this.callBack,
     required this.apiResponse,
+    // required this.acceptResponse,
   });
 
   @override
@@ -57,7 +59,7 @@ class _BodyState extends State<Body> {
   }
 
   Widget mapScreenBuilder(BuildContext context, double screenWidth) {
-    if (check) {
+    if (widget.apiResponse.isSuccess) {
       // 서버에 요청하여 경로가 생성되었을 때
       return Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -67,9 +69,9 @@ class _BodyState extends State<Body> {
               physics: BouncingScrollPhysics(),
               controller: widget.pageController,
               scrollDirection: Axis.horizontal,
-              itemCount: resultsString.length + 1,
+              itemCount: widget.apiResponse.result.length + 1,
               itemBuilder: (context, index) {
-                if (index == resultsString.length) {
+                if (index == widget.apiResponse.result.length) {
                   // 마지막 페이지에 도달 했을 때
                   return Container(
                     child: Text('마지막 페이지'),
@@ -214,44 +216,44 @@ class _BodyState extends State<Body> {
                             ),
                           ),
                         ),
-                        SizedBox(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                timeConvert();
-                              });
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MakePath(
-                                    currentPosition: widget.currentPosition,
-                                    targetTime: totalSec,
-                                    endClosewayPoints: widget.endClosewayPoints,
-                                    startClosewayPoints:
-                                        widget.startClosewayPoints,
-                                    makeRequest: widget.makeRequest,
-                                    callback: widget.callBack,
-                                    onCheckChange: onCheckChange,
-                                  ),
-                                ),
-                              );
-                              //widget.makeRequest;
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: (widget.currentHour == 0 &&
-                                      widget.currentMin == 0 &&
-                                      widget.currentSec == 0)
-                                  ? Colors.grey
-                                  : Colors.blue,
-                            ),
-                            child: Text(
-                              '경유지 추가하기',
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
+                        // SizedBox(
+                        //   child: ElevatedButton(
+                        //     onPressed: () {
+                        //       setState(() {
+                        //         timeConvert();
+                        //       });
+                        //       Navigator.push(
+                        //         context,
+                        //         MaterialPageRoute(
+                        //           builder: (context) => MakePath(
+                        //             currentPosition: widget.currentPosition,
+                        //             targetTime: totalSec,
+                        //             endClosewayPoints: widget.endClosewayPoints,
+                        //             startClosewayPoints:
+                        //                 widget.startClosewayPoints,
+                        //             makeRequest: widget.makeRequest,
+                        //             callback: widget.callBack,
+                        //             onCheckChange: onCheckChange,
+                        //           ),
+                        //         ),
+                        //       );
+                        //       //widget.makeRequest;
+                        //     },
+                        //     style: ElevatedButton.styleFrom(
+                        //       backgroundColor: (widget.currentHour == 0 &&
+                        //               widget.currentMin == 0 &&
+                        //               widget.currentSec == 0)
+                        //           ? Colors.grey
+                        //           : Colors.blue,
+                        //     ),
+                        //     child: Text(
+                        //       '경유지 추가하기',
+                        //       style: TextStyle(
+                        //         color: Colors.white,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -282,16 +284,20 @@ class _BodyState extends State<Body> {
                         SizedBox(
                           child: ElevatedButton(
                             onPressed: () async {
-                              setState(() {
-                                timeConvert();
-                              });
-                              widget.makeRequest(
-                                (String response) {
-                                  widget.callBack(response);
-                                },
-                                context,
-                              );
-                              onCheckChange();
+                              // setState(() {
+                              //   timeConvert();
+                              // });
+                              // widget.makeRequest(
+                              //   (String response) {
+                              //     widget.callBack(response);
+                              //   },
+                              //   context,
+                              // );
+
+                              // final response = widget.makeRequest();
+                              // widget.acceptResponse(response);
+                              // onCheckChange();
+                              widget.makeRequest();
                             },
                             child: Text(
                               '경유지 없이 경로 만들기',

@@ -22,7 +22,6 @@ import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:mamasteps_frontend/map/component/util/map_server_communication.dart';
 
-
 bool check = false;
 final List<String> resultsString = [
   '{wqcFov`dW??RFXHDBb@L????YbB????l@T????RF????AFu@xDSbB????DB????EC????RcBt@yD@G????SG????m@U????XcB????c@MECYISG??',
@@ -31,8 +30,8 @@ final List<String> resultsString = [
 ];
 
 class MapPage extends StatefulWidget {
-
-  const MapPage({super.key,
+  const MapPage({
+    super.key,
   });
 
   @override
@@ -94,19 +93,21 @@ class _MapPageState extends State<MapPage> {
           children: [
             Header(),
             Body(
-                currentHour: currentHour,
-                currentMin: currentMin,
-                currentSec: currentSec,
-                onHourChanged: onHourChanged,
-                onMinChanged: onMinChanged,
-                onSecChanged: onSecChanged,
-                apiResponse: apiResponse,
-                endClosewayPoints: endClosewayPoints,
-                startClosewayPoints: startClosewayPoints,
-                pageController: pageController,
-                currentPosition: currentPosition,
-                callBack: acceptResponse,
-                makeRequest: makeRequest),
+              currentHour: currentHour,
+              currentMin: currentMin,
+              currentSec: currentSec,
+              onHourChanged: onHourChanged,
+              onMinChanged: onMinChanged,
+              onSecChanged: onSecChanged,
+              apiResponse: apiResponse,
+              endClosewayPoints: endClosewayPoints,
+              startClosewayPoints: startClosewayPoints,
+              pageController: pageController,
+              currentPosition: currentPosition,
+              callBack: acceptResponse,
+              makeRequest: acceptResponse,
+              // acceptResponse: acceptResponse,
+            ),
           ],
         ),
       ),
@@ -143,15 +144,35 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void acceptResponse(value) {
+  // void acceptResponse(value) {
+  //   setState(() {
+  //     apiResponse = ApiResponse.fromJson(value);
+  //     if (apiResponse.isSuccess) {
+  //       final List<String> results =
+  //           apiResponse.result.map((route) => route.polyLine).toList();
+  //     } else {
+  //       print('Server Error');
+  //     }
+  //   });
+  // }
+
+  // void acceptResponse(value) {
+  //   setState(() {
+  //     apiResponse = ApiResponse.fromJson(value);
+  //     if (apiResponse.isSuccess) {
+  //       final List<String> results =
+  //       apiResponse.result.map((route) => route.polyLine).toList();
+  //     } else {
+  //       print('Server Error');
+  //     }
+  //   });
+  // }
+
+  void acceptResponse() async {
+    final value = await makeRequest();
+    print(value.result[0].polyLine);
     setState(() {
-      apiResponse = ApiResponse.fromJson(value);
-      if (apiResponse.isSuccess) {
-        final List<String> results =
-            apiResponse.result.map((route) => route.polyLine).toList();
-      } else {
-        print('Server Error');
-      }
+      apiResponse = value;
     });
   }
 
