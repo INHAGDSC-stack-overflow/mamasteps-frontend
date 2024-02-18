@@ -115,16 +115,20 @@ class _MapPageState extends State<MapPage> {
             return ListTile(
               title: Text('Item $index'),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TrackingScreen(
-                      Path: savedRoute[index - 1].polyLine,
-                      currentInitPosition: currentPosition,
-                      totalSeconds: savedRoute[index - 1].totalTimeSeconds,
-                    ),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => TrackingScreen(
+                //       Path: savedRoute[index - 1].polyLine,
+                //       currentInitPosition: currentPosition,
+                //       totalSeconds: savedRoute[index - 1].totalTimeSeconds,
+                //     ),
+                //   ),
+                // );
+                setState(() {
+                  manageRouteList(savedRoute[index-1], 'clear');
+                  manageRouteList(savedRoute[index-1], 'add');
+                });
               },
             );
           },
@@ -264,7 +268,7 @@ class _MapPageState extends State<MapPage> {
     final value = await makeRequest();
     print(value.result[0].polyLine);
     setState(() {
-      manageRouteList(value.result, 'add');
+      manageRouteList(value.result, 'addAll');
       apiResponse = value;
     });
   }
@@ -272,11 +276,13 @@ class _MapPageState extends State<MapPage> {
   void manageRouteList(data, order){
     setState(() {
       if(order == 'add'){
-        serverRoute.addAll(data);
+        serverRoute.add(data);
       } else if(order == 'delete'){
         serverRoute.remove(data);
       } else if(order == 'clear'){
         serverRoute.clear();
+      } else if(order == 'addAll'){
+        serverRoute.addAll(data);
       }
     });
   }
@@ -304,7 +310,7 @@ class _MapPageState extends State<MapPage> {
   // }
 
   Widget mapScreenBuilder(BuildContext context, double screenWidth) {
-    if (apiResponse.isSuccess) {
+    if (serverRoute.isNotEmpty) {
       // 서버에 요청하여 경로가 생성되었을 때
       return Padding(
         padding: const EdgeInsets.only(top: 16.0),
