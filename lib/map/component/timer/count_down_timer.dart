@@ -80,8 +80,10 @@ class _countDownTimerState extends State<countDownTimer> {
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
 
-    return Scaffold(
-      body: Column(
+    return SizedBox(
+      width: double.infinity,
+      height: double.infinity,
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Align(
@@ -102,23 +104,25 @@ class _countDownTimerState extends State<countDownTimer> {
               ),
             ),
           ),
-          SizedBox(height: 20),
-          Row(
-            children: [
-              (isRunning)
-                  ? IconButton(
-                      onPressed: pauseTimer,
-                      icon: Icon(Icons.pause),
-                    )
-                  : IconButton(
-                      onPressed: startTimer,
-                      icon: Icon(Icons.play_arrow),
-                    ),
-              IconButton(
-                onPressed: widget.showStopDialog,
-                icon: Icon(Icons.stop),
-              ),
-            ],
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Row(
+              children: [
+                (isRunning)
+                    ? IconButton(
+                        onPressed: pauseTimer,
+                        icon: Icon(Icons.pause),
+                      )
+                    : IconButton(
+                        onPressed: startTimer,
+                        icon: Icon(Icons.play_arrow),
+                      ),
+                IconButton(
+                  onPressed: widget.showStopDialog,
+                  icon: Icon(Icons.stop),
+                ),
+              ],
+            ),
           ),
         ],
       ),

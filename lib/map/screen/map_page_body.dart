@@ -1,42 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:mamasteps_frontend/map/component/timer/convert.dart';
 import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:mamasteps_frontend/map/screen/make_path.dart';
 import 'package:mamasteps_frontend/map/screen/map_screen.dart';
+import 'package:mamasteps_frontend/map/screen/tracking_page.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class Body extends StatefulWidget {
-  final PageController pageController;
+  final Position currentPosition;
+
   final int currentHour;
   final int currentMin;
   final int currentSec;
+
   final ValueChanged onHourChanged;
   final ValueChanged onMinChanged;
   final ValueChanged onSecChanged;
+
   final Set<Marker> startClosewayPoints;
   final Set<Marker> endClosewayPoints;
-  final Position currentPosition;
-  final dynamic makeRequest;
-  final void callBack;
+
+  // final dynamic makeRequest;
+  // final void callBack;
+
+  final PageController pageController;
+
   final ApiResponse apiResponse;
-  // final dynamic acceptResponse;
+  final VoidCallback acceptResponse;
+
   const Body({
     super.key,
-    required this.pageController,
+
+    required this.currentPosition,
+
     required this.currentHour,
     required this.currentMin,
     required this.currentSec,
+
     required this.onHourChanged,
     required this.onMinChanged,
     required this.onSecChanged,
+
     required this.startClosewayPoints,
     required this.endClosewayPoints,
-    required this.currentPosition,
-    required this.makeRequest,
-    required this.callBack,
+    // required this.makeRequest,
+    // required this.callBack,
+
     required this.apiResponse,
-    // required this.acceptResponse,
+    required this.acceptResponse,
+
+    required this.pageController,
   });
 
   @override
@@ -44,9 +59,9 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  late int totalSec;
-  bool check = false;
-  List<String> resultsString = [];
+
+  late int totalSec = 0;
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -78,18 +93,56 @@ class _BodyState extends State<Body> {
                   );
                 } else {
                   // 마지막 페이지가 아닐 때
-                  return SizedBox(
-                    width: screenWidth,
-                    height: 400,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MapScreen(
-                          Path: widget.apiResponse.result[index].polyLine,
+                  return InkWell(
+                    child: SizedBox(
+                      width: screenWidth,
+                      height: 400,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Stack(
+                            children: [
+                              MapScreen(
+                                Path: widget.apiResponse.result[index].polyLine,
+                              ),
+                              Positioned(
+                                top: 350,
+                                left: 5,
+                                child: Container(
+                                  width: screenWidth * 0.8,
+                                  height: 100,
+                                  child: Card(
+                                    child: Center(
+                                      child: Text(
+                                        '${(widget.apiResponse.result[index].totalTimeSeconds / 3600).toInt().toString().padLeft(2,'0')} : ${(widget.apiResponse.result[index].totalTimeSeconds % 3600 / 60).toInt().toString().padLeft(2,'0')} : ${(widget.apiResponse.result[index].totalTimeSeconds % 60).toInt().toString().padLeft(2,'0')}',
+                                        style: TextStyle(
+                                          fontSize: 35,
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
                     ),
+                    onTap: () {
+                      setState(() {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TrackingScreen(
+                                  Path: widget.apiResponse.result[index].polyLine,
+                                  currentInitPosition: widget.currentPosition,
+                                  totalSeconds: totalSec),
+                            ));
+                      });
+                    },
                   );
                 }
               }),
@@ -297,7 +350,7 @@ class _BodyState extends State<Body> {
                               // final response = widget.makeRequest();
                               // widget.acceptResponse(response);
                               // onCheckChange();
-                              widget.makeRequest();
+                              widget.acceptResponse();
                             },
                             child: Text(
                               '경유지 없이 경로 만들기',
@@ -331,13 +384,6 @@ class _BodyState extends State<Body> {
       totalSec = widget.currentHour * 3600 +
           widget.currentMin * 60 +
           widget.currentSec;
-    });
-  }
-
-  void onCheckChange() {
-    setState(() {
-      check = !check;
-      print("check 확인용 로그 :$check");
     });
   }
 }

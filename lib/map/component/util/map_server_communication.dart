@@ -100,3 +100,32 @@ Future<ApiResponse> makeRequest() async {
     return Future.error(error);
   }
 }
+
+Future SaveRoute(data) async {
+  final url = 'https://dev.mamasteps.dev/api/v1/routes/saveRoute';
+  final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
+  Map<String, dynamic> jsonData = data.toJson();
+  final jsonString = jsonEncode(jsonData);
+  print(jsonString);
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $AccessToken',
+      },
+      body: jsonString,
+    );
+
+    print('Server Response: ${response.statusCode}');
+    print('Exception: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('Server Response: ${response.statusCode}');
+    } else {
+      print('Server Error');
+    }
+  } catch (error) {
+    print('Server Error');
+  }
+}
