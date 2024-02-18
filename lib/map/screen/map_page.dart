@@ -1,17 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mamasteps_frontend/map/component/util/get_position.dart';
-// import 'package:mamasteps_frontend/map/screen/map_page_body.dart';
-// import 'package:mamasteps_frontend/map/screen/map_page_header.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:mamasteps_frontend/login/widget/google_login_components.dart';
 import 'package:mamasteps_frontend/map/component/google_map/pointlatlng_to_latlng.dart';
 import 'package:mamasteps_frontend/map/component/timer/convert.dart';
@@ -21,6 +16,8 @@ import 'package:mamasteps_frontend/map/screen/tracking_page.dart';
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:mamasteps_frontend/map/component/util/map_server_communication.dart';
+// import 'package:mamasteps_frontend/map/screen/map_page_body.dart';
+// import 'package:mamasteps_frontend/map/screen/map_page_header.dart';
 
 bool check = false;
 final List<String> resultsString = [
@@ -79,6 +76,9 @@ class _MapPageState extends State<MapPage> {
     result: [],
   );
 
+  List<MadeRoute> serverRoute = [];
+  List<MadeRoute> savedRoute = [];
+
   @override
   void initState() {
     pageController.addListener(() {
@@ -102,28 +102,42 @@ class _MapPageState extends State<MapPage> {
         key: _scaffoldKey,
         endDrawer: Drawer(
             child: ListView.builder(
-              itemCount: 5 + 1,
-              itemBuilder: (context, index) {
-                if(index == 0){
-                  return DrawerHeader(
-                    child: Text('Drawer Header'),
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
+          itemCount: savedRoute.length + 1,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return DrawerHeader(
+                child: Text('Drawer Header'),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                ),
+              );
+            }
+            return ListTile(
+              title: Text('Item $index'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TrackingScreen(
+                      Path: savedRoute[index - 1].polyLine,
+                      currentInitPosition: currentPosition,
+                      totalSeconds: savedRoute[index - 1].totalTimeSeconds,
                     ),
-                  );
-                }
-                return ListTile(
-                  title: Text('Item $index'),
-                  onTap: () {},
+                  ),
                 );
               },
-              padding: EdgeInsets.zero,
+            );
+          },
+          padding: EdgeInsets.zero,
         )),
         floatingActionButton: (apiResponse.isSuccess)
             ? FloatingActionButton(
                 onPressed: () {
                   int index = currentPage.toInt();
-                  SaveRoute(apiResponse.result[index]);
+                  // SaveRoute(apiResponse.result[index]);
+                  setState(() {
+                    manageSavedRouteList(serverRoute[index], 'add');
+                  });
                 },
                 child: Text('경로 저장'),
               )
@@ -177,8 +191,8 @@ class _MapPageState extends State<MapPage> {
             ),
             Expanded(
               flex: 3,
-              child:
-              SingleChildScrollView(child: mapScreenBuilder(context, screenWidth)),
+              child: SingleChildScrollView(
+                  child: mapScreenBuilder(context, screenWidth)),
             ),
           ],
         ),
@@ -250,9 +264,35 @@ class _MapPageState extends State<MapPage> {
     final value = await makeRequest();
     print(value.result[0].polyLine);
     setState(() {
+      manageRouteList(value.result, 'add');
       apiResponse = value;
     });
   }
+
+  void manageRouteList(data, order){
+    setState(() {
+      if(order == 'add'){
+        serverRoute.addAll(data);
+      } else if(order == 'delete'){
+        serverRoute.remove(data);
+      } else if(order == 'clear'){
+        serverRoute.clear();
+      }
+    });
+  }
+
+  void manageSavedRouteList(data, order){
+    setState(() {
+      if(order == 'add'){
+        savedRoute.add(data);
+      } else if(order == 'delete'){
+        savedRoute.remove(data);
+      } else if(order == 'clear'){
+        savedRoute.clear();
+      }
+    });
+  }
+
 
   // List<Coordinate> convertMarkersToList(Set<Marker> markers) {
   //   return markers.map((marker) {
@@ -274,13 +314,13 @@ class _MapPageState extends State<MapPage> {
               physics: BouncingScrollPhysics(),
               controller: pageController,
               scrollDirection: Axis.horizontal,
-              itemCount: apiResponse.result.length + 1,
+              itemCount: serverRoute.length + 1,
               itemBuilder: (context, index) {
-                if (index == apiResponse.result.length) {
+                if (index == serverRoute.length) {
                   // 마지막 페이지에 도달 했을 때
-                  return Container(
-                    child: Text('마지막 페이지'),
-                  );
+                  setState(() {
+                    acceptResponse();
+                  });
                 } else {
                   // 마지막 페이지가 아닐 때
                   return InkWell(
@@ -293,7 +333,7 @@ class _MapPageState extends State<MapPage> {
                           child: Stack(
                             children: [
                               MapScreen(
-                                Path: apiResponse.result[index].polyLine,
+                                Path: serverRoute[index].polyLine,
                               ),
                               Positioned(
                                 top: 350,
@@ -304,7 +344,7 @@ class _MapPageState extends State<MapPage> {
                                   child: Card(
                                     child: Center(
                                       child: Text(
-                                        '${(apiResponse.result[index].totalTimeSeconds / 3600).toInt().toString().padLeft(2,'0')} : ${(apiResponse.result[index].totalTimeSeconds % 3600 / 60).toInt().toString().padLeft(2,'0')} : ${(apiResponse.result[index].totalTimeSeconds % 60).toInt().toString().padLeft(2,'0')}',
+                                        '${(serverRoute[index].totalTimeSeconds / 3600).toInt().toString().padLeft(2, '0')} : ${(serverRoute[index].totalTimeSeconds % 3600 / 60).toInt().toString().padLeft(2, '0')} : ${(serverRoute[index].totalTimeSeconds % 60).toInt().toString().padLeft(2, '0')}',
                                         style: TextStyle(
                                           fontSize: 35,
                                           fontWeight: FontWeight.normal,
@@ -376,7 +416,7 @@ class _MapPageState extends State<MapPage> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceEvenly,
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Container(
                                       alignment: Alignment.center,
@@ -550,8 +590,8 @@ class _MapPageState extends State<MapPage> {
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: (currentHour == 0 &&
-                                  currentMin == 0 &&
-                                  currentSec == 0)
+                                      currentMin == 0 &&
+                                      currentSec == 0)
                                   ? Colors.grey
                                   : Colors.blue,
                             ),

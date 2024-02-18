@@ -48,9 +48,9 @@ class _TrackingScreenState extends State<TrackingScreen> {
   Set<Marker> markers = {};
   Set<Marker> streamCurrentMarkers = {};
   late List<LatLng> resultList;
-  late int hour;
-  late int minute;
-  late int second;
+  late int hour=0;
+  late int minute=0;
+  late int second=0;
   late List<int> numbers;
 
 

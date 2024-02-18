@@ -36,11 +36,13 @@ class Coordinate {
   };
 }
 
+
+
 class ApiResponse {
   final bool isSuccess;
   final String code;
   final String message;
-  final List<Route> result;
+  final List<MadeRoute> result;
 
   ApiResponse({
     required this.isSuccess,
@@ -53,11 +55,11 @@ class ApiResponse {
     isSuccess: json['isSuccess'],
     code: json['code'],
     message: json['message'],
-    result: List<Route>.from(json['result'].map((x) => Route.fromJson(x))),
+    result: List<MadeRoute>.from(json['result'].map((x) => MadeRoute.fromJson(x))),
   );
 }
 
-class Route {
+class MadeRoute {
   final int routeId;
   final int routesProfileId;
   final CreatedWaypoint createdWaypoint;
@@ -67,7 +69,7 @@ class Route {
   final String createdAt;
   final String updatedAt;
 
-  Route({
+  MadeRoute({
     required this.routeId,
     required this.routesProfileId,
     required this.createdWaypoint,
@@ -78,7 +80,7 @@ class Route {
     required this.updatedAt,
   });
 
-  factory Route.fromJson(Map<String, dynamic> json) => Route(
+  factory MadeRoute.fromJson(Map<String, dynamic> json) => MadeRoute(
     routeId: json['routeId'],
     routesProfileId: json['routesProfileId'],
     createdWaypoint: CreatedWaypoint.fromJson(json['createdWaypoint']),
