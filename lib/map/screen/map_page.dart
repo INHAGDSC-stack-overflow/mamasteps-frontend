@@ -126,8 +126,8 @@ class _MapPageState extends State<MapPage> {
                 //   ),
                 // );
                 setState(() {
-                  manageRouteList(savedRoute[index-1], 'clear');
-                  manageRouteList(savedRoute[index-1], 'add');
+                  manageRouteList(savedRoute[index - 1], 'clear');
+                  manageRouteList(savedRoute[index - 1], 'add');
                 });
               },
             );
@@ -273,32 +273,31 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void manageRouteList(data, order){
+  void manageRouteList(data, order) {
     setState(() {
-      if(order == 'add'){
+      if (order == 'add') {
         serverRoute.add(data);
-      } else if(order == 'delete'){
+      } else if (order == 'delete') {
         serverRoute.remove(data);
-      } else if(order == 'clear'){
+      } else if (order == 'clear') {
         serverRoute.clear();
-      } else if(order == 'addAll'){
+      } else if (order == 'addAll') {
         serverRoute.addAll(data);
       }
     });
   }
 
-  void manageSavedRouteList(data, order){
+  void manageSavedRouteList(data, order) {
     setState(() {
-      if(order == 'add'){
+      if (order == 'add') {
         savedRoute.add(data);
-      } else if(order == 'delete'){
+      } else if (order == 'delete') {
         savedRoute.remove(data);
-      } else if(order == 'clear'){
+      } else if (order == 'clear') {
         savedRoute.clear();
       }
     });
   }
-
 
   // List<Coordinate> convertMarkersToList(Set<Marker> markers) {
   //   return markers.map((marker) {
@@ -333,38 +332,52 @@ class _MapPageState extends State<MapPage> {
                     child: SizedBox(
                       width: screenWidth,
                       height: 400,
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Stack(
-                            children: [
-                              MapScreen(
-                                Path: serverRoute[index].polyLine,
-                              ),
-                              Positioned(
-                                top: 350,
-                                left: 5,
-                                child: Container(
-                                  width: screenWidth * 0.8,
-                                  height: 100,
-                                  child: Card(
-                                    child: Center(
-                                      child: Text(
-                                        '${(serverRoute[index].totalTimeSeconds / 3600).toInt().toString().padLeft(2, '0')} : ${(serverRoute[index].totalTimeSeconds % 3600 / 60).toInt().toString().padLeft(2, '0')} : ${(serverRoute[index].totalTimeSeconds % 60).toInt().toString().padLeft(2, '0')}',
-                                        style: TextStyle(
-                                          fontSize: 35,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.black,
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TrackingScreen(
+                                      Path: apiResponse.result[index].polyLine,
+                                      currentInitPosition: currentPosition,
+                                      totalSeconds: serverRoute[index].totalTimeSeconds),
+                                ));
+                          });
+                        },
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Stack(
+                              children: [
+                                MapScreen(
+                                  Path: serverRoute[index].polyLine,
+                                ),
+                                Positioned(
+                                  top: 350,
+                                  left: 5,
+                                  child: Container(
+                                    width: screenWidth * 0.8,
+                                    height: 100,
+                                    child: Card(
+                                      child: Center(
+                                        child: Text(
+                                          '${(serverRoute[index].totalTimeSeconds / 3600).toInt().toString().padLeft(2, '0')} : ${(serverRoute[index].totalTimeSeconds % 3600 / 60).toInt().toString().padLeft(2, '0')} : ${(serverRoute[index].totalTimeSeconds % 60).toInt().toString().padLeft(2, '0')}',
+                                          style: TextStyle(
+                                            fontSize: 35,
+                                            fontWeight: FontWeight.normal,
+                                            color: Colors.black,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                          elevation: 0,
                         ),
-                        elevation: 0,
                       ),
                     ),
                     onTap: () {
