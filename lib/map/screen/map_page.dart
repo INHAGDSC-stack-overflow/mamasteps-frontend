@@ -87,12 +87,23 @@ class _MapPageState extends State<MapPage> {
         currentPage = pageController.page!.toDouble();
       });
     });
-    getInitPosition().then((value) {
-      setState(() {
-        currentPosition = value;
-      });
+    // getInitPosition().then((value) {
+    //   setState(() {
+    //     currentPosition = value;
+    //   });
+    // });
+    // setOrigin(currentPosition);
+    // createRequestProfile();
+    userInitSetting();
+  }
+
+  void userInitSetting() async {
+    final position = await getInitPosition();
+    setState(() {
+      currentPosition = position;
     });
-    setOrigin(currentPosition);
+    await setOrigin(currentPosition);
+    await createRequestProfile();
   }
 
   @override

@@ -61,8 +61,8 @@ import 'package:mamasteps_frontend/storage/login/login_data.dart';
 
 Future<void> setOrigin(Position currentPosition) async {
   final url = 'https://dev.mamasteps.dev/api/v1/users/set-origin';
-  final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
-  try{
+  final AccessToken = await storage.read(key: 'access_token');
+  try {
     final response = await http.post(
       Uri.parse(url),
       headers: <String, String>{
@@ -70,8 +70,10 @@ Future<void> setOrigin(Position currentPosition) async {
         'Authorization': 'Bearer $AccessToken',
       },
       body: jsonEncode(<String, dynamic>{
-        'latitude': currentPosition.latitude,
-        'longitude': currentPosition.longitude,
+        'origin': {
+          'latitude': currentPosition.latitude,
+          'longitude': currentPosition.longitude,
+        },
       }),
     );
 
@@ -85,6 +87,31 @@ Future<void> setOrigin(Position currentPosition) async {
     }
   } catch (error) {
     print('set-origin Server Error : $error');
+  }
+}
+
+Future<void> createRequestProfile() async {
+  final url = 'https://dev.mamasteps.dev/api/v1/routes/createRequestProfile';
+  final AccessToken = await storage.read(key: 'access_token');
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $AccessToken',
+      },
+    );
+
+    print('createRequestProfile Server Response: ${response.statusCode}');
+    print('createRequestProfile Exception: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('createRequestProfile Server Response: ${response.statusCode}');
+    } else {
+      print('createRequestProfile Server Error');
+    }
+  } catch (error) {
+    print('createRequestProfile Server Error : $error');
   }
 }
 
@@ -124,7 +151,7 @@ Future<ApiResponse> getRoutes(BuildContext context) async {
 
 Future<ApiResponse> computeRoutes(BuildContext context) async {
   final url = 'https://dev.mamasteps.dev/api/v1/routes/computeRoutes';
-  final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
+  final AccessToken = await storage.read(key: 'access_token');
 
   try {
     final response = await http.get(
@@ -140,6 +167,7 @@ Future<ApiResponse> computeRoutes(BuildContext context) async {
     if (response.statusCode == 200) {
       print('success');
       final jsonResponse = jsonDecode(response.body);
+      print(jsonResponse);
       final ApiResponse apiResponse = ApiResponse.fromJson(jsonResponse);
       return apiResponse;
     } else {
@@ -148,7 +176,7 @@ Future<ApiResponse> computeRoutes(BuildContext context) async {
         MaterialPageRoute(
           builder: (context) => GoogleLogin(),
         ),
-            (route) => false,
+        (route) => false,
       );
       return Future.error('server error');
     }
