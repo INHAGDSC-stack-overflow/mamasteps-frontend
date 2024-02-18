@@ -60,7 +60,7 @@ class _GoogleLoginState extends State<GoogleLogin> {
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (context) => SplashScreen(),
+                builder: (context) => RootTab(),
               ),
               (route) => false);
         } else {

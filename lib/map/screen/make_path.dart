@@ -17,7 +17,8 @@ class MakePath extends StatefulWidget {
   final Set<Marker> startClosewayPoints;
   final Set<Marker> endClosewayPoints;
   final void Function(Function(String), BuildContext) makeRequest;
-  final void Function(String) callback;
+  final void callback;
+  final VoidCallback onCheckChange;
   const MakePath({
     required this.targetTime,
     required this.currentPosition,
@@ -25,6 +26,7 @@ class MakePath extends StatefulWidget {
     required this.endClosewayPoints,
     required this.makeRequest,
     required this.callback,
+    required this.onCheckChange,
     super.key,
   });
 
@@ -82,15 +84,19 @@ class _MakePathState extends State<MakePath> {
                         },
                         icon: Icon(Icons.arrow_left)),
                     ElevatedButton(
+                      // onPressed: () {
+                      //   setState(() {
+                      //     widget.makeRequest(
+                      //       (String response) {
+                      //         widget.callback(response);
+                      //       },
+                      //       context,
+                      //     );
+                      //   });
+                      // },
                       onPressed: () {
-                        setState(() {
-                          widget.makeRequest(
-                            (String response) {
-                              widget.callback(response);
-                            },
-                            context,
-                          );
-                        });
+                        widget.onCheckChange;
+                        Navigator.pop(context);
                       },
                       child: Text('경로 검색'),
                     ),
@@ -159,7 +165,7 @@ class _MakePathState extends State<MakePath> {
             icon: red_marker,
             infoWindow: InfoWindow(
               title: '경유지',
-              snippet: '탭하여 삭제',
+              snippet: '탭하여 수정',
               onTap: () {
                 showWayPointDialog(markerId, red_marker);
               },
