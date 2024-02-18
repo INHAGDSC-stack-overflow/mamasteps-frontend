@@ -81,6 +81,7 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void initState() {
+    super.initState();
     pageController.addListener(() {
       setState(() {
         currentPage = pageController.page!.toDouble();
@@ -91,7 +92,7 @@ class _MapPageState extends State<MapPage> {
         currentPosition = value;
       });
     });
-    super.initState();
+    setOrigin(currentPosition);
   }
 
   @override
@@ -265,7 +266,7 @@ class _MapPageState extends State<MapPage> {
   // }
 
   void acceptResponse() async {
-    final value = await makeRequest();
+    final value = await computeRoutes(context);
     print(value.result[0].polyLine);
     setState(() {
       manageRouteList(value.result, 'addAll');
