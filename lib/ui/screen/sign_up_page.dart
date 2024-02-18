@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/ui/data/contents.dart';
 import 'package:mamasteps_frontend/ui/layout/sign_up_default_layout.dart';
+import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
 import 'package:numberpicker/numberpicker.dart';
 
@@ -165,7 +166,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   void onSubmitPressed() async {
     final url = 'https://dev.mamasteps.dev/api/v1/auth/signup';
-
+    final AccessToken = await storage.read(key: 'access_token');
     final Map<String, dynamic> requestData = {
       "email": widget.userEmail,
       "name": userInformation[0],
@@ -180,10 +181,12 @@ class _SignUpPageState extends State<SignUpPage> {
     print(requestData);
 
     try {
+      print(AccessToken);
       final response = await http.post(
         Uri.parse(url),
         headers: <String, String>{
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $AccessToken'
         },
         body: jsonEncode(requestData),
       );
@@ -197,7 +200,7 @@ class _SignUpPageState extends State<SignUpPage> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => SplashScreen(),),
+            builder: (context) => RootTab(),),
           (route) => false,
         );
       } else {
