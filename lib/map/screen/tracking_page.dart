@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:dio/dio.dart';
+import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
 import 'package:mamasteps_frontend/map/component/google_map/drawpolyline.dart';
 import 'package:mamasteps_frontend/map/component/google_map/drawmarker.dart';
 import 'package:mamasteps_frontend/map/component/google_map/pointlatlng_to_latlng.dart';
@@ -309,6 +310,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             movementTimer?.cancel();
             movementTimer = null;
             _stopTracking();
+            addRecord(widget.totalSeconds);
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
                 builder: (_) => RootTab(),
