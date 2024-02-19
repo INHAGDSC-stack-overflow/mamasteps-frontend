@@ -351,7 +351,7 @@ class _MapPageState extends State<MapPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => TrackingScreen(
-                                      Path: apiResponse.result[index].polyLine,
+                                      Path: serverRoute[index].polyLine,
                                       currentInitPosition: currentPosition,
                                       totalSeconds: serverRoute[index].totalTimeSeconds),
                                 ));
