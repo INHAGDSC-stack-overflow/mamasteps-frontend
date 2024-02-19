@@ -10,6 +10,17 @@ class TableCalendarPage extends StatefulWidget {
 }
 
 class _TableCalendarPageState extends State<TableCalendarPage> {
+
+  DateTime selectedDay = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
+
+  DateTime focusedDay = DateTime.now();
+
+  late ValueNotifier<List<Event>> selectedEvents;
+
   @override
   void initState() {
     super.initState();
@@ -22,13 +33,9 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
     super.dispose();
   }
 
-  late final ValueNotifier<List<Event>> selectedEvents;
-  DateTime selectedDay = DateTime(
-    DateTime.now().year,
-    DateTime.now().month,
-    DateTime.now().day,
-  );
-  DateTime focusedDay = DateTime.now();
+
+
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
