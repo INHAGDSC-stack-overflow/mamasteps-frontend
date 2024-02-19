@@ -93,10 +93,20 @@ class getRecordResult {
   });
 
   factory getRecordResult.fromJson(Map<String, dynamic> json) {
+    var dateList = json['date'] as List;
+    DateTime date = DateTime(
+      dateList[0],
+      dateList[1],
+      dateList[2],
+      dateList[3],
+      dateList[4],
+      dateList[5],
+      dateList[6] ~/ 1000000,
+    );
     return getRecordResult(
       id: json['id'],
       routeId: json['routeId'],
-      date: DateTime.parse(json['date']),
+      date: date,
       completedTimeSeconds: json['completedTimeSeconds'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],

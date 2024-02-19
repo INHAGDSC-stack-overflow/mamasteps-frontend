@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
 import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -28,6 +29,7 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
   void initState() {
     super.initState();
     selectedEvents = ValueNotifier(_getEventsForDay(selectedDay));
+    test();
   }
 
   @override
@@ -36,7 +38,12 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
     super.dispose();
   }
 
-
+  void test() async
+  {
+    await addRecord(1000);
+    await getSchedules();
+    await getRecords();
+  }
 
 
   @override
