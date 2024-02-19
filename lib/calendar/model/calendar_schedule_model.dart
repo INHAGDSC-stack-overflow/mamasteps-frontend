@@ -201,14 +201,14 @@ class getScheduleResult {
   }
 }
 
-// 캘린더 스케쥴 모델
-class EventMap {
-  Map<DateTime, List<Event>> events;
-
-  EventMap(this.events);
-}
-class Event {
-  String title;
-
-  Event(this.title);
-}
+// // 캘린더 스케쥴 모델
+// class EventMap {
+//   Map<DateTime, List<Event>> events;
+//
+//   EventMap(this.events);
+// }
+// class Event {
+//   String title;
+//
+//   Event(this.title);
+// }

@@ -4,6 +4,10 @@ import 'package:mamasteps_frontend/calendar/component/calendar_server_communicat
 import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+// Map<DateTime, List<Event>> events = {
+//   DateTime.utc(2024, 2, 2): [Event('17 분'), Event('18 분')],
+//   DateTime.utc(2024, 2, 3): [Event('20 분')],
+// };
 
 class TableCalendarPage extends StatefulWidget {
   const TableCalendarPage({super.key});
@@ -13,7 +17,7 @@ class TableCalendarPage extends StatefulWidget {
 }
 
 class _TableCalendarPageState extends State<TableCalendarPage> {
-  late EventMap eventMap;
+  final Map<DateTime, List<Event>> events = {};
 
   DateTime selectedDay = DateTime(
     DateTime.now().year,
@@ -29,7 +33,6 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
   void initState() {
     super.initState();
     selectedEvents = ValueNotifier(_getEventsForDay(selectedDay));
-    test();
   }
 
   @override
@@ -38,13 +41,31 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
     super.dispose();
   }
 
-  void test() async
-  {
-    await addRecord(1000);
-    await getSchedules();
-    await getRecords();
+  void acceptResponse() async {
+    getScheduleResponse apiResponse = await getSchedules();
+    if (apiResponse.isSuccess) {
+      for (int i = 0; i < apiResponse.result.length; i++) {
+        DateTime date = apiResponse.result[i].date;
+        int completedTimeSeconds = apiResponse.result[i].targetTimeSeconds;
+        int hours = completedTimeSeconds ~/ 3600;
+        int minutes = (completedTimeSeconds % 3600) ~/ 60;
+        String time =
+            '${hours.toString().padLeft(2, '0')} 시간 ${minutes.toString().padLeft(2, '0')} 분';
+        DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
+        if (events[eventDate] != null) {
+          // 해당날짜에 이벤트가 이미 있는 경우
+          events[eventDate]!.add(Event(time));
+        } else {
+          // 해당날짜에 이벤트가 없는 경우
+          events[eventDate] = [Event(time)];
+        }
+      }
+    }
   }
 
+  List<Event> _getEventsForDay(DateTime day) {
+    return events[day] ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +75,7 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
         floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add),
             onPressed: () {
-              _showAddDialog();
+              _showSelectDialog();
             }),
         body: Column(
           children: [
@@ -183,6 +204,33 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
     }
   }
 
+  void _showSelectDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('이벤트 추가'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              setState(() {
+                acceptResponse();
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text('자동 추가 하기'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _showAddDialog();
+            },
+            child: Text('직접 입력 하기'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showAddDialog() {
     final TextEditingController _eventController = TextEditingController();
 
@@ -270,13 +318,4 @@ class Event {
   String title;
 
   Event(this.title);
-}
-
-Map<DateTime, List<Event>> events = {
-  DateTime.utc(2024, 2, 2): [Event('17 분'), Event('18 분')],
-  DateTime.utc(2024, 2, 3): [Event('20 분')],
-};
-
-List<Event> _getEventsForDay(DateTime day) {
-  return events[day] ?? [];
 }
