@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
 import 'package:table_calendar/table_calendar.dart';
+
 
 class TableCalendarPage extends StatefulWidget {
   const TableCalendarPage({super.key});
@@ -10,6 +12,7 @@ class TableCalendarPage extends StatefulWidget {
 }
 
 class _TableCalendarPageState extends State<TableCalendarPage> {
+  late EventMap eventMap;
 
   DateTime selectedDay = DateTime(
     DateTime.now().year,
