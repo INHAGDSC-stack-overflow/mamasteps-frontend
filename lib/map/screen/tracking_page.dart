@@ -11,6 +11,7 @@ import 'package:mamasteps_frontend/map/component/timer/convert.dart';
 import 'package:mamasteps_frontend/map/component/timer/count_down_timer.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
+import 'package:telephony/telephony.dart';
 
 class TrackingScreen extends StatefulWidget {
   final String Path;
@@ -36,6 +37,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   late GoogleMapController mapController;
   late Position currentPosition;
   late Duration duration;
+  late StreamSubscription<Position>? positionSubscription;
 
   //polyline들의 집합
   Set<Polyline> polylines = {};
@@ -47,6 +49,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   late int minute;
   late int second;
   bool isRunning = false;
+  bool isSelect = false;
 
   @override
   void initState() {
@@ -57,7 +60,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     drawPolylines(polylines, resultList);
     drawMarkers(markers, resultList);
     initTimer();
-    startTimer();
+    // startTimer();
     _determinePosition();
   }
 
@@ -171,7 +174,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 ),
               ),
             ),
-            Positioned(
+            isSelect ? Positioned(
               bottom: 25,
               left: 0,
               right: 0,
@@ -195,6 +198,19 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     ),
                   ],
                 ),
+              ),
+            )
+            : Positioned(
+              bottom: 25,
+              right: 25,
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isSelect = true;
+                    startTimer();
+                  });
+                },
+                child: Text('산책 시작'),
               ),
             ),
           ],
@@ -237,7 +253,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     Timer? movementTimer;
 
     setState(() {
-      Geolocator.getPositionStream().listen(
+      positionSubscription = Geolocator.getPositionStream().listen(
         (Position position) {
           print(position);
 
@@ -253,7 +269,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             ),
           );
 
-          // 마지막 위치와 현재 위치가 동일한지 확인
+          // 마지막 위치와 현재 위치가 동일한지 확인 사용자가 움직이는지 추적하는 거리
           if (lastPosition != null) {
             double distance = Geolocator.distanceBetween(
               lastPosition!.latitude,
@@ -268,7 +284,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 movementTimer = Timer(
                   Duration(seconds: 5),
                   () {
-                    //sendSmsMessageToGuardian('사용자가 움직이지 않음', ['01012345678']);
+                    if(isRunning){
+                      pauseTimer();
+                    }
+                    showSendSmsDialog();
                     print('사용자가 움직이지 않음');
                   },
                 );
@@ -279,24 +298,24 @@ class _TrackingScreenState extends State<TrackingScreen> {
             movementTimer?.cancel();
             movementTimer = null;
           }
-          double distance = Geolocator.distanceBetween(
+          double initDistance = Geolocator.distanceBetween(
             widget.currentInitPosition.latitude,
             widget.currentInitPosition.longitude,
             position.latitude,
             position.longitude,
           );
-          // if (minute == 0 && second == 0 && hour == 0 && distance < 10) {
-          //   // 목적지에 도착했을 때, 시간과 거리로 판단
-          //   movementTimer?.cancel();
-          //   movementTimer = null;
-          //   // 위치 구독 해제 코드 추가해야함
-          //   // Navigator.of(context).pushAndRemoveUntil(
-          //   //   MaterialPageRoute(
-          //   //     builder: (_) => RootTab(),
-          //   //   ),
-          //   //   (route) => false,
-          //   // );
-          // }
+          if (minute == 0 && second == 0 && hour == 0 && initDistance < 10) {
+            // 목적지에 도착했을 때, 시간과 거리로 판단
+            movementTimer?.cancel();
+            movementTimer = null;
+            _stopTracking();
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (_) => RootTab(),
+              ),
+              (route) => false,
+            );
+          }
 
           // 마지막 위치 업데이트
           lastPosition = position;
@@ -308,12 +327,72 @@ class _TrackingScreenState extends State<TrackingScreen> {
     });
   }
 
-  // void sendSmsMessageToGuardian(String message, List<String> recipents) async {
-  //   SmsSender sender = new SmsSender();
-  //   String address = recipents[0];
-  //   sender.sendSms(new SmsMessage(address, message));
-  //   // 사용자의 보호자에게 문자 메시지를 보냅니다.
-  // }
+  // 보호자 문자 보내기 팝업 창
+  void showSendSmsDialog() {
+    Timer? timer;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        timer = Timer(Duration(seconds: 5), () {
+          sendSmsMessageToGuardian('테스트용 문자', ['01000000000']);
+          timer?.cancel();
+          Navigator.pop(context);
+          afterSendSmsDialog();
+        });
+
+        return AlertDialog(
+          content: Text('보호자에게 문자를 전송합니다.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                timer?.cancel();
+                Navigator.pop(context);
+              },
+              child: Text('취소'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 보호자에게 문자 전송 후 팝업 창
+  void afterSendSmsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text('보호자에게 문자를 전송했습니다.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => RootTab()),
+                    (route) => false);
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 보호자에게 문자 보내기
+  void sendSmsMessageToGuardian(String message, List<String> recipents) async {
+    final Telephony telephony = Telephony.instance;
+    bool? permissions = await telephony.requestPhoneAndSmsPermissions;
+    if (permissions == true) {
+      for (String recipent in recipents) {
+        await telephony.sendSms(
+          to: recipent,
+          message: message,
+        );
+      }
+    }
+  }
 
   void showStopDialog() {
     showDialog(
@@ -345,46 +424,9 @@ class _TrackingScreenState extends State<TrackingScreen> {
       },
     );
   }
-}
 
-// Widget _watch() {
-//   return Align(
-//     alignment: Alignment.topCenter,
-//     child: Padding(
-//       padding: const EdgeInsets.all(8.0),
-//       child: Container(
-//         width: MediaQuery.of(context).size.width,
-//         height: 100,
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Text(
-//               '00',
-//               style: TextStyle(fontSize: 80),
-//             ), //시
-//             const SizedBox(width: 10),
-//             Text(
-//               ':',
-//               style: TextStyle(fontSize: 80),
-//             ),
-//             const SizedBox(width: 10),
-//             Text(
-//               '00',
-//               style: TextStyle(fontSize: 80),
-//             ), //분
-//             const SizedBox(width: 10),
-//             Text(
-//               ':',
-//               style: TextStyle(fontSize: 80),
-//             ),
-//             const SizedBox(width: 10),
-//             Text(
-//               '99',
-//               style: TextStyle(fontSize: 80),
-//             ), //초
-//           ],
-//         ),
-//       ),
-//     ),
-//   );
-// }
+  void _stopTracking() {
+    positionSubscription?.cancel();
+    positionSubscription = null;
+  }
+}

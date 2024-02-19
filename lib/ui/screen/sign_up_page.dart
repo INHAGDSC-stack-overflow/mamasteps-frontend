@@ -197,12 +197,14 @@ class _SignUpPageState extends State<SignUpPage> {
         Map<String, dynamic> data = jsonDecode(response.body);
         String accessToken = data['result']['accessToken'];
         storage.write(key: 'access_token', value: accessToken);
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RootTab(),),
-          (route) => false,
-        );
+        setState(() {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RootTab(),),
+                (route) => false,
+          );
+        });
       } else {
         // 에러 응답 처리
         print('Error: ${response.statusCode}, ${response.body}');

@@ -60,35 +60,24 @@ class ApiResponse {
 }
 
 class MadeRoute {
-  final int routeId;
-  final int routesProfileId;
-  final CreatedWaypoint createdWaypoint;
   final String polyLine;
-  final int totalDistanceMeters;
+  final double totalDistanceMeters;
   final int totalTimeSeconds;
   final String createdAt;
-  final String updatedAt;
+
 
   MadeRoute({
-    required this.routeId,
-    required this.routesProfileId,
-    required this.createdWaypoint,
     required this.polyLine,
     required this.totalDistanceMeters,
     required this.totalTimeSeconds,
     required this.createdAt,
-    required this.updatedAt,
   });
 
   factory MadeRoute.fromJson(Map<String, dynamic> json) => MadeRoute(
-    routeId: json['routeId'],
-    routesProfileId: json['routesProfileId'],
-    createdWaypoint: CreatedWaypoint.fromJson(json['createdWaypoint']),
     polyLine: json['polyLine'],
     totalDistanceMeters: json['totalDistanceMeters'],
     totalTimeSeconds: json['totalTimeSeconds'],
     createdAt: json['createdAt'],
-    updatedAt: json['updatedAt'],
   );
 }
 
