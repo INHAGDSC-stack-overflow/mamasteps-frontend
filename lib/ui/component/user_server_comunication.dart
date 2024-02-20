@@ -60,3 +60,34 @@ Future<getMeResponse> getMe() async {
 //     return Future.error(error);
 //   }
 // }
+
+
+Future<myInfo> getMyInfo() async {
+  final url = 'https://dev.mamasteps.dev/api/v1/optimize/get-info';
+  final AccessToken = await storage.read(key: 'access_token');
+
+  try {
+    final response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Authorization': 'Bearer $AccessToken',
+      },
+    );
+
+    print('Server Response: ${response.statusCode}');
+    print('Exception: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('success');
+      final jsonResponse = jsonDecode(response.body);
+      print(jsonResponse);
+      final myInfo apiResponse =
+      myInfo.fromJson(jsonResponse);
+      return apiResponse;
+    } else {
+      return Future.error('server error');
+    }
+  } catch (error) {
+    return Future.error(error);
+  }
+}

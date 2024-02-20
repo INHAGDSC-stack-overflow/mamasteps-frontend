@@ -2,13 +2,17 @@ class getMeResponse {
   final bool isSuccess;
   final String code;
   final String message;
-  final UserProfile result;
+  final List<dynamic> pregnancyStartDate;
+  final String guardianPhoneNumber;
+  // final UserProfile result;
 
   getMeResponse({
     required this.isSuccess,
     required this.code,
     required this.message,
-    required this.result,
+    required this.pregnancyStartDate,
+    required this.guardianPhoneNumber,
+    // required this.result,
   });
 
   factory getMeResponse.fromJson(Map<String, dynamic> json) {
@@ -16,7 +20,9 @@ class getMeResponse {
       isSuccess: json['isSuccess'],
       code: json['code'],
       message: json['message'],
-      result: UserProfile.fromJson(json['result']),
+      pregnancyStartDate: json['result']['pregnancyStartDate'],
+      guardianPhoneNumber: json['result']['guardianPhoneNumber'],
+      // result: UserProfile.fromJson(json['result']),
     );
   }
 }
@@ -106,6 +112,32 @@ class Time {
       minute: json['minute'],
       second: json['second'],
       nano: json['nano'],
+    );
+  }
+}
+
+class myInfo{
+  final bool isSuccess;
+  final String code;
+  final String message;
+  final int targetTime;
+  final double walkSpeed;
+
+  myInfo({
+    required this.isSuccess,
+    required this.code,
+    required this.message,
+    required this.targetTime,
+    required this.walkSpeed,
+  });
+
+  factory myInfo.fromJson(Map<String, dynamic> json) {
+    return myInfo(
+      isSuccess: json['isSuccess'],
+      code: json['code'],
+      message: json['message'],
+      targetTime: json['result']['targetTime'],
+      walkSpeed: json['result']['walkSpeed'],
     );
   }
 }

@@ -195,8 +195,8 @@ class _SignUpPageState extends State<SignUpPage> {
         // 성공적인 응답 처리, 예를 들어 새로운 화면으로 이동
         print('Success: ${response.body}');
         Map<String, dynamic> data = jsonDecode(response.body);
-        String accessToken = data['result']['accessToken'];
-        storage.write(key: 'access_token', value: accessToken);
+        String accessToken = data['result']['access_token'];
+        await storage.write(key: 'access_token', value: accessToken);
         setState(() {
           Navigator.pushAndRemoveUntil(
             context,
