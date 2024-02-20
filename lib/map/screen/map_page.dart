@@ -62,12 +62,12 @@ class _MapPageState extends State<MapPage> {
     headingAccuracy: 0,
   );
 
-  RequestData requestData = RequestData(
-    targetTime: 0,
-    origin: Coordinate(latitude: 0, longitude: 0),
-    startCloseIntermediates: [],
-    endCloseIntermediates: [],
-  );
+  // RequestData requestData = RequestData(
+  //   targetTime: 0,
+  //   origin: Coordinate(latitude: 0, longitude: 0),
+  //   startCloseIntermediates: [],
+  //   endCloseIntermediates: [],
+  // );
 
   ApiResponse apiResponse = ApiResponse(
     isSuccess: false,
@@ -283,6 +283,16 @@ class _MapPageState extends State<MapPage> {
       manageRouteList(value.result, 'addAll');
       apiResponse = value;
     });
+  }
+
+  void acceptEditResponse() async {
+    await editRequestProfile(context, totalSec, currentPosition, startClosewayPoints, endClosewayPoints);
+    // print(value.result[0].polyLine);
+    // setState(() {
+    //   manageRouteList(value.result, 'addAll');
+    //   apiResponse = value;
+    // });
+    acceptResponse();
   }
 
   void manageRouteList(data, order) {
@@ -530,44 +540,42 @@ class _MapPageState extends State<MapPage> {
                             ),
                           ),
                         ),
-                        // SizedBox(
-                        //   child: ElevatedButton(
-                        //     onPressed: () {
-                        //       setState(() {
-                        //         timeConvert();
-                        //       });
-                        //       Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(
-                        //           builder: (context) => MakePath(
-                        //             currentPosition: widget.currentPosition,
-                        //             targetTime: totalSec,
-                        //             endClosewayPoints: widget.endClosewayPoints,
-                        //             startClosewayPoints:
-                        //                 widget.startClosewayPoints,
-                        //             makeRequest: widget.makeRequest,
-                        //             callback: widget.callBack,
-                        //             onCheckChange: onCheckChange,
-                        //           ),
-                        //         ),
-                        //       );
-                        //       //widget.makeRequest;
-                        //     },
-                        //     style: ElevatedButton.styleFrom(
-                        //       backgroundColor: (widget.currentHour == 0 &&
-                        //               widget.currentMin == 0 &&
-                        //               widget.currentSec == 0)
-                        //           ? Colors.grey
-                        //           : Colors.blue,
-                        //     ),
-                        //     child: Text(
-                        //       '경유지 추가하기',
-                        //       style: TextStyle(
-                        //         color: Colors.white,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                        SizedBox(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // setState(() {
+                              //   timeConvert();
+                              // });
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MakePath(
+                                    currentPosition: currentPosition,
+                                    targetTime: totalSec,
+                                    endClosewayPoints: endClosewayPoints,
+                                    startClosewayPoints:
+                                        startClosewayPoints,
+                                    makeRequest: acceptEditResponse,
+                                  ),
+                                ),
+                              );
+                              //widget.makeRequest;
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: (currentHour == 0 &&
+                                      currentMin == 0 &&
+                                      currentSec == 0)
+                                  ? Colors.grey
+                                  : Colors.blue,
+                            ),
+                            child: Text(
+                              '경유지 추가하기',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -16,17 +16,18 @@ class MakePath extends StatefulWidget {
   final Position currentPosition;
   final Set<Marker> startClosewayPoints;
   final Set<Marker> endClosewayPoints;
-  final void Function(Function(String), BuildContext) makeRequest;
-  final void callback;
-  final VoidCallback onCheckChange;
+  // final void Function(Function(String), BuildContext) makeRequest;
+  final VoidCallback makeRequest;
+  // final void callback;
+  // final VoidCallback onCheckChange;
   const MakePath({
     required this.targetTime,
     required this.currentPosition,
     required this.startClosewayPoints,
     required this.endClosewayPoints,
     required this.makeRequest,
-    required this.callback,
-    required this.onCheckChange,
+    // required this.callback,
+    // required this.onCheckChange,
     super.key,
   });
 
@@ -95,7 +96,7 @@ class _MakePathState extends State<MakePath> {
                       //   });
                       // },
                       onPressed: () {
-                        widget.onCheckChange;
+                        widget.makeRequest();
                         Navigator.pop(context);
                       },
                       child: Text('경로 검색'),
@@ -216,7 +217,7 @@ class _MakePathState extends State<MakePath> {
   void _removeBlueMarker(MarkerId markerId) {
     setState(
       () {
-        widget.startClosewayPoints
+        widget.endClosewayPoints
             .removeWhere((marker) => marker.markerId == markerId);
         if (currentMarkerIndex >= widget.endClosewayPoints.length) {
           currentMarkerIndex = widget.endClosewayPoints.length - 1;
@@ -235,16 +236,20 @@ class _MakePathState extends State<MakePath> {
           actions: [
             ElevatedButton(
               onPressed: () {
-                _removeRedMarker(markerId);
-                startWayPointAdd();
+                setState(() {
+                  _removeRedMarker(markerId);
+                  startWayPointAdd();
+                });
                 Navigator.pop(context);
               },
               child: Text('가는길'),
             ),
             ElevatedButton(
               onPressed: () {
-                _removeBlueMarker(markerId);
-                endWayPointAdd();
+                setState(() {
+                  _removeBlueMarker(markerId);
+                  endWayPointAdd();
+                });
                 Navigator.pop(context);
               },
               child: Text('오는길'),

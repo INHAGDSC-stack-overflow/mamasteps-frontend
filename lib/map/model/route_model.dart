@@ -1,25 +1,57 @@
 class RequestData {
   final int targetTime;
+  final int walkSpeed;
   final Coordinate origin;
-  final List<Coordinate> startCloseIntermediates;
-  final List<Coordinate> endCloseIntermediates;
+  final List<Coordinate> startCloseWaypoints;
+  final List<Coordinate> endCloseWaypoints;
+  final String createdAt;
+  final String updatedAt;
 
   RequestData({
     required this.targetTime,
+    required this.walkSpeed,
     required this.origin,
-    required this.startCloseIntermediates,
-    required this.endCloseIntermediates,
+    required this.startCloseWaypoints,
+    required this.endCloseWaypoints,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   Map<String, dynamic> toJson() => {
     'targetTime': targetTime,
+    'walkSpeed': walkSpeed,
     'origin': origin.toJson(),
-    'startCloseIntermediates':
-    startCloseIntermediates.map((i) => i.toJson()).toList(),
-    'endCloseIntermediates':
-    endCloseIntermediates.map((i) => i.toJson()).toList(),
+    'startCloseWaypoints':
+    startCloseWaypoints.map((i) => i.toJson()).toList(),
+    'endCloseWaypoints':
+    endCloseWaypoints.map((i) => i.toJson()).toList(),
+    'createdAt': createdAt,
+    'updatedAt': updatedAt,
   };
 }
+
+// class RequestData {
+//   final int targetTime;
+//   final Coordinate origin;
+//   final List<Coordinate> startCloseIntermediates;
+//   final List<Coordinate> endCloseIntermediates;
+//
+//   RequestData({
+//     required this.targetTime,
+//     required this.origin,
+//     required this.startCloseIntermediates,
+//     required this.endCloseIntermediates,
+//   });
+//
+//   Map<String, dynamic> toJson() => {
+//     'targetTime': targetTime,
+//     'origin': origin.toJson(),
+//     'startCloseIntermediates':
+//     startCloseIntermediates.map((i) => i.toJson()).toList(),
+//     'endCloseIntermediates':
+//     endCloseIntermediates.map((i) => i.toJson()).toList(),
+//   };
+// }
 
 class Coordinate {
   final double latitude;
