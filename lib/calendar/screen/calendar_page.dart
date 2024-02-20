@@ -54,10 +54,10 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
         DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
         if (events[eventDate] != null) {
           // 해당날짜에 이벤트가 이미 있는 경우
-          events[eventDate]!.add(Event(time));
+          events[eventDate]!.add(Event(time, apiResponse.result[i].date));
         } else {
           // 해당날짜에 이벤트가 없는 경우
-          events[eventDate] = [Event(time)];
+          events[eventDate] = [Event(time, apiResponse.result[i].date)];
         }
       }
     }
@@ -157,7 +157,7 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                                     _showEditDialog(index);
                                   },
                                   child: SizedBox(
-                                    height: 50,
+                                    height: 70,
                                     child: Card(
                                       color: Colors.white,
                                       elevation: 0,
@@ -165,13 +165,21 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8.0),
                                         child: Align(
-                                            child: Text(
-                                              value[index].title,
-                                              style: TextStyle(
-                                                color: Color(0xffa412db),
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${value[index].date.hour}시 ${value[index].date.minute.toString().padLeft(2,'0')}분",
+                                                ),
+                                                Text(
+                                                  value[index].title,
+                                                  style: TextStyle(
+                                                    color: Color(0xffa412db),
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             alignment: Alignment.centerLeft),
                                       ),
@@ -253,9 +261,9 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
               setState(
                 () {
                   if (events[selectedDay] != null) {
-                    events[selectedDay]!.add(Event(_eventController.text));
+                    events[selectedDay]!.add(Event(_eventController.text, selectedDay));
                   } else {
-                    events[selectedDay] = [Event(_eventController.text)];
+                    events[selectedDay] = [Event(_eventController.text, selectedDay)];
                   }
                 },
               );
@@ -316,6 +324,6 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
 
 class Event {
   String title;
-
-  Event(this.title);
+  DateTime date;
+  Event(this.title, this.date);
 }
