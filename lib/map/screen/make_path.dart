@@ -96,8 +96,10 @@ class _MakePathState extends State<MakePath> {
                       //   });
                       // },
                       onPressed: () {
-                        widget.makeRequest();
-                        Navigator.pop(context);
+                        setState(() {
+                          widget.makeRequest();
+                          Navigator.pop(context);
+                        });
                       },
                       child: Text('경로 검색'),
                     ),
