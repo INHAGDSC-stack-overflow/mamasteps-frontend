@@ -114,49 +114,49 @@ class _MapPageState extends State<MapPage> {
         key: _scaffoldKey,
         endDrawer: Drawer(
             child: ListView.builder(
-          itemCount: savedRoute.length + 1,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return DrawerHeader(
-                child: Text('Drawer Header'),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-              );
-            }
-            return ListTile(
-              title: Text('Item $index'),
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => TrackingScreen(
-                //       Path: savedRoute[index - 1].polyLine,
-                //       currentInitPosition: currentPosition,
-                //       totalSeconds: savedRoute[index - 1].totalTimeSeconds,
-                //     ),
-                //   ),
-                // );
-                setState(() {
-                  manageRouteList(savedRoute[index - 1], 'clear');
-                  manageRouteList(savedRoute[index - 1], 'add');
-                });
+              itemCount: savedRoute.length + 1,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return DrawerHeader(
+                    child: Text('Drawer Header'),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                    ),
+                  );
+                }
+                return ListTile(
+                  title: Text('Item $index'),
+                  onTap: () {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => TrackingScreen(
+                    //       Path: savedRoute[index - 1].polyLine,
+                    //       currentInitPosition: currentPosition,
+                    //       totalSeconds: savedRoute[index - 1].totalTimeSeconds,
+                    //     ),
+                    //   ),
+                    // );
+                    setState(() {
+                      manageRouteList(savedRoute[index - 1], 'clear');
+                      manageRouteList(savedRoute[index - 1], 'add');
+                    });
+                  },
+                );
               },
-            );
-          },
-          padding: EdgeInsets.zero,
-        )),
+              padding: EdgeInsets.zero,
+            )),
         floatingActionButton: (apiResponse.isSuccess)
             ? FloatingActionButton(
-                onPressed: () {
-                  int index = currentPage.toInt();
-                  // SaveRoute(apiResponse.result[index]);
-                  setState(() {
-                    manageSavedRouteList(serverRoute[index], 'add');
-                  });
-                },
-                child: Text('경로 저장'),
-              )
+          onPressed: () {
+            int index = currentPage.toInt();
+            // SaveRoute(apiResponse.result[index]);
+            setState(() {
+              manageSavedRouteList(serverRoute[index], 'add');
+            });
+          },
+          child: Text('경로 저장'),
+        )
             : null,
         backgroundColor: Color(0xFFF5F5F5),
         body: Column(
@@ -457,7 +457,7 @@ class _MapPageState extends State<MapPage> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                  MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Container(
                                       alignment: Alignment.center,
@@ -554,7 +554,7 @@ class _MapPageState extends State<MapPage> {
                                     targetTime: totalSec,
                                     endClosewayPoints: endClosewayPoints,
                                     startClosewayPoints:
-                                        startClosewayPoints,
+                                    startClosewayPoints,
                                     makeRequest: acceptEditResponse,
                                   ),
                                 ),
@@ -563,8 +563,8 @@ class _MapPageState extends State<MapPage> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: (currentHour == 0 &&
-                                      currentMin == 0 &&
-                                      currentSec == 0)
+                                  currentMin == 0 &&
+                                  currentSec == 0)
                                   ? Colors.grey
                                   : Colors.blue,
                             ),
@@ -629,8 +629,8 @@ class _MapPageState extends State<MapPage> {
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: (currentHour == 0 &&
-                                      currentMin == 0 &&
-                                      currentSec == 0)
+                                  currentMin == 0 &&
+                                  currentSec == 0)
                                   ? Colors.grey
                                   : Colors.blue,
                             ),
