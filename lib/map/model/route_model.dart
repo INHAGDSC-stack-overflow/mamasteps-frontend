@@ -128,3 +128,24 @@ class CreatedWaypoint {
         longitude: json['longitude'].toDouble(),
       );
 }
+
+class getRequestResponse {
+  final bool isSuccess;
+  final String code;
+  final String message;
+  final int targetTime; // targetTime을 직접적으로 int 타입으로 선언합니다.
+
+  getRequestResponse({
+    required this.isSuccess,
+    required this.code,
+    required this.message,
+    required this.targetTime, // 필드 선언 변경
+  });
+
+  factory getRequestResponse.fromJson(Map<String, dynamic> json) => getRequestResponse(
+    isSuccess: json['isSuccess'],
+    code: json['code'],
+    message: json['message'],
+    targetTime: json['result']['targetTime'], // JSON 객체에서 targetTime 값을 직접 추출
+  );
+}

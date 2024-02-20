@@ -243,3 +243,38 @@ Future SaveRoute(data) async {
     print('Server Error');
   }
 }
+
+
+Future<getRequestResponse> getRequestProfile(BuildContext context) async {
+  final url = 'https://dev.mamasteps.dev/api/v1/routes/getRequestProfile';
+  final AccessToken = await storage.read(key: 'access_token');
+
+  try {
+    final response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Authorization': 'Bearer $AccessToken',
+      },
+    );
+
+    print('Server Response: ${response.statusCode}');
+    print('Exception: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      final getRequestResponse apiResponse = getRequestResponse.fromJson(jsonResponse);
+      return apiResponse;
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GoogleLogin(),
+        ),
+            (route) => false,
+      );
+      return Future.error('server error');
+    }
+  } catch (error) {
+    return Future.error(error);
+  }
+}

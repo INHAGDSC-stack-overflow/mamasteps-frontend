@@ -104,6 +104,13 @@ class _MapPageState extends State<MapPage> {
     });
     await setOrigin(currentPosition);
     await createRequestProfile();
+    getRequestResponse response = await getRequestProfile(context);
+    setState(() {
+      print('초기시간 설정');
+      currentHour = response.targetTime ~/ 3600;
+      currentMin = response.targetTime ~/ 60;
+      currentSec = response.targetTime % 60;
+    });
   }
 
   @override
