@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/calendar/v3.dart' as calendarv3;
 import 'package:intl/intl.dart';
 import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
+import 'package:mamasteps_frontend/calendar/component/google_calendar.dart';
 import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -8,6 +11,10 @@ import 'package:table_calendar/table_calendar.dart';
 //   DateTime.utc(2024, 2, 2): [Event('17 분'), Event('18 분')],
 //   DateTime.utc(2024, 2, 3): [Event('20 분')],
 // };
+
+final GoogleSignIn _googleSignIn = GoogleSignIn(
+  scopes: <String>[calendarv3.CalendarApi.calendarScope],
+);
 
 class TableCalendarPage extends StatefulWidget {
   const TableCalendarPage({super.key});
@@ -17,6 +24,8 @@ class TableCalendarPage extends StatefulWidget {
 }
 
 class _TableCalendarPageState extends State<TableCalendarPage> {
+  late calendarv3.CalendarApi calendar;
+  late calendarv3.Calendar primaryCalendar;
   final Map<DateTime, List<Event>> events = {};
 
   DateTime selectedDay = DateTime(
@@ -33,12 +42,21 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
   void initState() {
     super.initState();
     selectedEvents = ValueNotifier(_getEventsForDay(selectedDay));
+    initGoogleCalendar();
   }
 
   @override
   void dispose() {
     selectedEvents.dispose();
     super.dispose();
+  }
+
+  void initGoogleCalendar() async {
+    calendar = await initCalendarApi();
+    primaryCalendar = await getCalendar(calendar, 'primary');
+    await getEvent(calendar);
+    calendarv3.Event myEvent = calendarv3.Event(end: calendarv3.EventDateTime(date: DateTime.now()), start: calendarv3.EventDateTime(), description: 'test');
+    await insertEvent(calendar, myEvent);
   }
 
   void acceptResponse() async {
