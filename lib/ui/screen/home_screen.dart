@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter_updated/flutter.dart' as charts;
+import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
+import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
+import 'package:mamasteps_frontend/storage/user/user_data.dart';
+import 'package:mamasteps_frontend/ui/component/user_server_comunication.dart';
 import 'package:mamasteps_frontend/ui/layout/home_screen_default_layout.dart';
+import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
 
 class HomeScreen extends StatefulWidget {
-  final int weeks = 16;
-  final int todayWalkTimeMin = 17;
-  final int thisWeekWalkTimeHour = 1;
-  final int thisWeekWalkTimeMin = 26;
-  final int thisWeekAchievement = 10;
-  final int totalWeekAchievement = 20;
+  // final int weeks = 16;
+  // final int todayWalkTimeMin = 17;
+  // final int thisWeekWalkTimeHour = 1;
+  // final int thisWeekWalkTimeMin = 26;
+  // final int thisWeekAchievement = 10;
+  // final int totalWeekAchievement = 20;
   const HomeScreen({
     super.key,
   });
@@ -18,12 +23,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final int weeks = 16;
-  final int todayWalkTimeMin = 17;
-  final int thisWeekWalkTimeHour = 1;
-  final int thisWeekWalkTimeMin = 26;
-  final int thisWeekAchievement = 10;
-  final int totalWeekAchievement = 20;
+  late int weeks = 0;
+  late int todayWalkTimeTotalSeconds = 0;
+  // late int todayWalkTimeMin = 0;
+  late int thisWeekWalkTimeTotalSeconds = 0;
+  // late int thisWeekWalkTimeHour = 0;
+  // late int thisWeekWalkTimeMin = 0;
+  late int thisWeekAchievement = 10;
+  late int totalWeekAchievement = 20;
+  late List<int> weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
+
+  @override
+  void initState() {
+    super.initState();
+    acceptResponse();
+    acceptUserResponse();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,16 +48,61 @@ class _HomeScreenState extends State<HomeScreen> {
     double progressBarWidth = screenWidth * 0.8 * progressRatio;
     return HomeScreenDefaultLayout(
         Header: _Header(
-          weeks: 10,
+          weeks: weeks,
         ),
         Body: buildWidgetsList(
             screenWidth,
-            todayWalkTimeMin,
-            thisWeekWalkTimeHour,
-            thisWeekWalkTimeMin,
+            // todayWalkTimeMin,
+            // thisWeekWalkTimeHour,
+            // thisWeekWalkTimeMin,
+            todayWalkTimeTotalSeconds,
+            thisWeekWalkTimeTotalSeconds,
             thisWeekAchievement,
             totalWeekAchievement,
+            weekWalkTime,
             progressBarWidth));
+  }
+
+  void acceptUserResponse() async{
+    getMeResponse apiResponse = await getMe();
+    setState(() {
+      DateTime now = DateTime.now();
+      Duration difference = now.difference(apiResponse.result.pregnancyStartDate);
+      int weeks = difference.inDays ~/ 7;
+      if (apiResponse.isSuccess) {
+        weeks = weeks;
+      }
+      user_storage.write(key: 'guardianPhoneNumber', value: apiResponse.result.guardianPhoneNumber);
+    });
+  }
+  void acceptResponse() async {
+    getRecordResponse apiResponse = await getRecords();
+    setState(() {
+      if (apiResponse.isSuccess) {
+
+        DateTime now = DateTime.now();
+        DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        DateTime endOfWeek =
+        now.add(Duration(days: DateTime.daysPerWeek - now.weekday));
+
+        for (int i = 0; i < apiResponse.result.length; i++) {
+          // 이번주 총 산책 시간 계산
+          if (apiResponse.result[i].date.isAfter(startOfWeek) &&
+              apiResponse.result[i].date.isBefore(endOfWeek)) {
+            thisWeekWalkTimeTotalSeconds +=
+                apiResponse.result[i].completedTimeSeconds;
+            // 요일별 산책 시간 저장
+            weekWalkTime[i] = apiResponse.result[i].completedTimeSeconds.toInt() ~/ 3600;
+          }
+
+          // 오늘 산책 시간 계산
+          apiResponse.result[i].date.isAtSameMomentAs(now)
+              ? todayWalkTimeTotalSeconds +=
+              apiResponse.result[i].completedTimeSeconds
+              : null;
+        }
+      }
+    });
   }
 }
 
@@ -122,38 +183,42 @@ class walkTime {
 }
 
 class SimpleBarChart extends StatelessWidget {
-  const SimpleBarChart({super.key});
+  final List<int> walkTimeList;
+
+  const SimpleBarChart({super.key,
+  required this.walkTimeList
+  });
 
   @override
   Widget build(BuildContext context) {
     final List<walkTime> seriesList = [
       walkTime(
         '월',
-        1,
+        walkTimeList[0],
       ),
       walkTime(
         '화',
-        2,
+        walkTimeList[1],
       ),
       walkTime(
         '수',
-        3,
+        walkTimeList[2],
       ),
       walkTime(
         '목',
-        4,
+        walkTimeList[3],
       ),
       walkTime(
         '금',
-        5,
+        walkTimeList[4],
       ),
       walkTime(
         '토',
-        6,
+        walkTimeList[5],
       ),
       walkTime(
         '일',
-        7,
+        walkTimeList[6],
       ),
     ];
 
@@ -190,12 +255,19 @@ class SimpleBarChart extends StatelessWidget {
 
 List<Widget> buildWidgetsList(
     double screenWidth,
-    int todayWalkTimeMin,
-    int thisWeekWalkTimeHour,
-    int thisWeekWalkTimeMin,
+    // int todayWalkTimeMin,
+    // int thisWeekWalkTimeHour,
+    // int thisWeekWalkTimeMin,
+    int totdayWalkTimeTotalSeconds,
+    int thisWeekWalkTimeTotalSeconds,
     int thisWeekAchievement,
     int totalWeekAchievement,
+    List<int> weekWalkTime,
     double progressBarWidth) {
+  int todayHours = totdayWalkTimeTotalSeconds ~/ 3600;
+  int todayMinutes = (totdayWalkTimeTotalSeconds % 3600) ~/ 60;
+  int thisWeekWalkTimeHour = thisWeekWalkTimeTotalSeconds ~/ 3600;
+  int thisWeekWalkTimeMin = (thisWeekWalkTimeTotalSeconds % 3600) ~/ 60;
   return [
     SizedBox(
       width: screenWidth,
@@ -218,7 +290,7 @@ List<Widget> buildWidgetsList(
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                '$todayWalkTimeMin M',
+                '${todayHours.toString().padLeft(2, '0')} 시간 ${todayMinutes.toString().padLeft(2, '0')} 분',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -252,7 +324,7 @@ List<Widget> buildWidgetsList(
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                '${thisWeekWalkTimeHour}H ${thisWeekWalkTimeMin}M',
+                '${thisWeekWalkTimeHour.toString().padLeft(2, '0')} 시간 ${thisWeekWalkTimeMin.toString().padLeft(2, '0')} 분',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -363,7 +435,7 @@ List<Widget> buildWidgetsList(
               height: 300,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: SimpleBarChart(), // 여기에 SimpleBarChart 위젯의 정의가 필요합니다.
+                child: SimpleBarChart(walkTimeList: weekWalkTime,), // 여기에 SimpleBarChart 위젯의 정의가 필요합니다.
               ),
             ),
           ],

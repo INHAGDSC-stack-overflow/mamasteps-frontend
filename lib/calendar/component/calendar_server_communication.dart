@@ -46,7 +46,35 @@ Future<void> addRecord(int completedTimeSeconds) async {
   }
 }
 
-Future<getScheduleResponse> getSchedules() async {
+Future<void> createAutoSchedule() async {
+  final url = 'https://dev.mamasteps.dev/api/v1/calendar/createAutoSchedule';
+  final AccessToken = await storage.read(key: 'access_token');
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Authorization': 'Bearer $AccessToken',
+      },
+    );
+
+    print('Server Response: ${response.statusCode}');
+    print('Exception: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('success');
+      final jsonResponse = jsonDecode(response.body);
+      print(jsonResponse);
+
+    } else {
+      return Future.error('server error');
+    }
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<getScheduleResponse> getSchdule() async {
   final url = 'https://dev.mamasteps.dev/api/v1/calendar/getSchedules';
   final AccessToken = await storage.read(key: 'access_token');
 
@@ -66,7 +94,7 @@ Future<getScheduleResponse> getSchedules() async {
       final jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
       final getScheduleResponse apiResponse =
-          getScheduleResponse.fromJson(jsonResponse);
+      getScheduleResponse.fromJson(jsonResponse);
       return apiResponse;
     } else {
       return Future.error('server error');

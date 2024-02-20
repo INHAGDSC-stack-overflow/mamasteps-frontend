@@ -163,7 +163,7 @@ class getScheduleResponse {
 
 class getScheduleResult {
   final int id;
-  final int routeId;
+  final int? routeId;
   final DateTime date;
   final int targetTimeSeconds;
   final String createdAt;
@@ -171,7 +171,7 @@ class getScheduleResult {
 
   getScheduleResult({
     required this.id,
-    required this.routeId,
+    this.routeId,
     required this.date,
     required this.targetTimeSeconds,
     required this.createdAt,
@@ -179,10 +179,18 @@ class getScheduleResult {
   });
 
   factory getScheduleResult.fromJson(Map<String, dynamic> json) {
+    var dateList = json['date'] as List;
+    DateTime date = DateTime(
+      dateList[0],
+      dateList[1],
+      dateList[2],
+      dateList[3],
+      dateList[4],
+    );
     return getScheduleResult(
       id: json['id'],
       routeId: json['routeId'],
-      date: DateTime.parse(json['date']),
+      date: date,
       targetTimeSeconds: json['targetTimeSeconds'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],

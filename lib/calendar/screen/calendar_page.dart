@@ -42,7 +42,7 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
   }
 
   void acceptResponse() async {
-    getScheduleResponse apiResponse = await getSchedules();
+    getScheduleResponse apiResponse = await getSchdule();
     if (apiResponse.isSuccess) {
       for (int i = 0; i < apiResponse.result.length; i++) {
         DateTime date = apiResponse.result[i].date;
