@@ -27,10 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
   late int todayWalkTimeTotalSeconds = 0;
   // late int todayWalkTimeMin = 0;
   late int thisWeekWalkTimeTotalSeconds = 0;
+  late int recommended = 0;
   // late int thisWeekWalkTimeHour = 0;
   // late int thisWeekWalkTimeMin = 0;
-  late int thisWeekAchievement = 10;
-  late int totalWeekAchievement = 20;
+  late int thisWeekAchievement = 0;
+  late int totalWeekAchievement = 7;
   late List<int> weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
 
   @override
@@ -38,8 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     acceptResponse();
     acceptUserResponse();
+    acceptGetInfo();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -51,39 +52,64 @@ class _HomeScreenState extends State<HomeScreen> {
           weeks: weeks,
         ),
         Body: buildWidgetsList(
-            screenWidth,
-            // todayWalkTimeMin,
-            // thisWeekWalkTimeHour,
-            // thisWeekWalkTimeMin,
-            todayWalkTimeTotalSeconds,
-            thisWeekWalkTimeTotalSeconds,
-            thisWeekAchievement,
-            totalWeekAchievement,
-            weekWalkTime,
-            progressBarWidth));
+          screenWidth,
+          // todayWalkTimeMin,
+          // thisWeekWalkTimeHour,
+          // thisWeekWalkTimeMin,
+          todayWalkTimeTotalSeconds,
+          thisWeekWalkTimeTotalSeconds,
+          thisWeekAchievement,
+          totalWeekAchievement,
+          weekWalkTime,
+          recommended,
+          progressBarWidth,
+        ));
   }
 
-  void acceptUserResponse() async{
+  void initThisWeekAchievement() {
+    setState(() {
+      for (int i = 0; i < weekWalkTime.length; i++) {
+        if (weekWalkTime[i] > recommended * 0.9) {
+          thisWeekAchievement++;
+        }
+      }
+    });
+  }
+
+  void acceptGetInfo() async {
+    myInfo apiResponse = await getMyInfo();
+    setState(() {
+      if (apiResponse.isSuccess) {
+        recommended = apiResponse.targetTime ~/ 60;
+      }
+    });
+  }
+
+  void acceptUserResponse() async {
     getMeResponse apiResponse = await getMe();
     setState(() {
       DateTime now = DateTime.now();
-      Duration difference = now.difference(apiResponse.result.pregnancyStartDate);
-      int weeks = difference.inDays ~/ 7;
-      if (apiResponse.isSuccess) {
-        weeks = weeks;
-      }
-      user_storage.write(key: 'guardianPhoneNumber', value: apiResponse.result.guardianPhoneNumber);
+      Duration difference = now.difference(DateTime(
+          apiResponse.pregnancyStartDate[0],
+          apiResponse.pregnancyStartDate[1],
+          apiResponse.pregnancyStartDate[2]));
+      weeks = difference.inDays ~/ 7;
+      // if (apiResponse.isSuccess) {
+      //   weeks = weeks;
+      // }
+      user_storage.write(
+          key: 'guardianPhoneNumber', value: apiResponse.guardianPhoneNumber);
     });
   }
+
   void acceptResponse() async {
     getRecordResponse apiResponse = await getRecords();
     setState(() {
       if (apiResponse.isSuccess) {
-
         DateTime now = DateTime.now();
         DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
         DateTime endOfWeek =
-        now.add(Duration(days: DateTime.daysPerWeek - now.weekday));
+            now.add(Duration(days: DateTime.daysPerWeek - now.weekday));
 
         for (int i = 0; i < apiResponse.result.length; i++) {
           // 이번주 총 산책 시간 계산
@@ -92,13 +118,14 @@ class _HomeScreenState extends State<HomeScreen> {
             thisWeekWalkTimeTotalSeconds +=
                 apiResponse.result[i].completedTimeSeconds;
             // 요일별 산책 시간 저장
-            weekWalkTime[i] = apiResponse.result[i].completedTimeSeconds.toInt() ~/ 3600;
+            weekWalkTime[i] =
+                apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
           }
 
           // 오늘 산책 시간 계산
           apiResponse.result[i].date.isAtSameMomentAs(now)
               ? todayWalkTimeTotalSeconds +=
-              apiResponse.result[i].completedTimeSeconds
+                  apiResponse.result[i].completedTimeSeconds
               : null;
         }
       }
@@ -188,9 +215,12 @@ class walkTime {
 
 class SimpleBarChart extends StatelessWidget {
   final List<int> walkTimeList;
+  final int recommended;
 
-  const SimpleBarChart({super.key,
-  required this.walkTimeList
+  const SimpleBarChart({
+    super.key,
+    required this.walkTimeList,
+    required this.recommended,
   });
 
   @override
@@ -236,14 +266,22 @@ class SimpleBarChart extends StatelessWidget {
     ];
 
     return charts.BarChart(
+      primaryMeasureAxis: new charts.NumericAxisSpec(
+          tickProviderSpec:
+              charts.StaticNumericTickProviderSpec(<charts.TickSpec<num>>[
+        charts.TickSpec<num>(0),
+        charts.TickSpec<num>(20),
+        charts.TickSpec<num>(40),
+        charts.TickSpec<num>(60),
+      ])),
       series,
       animate: true,
       behaviors: [
         new charts.RangeAnnotation(
           [
             charts.RangeAnnotationSegment(
-              3,
-              3,
+              recommended,
+              recommended,
               charts.RangeAnnotationAxisType.measure,
               color: charts.MaterialPalette.gray.shadeDefault,
               startLabel: 'recommended',
@@ -258,20 +296,23 @@ class SimpleBarChart extends StatelessWidget {
 }
 
 List<Widget> buildWidgetsList(
-    double screenWidth,
-    // int todayWalkTimeMin,
-    // int thisWeekWalkTimeHour,
-    // int thisWeekWalkTimeMin,
-    int totdayWalkTimeTotalSeconds,
-    int thisWeekWalkTimeTotalSeconds,
-    int thisWeekAchievement,
-    int totalWeekAchievement,
-    List<int> weekWalkTime,
-    double progressBarWidth) {
+  double screenWidth,
+  // int todayWalkTimeMin,
+  // int thisWeekWalkTimeHour,
+  // int thisWeekWalkTimeMin,
+  int totdayWalkTimeTotalSeconds,
+  int thisWeekWalkTimeTotalSeconds,
+  int thisWeekAchievement,
+  int totalWeekAchievement,
+  List<int> weekWalkTime,
+  int recommended,
+  double progressBarWidth,
+) {
   int todayHours = totdayWalkTimeTotalSeconds ~/ 3600;
   int todayMinutes = (totdayWalkTimeTotalSeconds % 3600) ~/ 60;
   int thisWeekWalkTimeHour = thisWeekWalkTimeTotalSeconds ~/ 3600;
   int thisWeekWalkTimeMin = (thisWeekWalkTimeTotalSeconds % 3600) ~/ 60;
+
   return [
     SizedBox(
       width: screenWidth,
@@ -294,7 +335,9 @@ List<Widget> buildWidgetsList(
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                '${todayHours.toString().padLeft(2, '0')} 시간 ${todayMinutes.toString().padLeft(2, '0')} 분',
+                todayHours > 0
+                    ? '${todayHours.toString().padLeft(2, '0')} 시간 ${todayMinutes.toString().padLeft(2, '0')} 분'
+                    : '${todayMinutes.toString().padLeft(2, '0')} 분',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -328,7 +371,9 @@ List<Widget> buildWidgetsList(
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                '${thisWeekWalkTimeHour.toString().padLeft(2, '0')} 시간 ${thisWeekWalkTimeMin.toString().padLeft(2, '0')} 분',
+                thisWeekWalkTimeHour > 0
+                    ? '${thisWeekWalkTimeHour.toString().padLeft(2, '0')} 시간 ${thisWeekWalkTimeMin.toString().padLeft(2, '0')} 분'
+                    : '${thisWeekWalkTimeMin.toString().padLeft(2, '0')} 분',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -354,7 +399,7 @@ List<Widget> buildWidgetsList(
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
-                    '이번 주 업적 달성률',
+                    '이번 주 목표 달성률',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -439,7 +484,10 @@ List<Widget> buildWidgetsList(
               height: 300,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: SimpleBarChart(walkTimeList: weekWalkTime,), // 여기에 SimpleBarChart 위젯의 정의가 필요합니다.
+                child: SimpleBarChart(
+                  walkTimeList: weekWalkTime,
+                  recommended: recommended,
+                ), // 여기에 SimpleBarChart 위젯의 정의가 필요합니다.
               ),
             ),
           ],
