@@ -155,6 +155,16 @@ class _Header extends StatelessWidget {
             ),
           ),
           Positioned(
+            left: 5,
+            top: 10,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.4,
+              child: Image.asset("asset/image/mamasteps_logo.png",
+              fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned(
             right: 0,
             child: IconButton(
               icon: Icon(Icons.settings),
