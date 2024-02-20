@@ -47,24 +47,22 @@ class HomeScreenDefaultLayout extends StatelessWidget {
             ),
           ),
         ),
-        body: Column(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Header,
-            ),
-            Expanded(
-              flex: 3,
-              child: SingleChildScrollView(
-                child: Padding(
+        body: SizedBox(
+          width: screenWidth,
+          height: MediaQuery.of(context).size.height,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Header,
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: Body,
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

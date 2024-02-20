@@ -119,6 +119,61 @@ class _MapPageState extends State<MapPage> {
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
+        // endDrawer: Drawer(
+        //     child: ListView.builder(
+        //   itemCount: savedRoute.length + 1,
+        //   itemBuilder: (context, index) {
+        //     if (index == 0) {
+        //       return DrawerHeader(
+        //         child: Text('Drawer Header'),
+        //         decoration: BoxDecoration(
+        //           color: Colors.blue,
+        //         ),
+        //       );
+        //     }
+        //     return ListTile(
+        //       title: Text('Item $index'),
+        //       onTap: () {
+        //         // Navigator.push(
+        //         //   context,
+        //         //   MaterialPageRoute(
+        //         //     builder: (context) => TrackingScreen(
+        //         //       Path: savedRoute[index - 1].polyLine,
+        //         //       currentInitPosition: currentPosition,
+        //         //       totalSeconds: savedRoute[index - 1].totalTimeSeconds,
+        //         //     ),
+        //         //   ),
+        //         // );
+        //         setState(() {
+        //           manageRouteList(savedRoute[index - 1], 'clear');
+        //           manageRouteList(savedRoute[index - 1], 'add');
+        //         });
+        //       },
+        //     );
+        //   },
+        //   padding: EdgeInsets.zero,
+        // )),
+        floatingActionButton: (apiResponse.isSuccess)
+            ? SizedBox(
+                width: 80,
+              child: FloatingActionButton(
+                  onPressed: () {
+                    int index = currentPage.toInt();
+                    setState(() {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TrackingScreen(
+                                Path: serverRoute[index].polyLine,
+                                currentInitPosition: currentPosition,
+                                totalSeconds: serverRoute[index].totalTimeSeconds),
+                          ));
+                    });
+                  },
+                  child: Text('산책 하기'),
+                ),
+            )
+=======
         endDrawer: Drawer(
             child: ListView.builder(
               itemCount: savedRoute.length + 1,
@@ -164,7 +219,7 @@ class _MapPageState extends State<MapPage> {
           },
           child: Text('경로 저장'),
         )
-            : null,
+          : null,
         backgroundColor: Color(0xFFF5F5F5),
         body: Column(
           children: [
@@ -195,19 +250,19 @@ class _MapPageState extends State<MapPage> {
                         ),
                       ),
                     ),
-                    Positioned(
-                      right: 0,
-                      top: 40,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.menu,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          _scaffoldKey.currentState!.openEndDrawer();
-                        },
-                      ),
-                    ),
+                    // Positioned(
+                    //   right: 0,
+                    //   top: 40,
+                    //   child: IconButton(
+                    //     icon: Icon(
+                    //       Icons.menu,
+                    //       color: Colors.white,
+                    //     ),
+                    //     onPressed: () {
+                    //       _scaffoldKey.currentState!.openEndDrawer();
+                    //     },
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
