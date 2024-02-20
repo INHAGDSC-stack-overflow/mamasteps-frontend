@@ -115,62 +115,66 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        Positioned(
-          child: Image.asset(
-            'asset/image/root_tab_top_image.png',
-            fit: BoxFit.cover,
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 300,
+      child: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          Positioned(
+            child: Image.asset(
+              'asset/image/root_tab_top_image.png',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        Positioned(
-          right: 0,
-          child: IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {},
+          Positioned(
+            right: 0,
+            child: IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {},
+            ),
           ),
-        ),
-        Positioned(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                child: Text(
-                  '임신',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+          Positioned(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  child: Text(
+                    '임신',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                child: Text(
-                  weeks.toString(),
-                  style: TextStyle(
-                    fontSize: 52,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                const SizedBox(width: 10),
+                Container(
+                  child: Text(
+                    weeks.toString(),
+                    style: TextStyle(
+                      fontSize: 52,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                child: Text(
-                  '주차',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                const SizedBox(width: 10),
+                Container(
+                  child: Text(
+                    '주차',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
