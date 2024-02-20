@@ -141,17 +141,19 @@ class _MakePathState extends State<MakePath> {
   }
 
   Future<void> setBlueMarker() async {
-    blue_marker = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'asset/image/blue_marker.png',
-    );
+    // blue_marker = await BitmapDescriptor.fromAssetImage(
+    //   ImageConfiguration(devicePixelRatio: 2.5),
+    //   'asset/image/blue_marker.png',
+    // );
+    blue_marker = await BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
   }
 
   Future<void> setRedMarker() async {
-    red_marker = await BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 2.5),
-      'asset/image/red_marker.png',
-    );
+    // red_marker = await BitmapDescriptor.fromAssetImage(
+    //   ImageConfiguration(devicePixelRatio: 2.5),
+    //   'asset/image/red_marker.png',
+    // );
+    red_marker = await BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
   }
 
   void startWayPointAdd() {
