@@ -68,7 +68,7 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
         int hours = completedTimeSeconds ~/ 3600;
         int minutes = (completedTimeSeconds % 3600) ~/ 60;
         String time =
-            '${hours.toString().padLeft(2, '0')} 시간 ${minutes.toString().padLeft(2, '0')} 분';
+            '${minutes.toString().padLeft(2, '0')} 분';
         DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
         if (events[eventDate] != null) {
           // 해당날짜에 이벤트가 이미 있는 경우
@@ -95,126 +95,136 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
             onPressed: () {
               _showSelectDialog();
             }),
-        body: Column(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Stack(
-                fit: StackFit.expand,
-                children: <Widget>[
-                  Positioned(
-                    child: Image.asset(
-                      'asset/image/others_home_screen_back_ground_image.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned(
-                    left: 0,
-                    top: 40,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        "산책 일정 관리",
-                        style: TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 170,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    Positioned(
+                      child: Image.asset(
+                        'asset/image/others_home_screen_back_ground_image.png',
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 15),
-            Expanded(
-              flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Card(
-                      child: TableCalendar(
-                        // 캘린더
-                        locale: 'ko_KR',
-                        firstDay: DateTime.utc(2010, 10, 16),
-                        lastDay: DateTime.utc(2030, 3, 14),
-                        focusedDay: focusedDay,
-                        onDaySelected: _onDaySelected,
-                        selectedDayPredicate: (DateTime day) {
-                          return isSameDay(selectedDay, day);
-                        },
-                        eventLoader: _getEventsForDay,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Padding(
-                      //날짜 출력부
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
+                    Positioned(
+                      left: 0,
+                      top: 40,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
-                          DateFormat('yyyy년 MM월 dd일 산책일정').format(selectedDay),
+                          "산책 일정 관리",
                           style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.normal),
+                            fontSize: 35,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Expanded(
-                      // 이벤트 리스트 출력부
-                      child: ValueListenableBuilder<List<Event>>(
-                        valueListenable: selectedEvents,
-                        builder: (context, value, _) {
-                          return ListView.builder(
-                            itemCount: value.length,
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                title: InkWell(
-                                  onTap: () {
-                                    _showEditDialog(index);
-                                  },
-                                  child: SizedBox(
-                                    height: 70,
-                                    child: Card(
-                                      color: Colors.white,
-                                      elevation: 0,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0),
-                                        child: Align(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${value[index].date.hour}시 ${value[index].date.minute.toString().padLeft(2,'0')}분",
-                                                ),
-                                                Text(
-                                                  value[index].title,
-                                                  style: TextStyle(
-                                                    color: Color(0xffa412db),
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            alignment: Alignment.centerLeft),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                height: 600,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Card(
+                        child: TableCalendar(
+                          // 캘린더
+                          locale: 'ko_KR',
+                          firstDay: DateTime.utc(2010, 10, 16),
+                          lastDay: DateTime.utc(2030, 3, 14),
+                          focusedDay: focusedDay,
+                          onDaySelected: _onDaySelected,
+                          selectedDayPredicate: (DateTime day) {
+                            return isSameDay(selectedDay, day);
+                          },
+                          eventLoader: _getEventsForDay,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      Padding(
+                        //날짜 출력부
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            DateFormat('yyyy년 MM월 dd일 산책일정').format(selectedDay),
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.normal),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      Expanded(
+                        // 이벤트 리스트 출력부
+                        child: ValueListenableBuilder<List<Event>>(
+                          valueListenable: selectedEvents,
+                          builder: (context, value, _) {
+                            return ListView.builder(
+                              itemCount: value.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  title: InkWell(
+                                    onTap: () {
+                                      _showEditDialog(index);
+                                    },
+                                    child: SizedBox(
+                                      height: 80,
+                                      child: Card(
+                                        color: Colors.white,
+                                        elevation: 0,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: Align(
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "${value[index].date.hour ~/ 12}시 ${value[index].date.minute.toString().padLeft(2,'0')}분",
+                                                    style: TextStyle(
+
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    value[index].title,
+                                                    style: TextStyle(
+                                                      color: Color(0xffa412db),
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              alignment: Alignment.centerLeft),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
