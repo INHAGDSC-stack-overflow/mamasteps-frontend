@@ -275,7 +275,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
               markerId: MarkerId('current'),
               position:
                   LatLng(currentPosition.latitude, currentPosition.longitude),
-              icon: BitmapDescriptor.defaultMarker,
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
             ),
           );
 
@@ -292,7 +292,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             if (distance < 10) {
               if (movementTimer == null) {
                 movementTimer = Timer(
-                  Duration(seconds: 10),
+                  Duration(minutes: 5),
                   () {
                     if (isRunning) {
                       pauseTimer();
@@ -305,6 +305,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             }
           } else {
             // 사용자가 움직였음, 타이머 리셋
+            print('사용자가 다시 움직임');
             movementTimer?.cancel();
             movementTimer = null;
           }
@@ -316,14 +317,17 @@ class _TrackingScreenState extends State<TrackingScreen> {
           );
           // 목적지에 도착했을 때, 최대로 멀리간 거리 기준으로 판단
           if (initDistance > widget.totalMeter * 0.5 && !ismiddle) {
+            print('중간지점 도착');
             ismiddle = true;
           } else if (initDistance < 25 && ismiddle) {
+            print('도착');
             int completeTimeSeconds = widget.totalSeconds - duration.inSeconds;
             movementTimer?.cancel();
             movementTimer = null;
             _stopTracking();
-            addRecord(widget.totalSeconds);
+            addRecord(completeTimeSeconds);
             optimizeSpeed(widget.totalMeter, completeTimeSeconds);
+            afterTrackingDialog();
           }
           // 마지막 위치 업데이트
           lastPosition = position;
@@ -341,20 +345,32 @@ class _TrackingScreenState extends State<TrackingScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('산책 완료'),
-          content: Column(
-            children: [
-              Text('산책의 만족도를 평가해 주세요'),
-              NumberPicker(
-                  axis: Axis.horizontal,
-                  minValue: -9,
-                  maxValue: 9,
-                  value: afterRating,
+          content: SizedBox(
+            height: 100,
+            child: Column(
+              children: [
+                Text('산책의 만족도를 평가해 주세요'),
+                // NumberPicker(
+                //     axis: Axis.horizontal,
+                //     minValue: -9,
+                //     maxValue: 9,
+                //     value: afterRating,
+                //     onChanged: (value) {
+                //       setState(() {
+                //         afterRating = value;
+                //       });
+                //     })
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: '평가',
+                    hintText: '-9 ~ 9 까지의 수를 입력해 주세요',
+                  ),
                   onChanged: (value) {
-                    setState(() {
-                      afterRating = value;
-                    });
-                  })
-            ],
+                    afterRating = int.parse(value);
+                  },
+                )
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -381,8 +397,9 @@ class _TrackingScreenState extends State<TrackingScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        localtimer = Timer(Duration(seconds: 5), () {
+        localtimer = Timer(Duration(minutes: 1), () {
           String recipient = user_storage.read(key: 'guardian_phone').toString();
+          print('보호자 번호: $recipient');
           sendSmsMessageToGuardian('테스트용 문자', [recipient]);
           localtimer?.cancel();
           Navigator.pop(context);
