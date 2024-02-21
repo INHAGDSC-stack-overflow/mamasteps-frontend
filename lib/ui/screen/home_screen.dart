@@ -316,12 +316,10 @@ class SimpleBarChart extends StatelessWidget {
       behaviors: [
         new charts.RangeAnnotation(
           [
-            charts.RangeAnnotationSegment(
-              recommended,
+            charts.LineAnnotationSegment(
               recommended,
               charts.RangeAnnotationAxisType.measure,
-              color: charts.MaterialPalette.gray.shadeDefault,
-              startLabel: 'recommended',
+              color: charts.MaterialPalette.red.shadeDefault,
               labelDirection: charts.AnnotationLabelDirection.horizontal,
               labelAnchor: charts.AnnotationLabelAnchor.start,
             ),
