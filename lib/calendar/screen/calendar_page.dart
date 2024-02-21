@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart' as calendarv3;
+import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
+import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
+import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
-import 'package:mamasteps_frontend/calendar/component/google_calendar.dart';
 import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:mamasteps_frontend/calendar/component/google_calendar.dart' as myGoogle;
 
 // Map<DateTime, List<Event>> events = {
 //   DateTime.utc(2024, 2, 2): [Event('17 분'), Event('18 분')],
 //   DateTime.utc(2024, 2, 3): [Event('20 분')],
 // };
-
-final GoogleSignIn _googleSignIn = GoogleSignIn(
+final GoogleSignIn myGoogleSignIn = GoogleSignIn(
+  // Optional clientId
+  // clientId: '[YOUR_OAUTH_2_CLIENT_ID]',
   scopes: <String>[calendarv3.CalendarApi.calendarScope],
 );
 
+
+
 class TableCalendarPage extends StatefulWidget {
-  const TableCalendarPage({super.key});
+  const TableCalendarPage({super.key,
+  });
 
   @override
   State<TableCalendarPage> createState() => _TableCalendarPageState();
@@ -53,12 +60,23 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
     super.initState();
     selectedEvents = ValueNotifier(_getEventsForDay(selectedDay));
     //initGoogleCalendar();
+    googleInit();
   }
 
   @override
   void dispose() {
     selectedEvents.dispose();
     super.dispose();
+  }
+
+  void googleInit() async{
+    await myGoogleSignIn.signInSilently();
+    final auth.AuthClient? client = await myGoogleSignIn.authenticatedClient();
+    assert(client != null, 'Authenticated client missing!');
+    final calendarv3.CalendarApi calendarApi = calendarv3.CalendarApi(client!);
+    setState(() {
+      calendar = calendarApi;
+    });
   }
 
   // void initGoogleCalendar() async {
@@ -68,7 +86,6 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
   //   calendarv3.Event myEvent = calendarv3.Event(end: calendarv3.EventDateTime(date: DateTime.now()), start: calendarv3.EventDateTime(), description: 'test');
   //   await insertEvent(calendar, myEvent);
   // }
-
   void acceptResponse() async {
     getScheduleResponse apiResponse = await getSchdule();
     if (apiResponse.isSuccess) {
@@ -78,8 +95,23 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
           int completedTimeSeconds = apiResponse.result[i].targetTimeSeconds;
           int hours = completedTimeSeconds ~/ 3600;
           int minutes = (completedTimeSeconds % 3600) ~/ 60;
+          String hourTime = '${hours.toString().padLeft(2, '0')} 시';
           String time =
               '${minutes.toString().padLeft(2, '0')} 분';
+
+          DateTime endTime = apiResponse.result[i].date.add(Duration(seconds: completedTimeSeconds));
+
+          var tempEvent = calendarv3.Event(
+              summary: "${time} 산책 일정",
+              start: calendarv3.EventDateTime(
+                dateTime: date,
+              ),
+              end: calendarv3.EventDateTime(
+                dateTime: endTime,
+              ));
+
+          myGoogle.insertEvents(calendar,tempEvent);
+
           DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
           // if (events[eventDate] != null) {
           //   // 해당날짜에 이벤트가 이미 있는 경우

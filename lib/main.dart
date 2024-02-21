@@ -29,7 +29,7 @@ void main() async {
       child: MaterialApp(
         // 2번코드
         debugShowCheckedModeBanner: false,
-        home: SignInDemo(),
+        home: SplashScreen(),
       ),
     ),
   );

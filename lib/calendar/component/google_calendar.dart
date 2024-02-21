@@ -179,6 +179,6 @@ Future<Events> getEvents(CalendarApi calendarApi) async {
 
 Future<Event> insertEvents(CalendarApi calendarApi, Event data)  async {
   final Event response = await calendarApi.events.insert(data, 'primary');
-
+  print("insert Events response : " + response.toString());
   return response;
 }
