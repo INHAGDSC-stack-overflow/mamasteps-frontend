@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    pageInit();
     acceptResponse();
     acceptUserResponse();
     acceptGetInfo();
@@ -46,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double progressRatio = thisWeekAchievement / totalWeekAchievement;
-    double progressBarWidth = screenWidth * 0.8 * progressRatio;
+    double progressBarWidth = screenWidth * progressRatio;
     return HomeScreenDefaultLayout(
         Header: _Header(
           weeks: weeks,
@@ -64,6 +65,16 @@ class _HomeScreenState extends State<HomeScreen> {
           recommended,
           progressBarWidth,
         ));
+  }
+
+  void pageInit() {
+    weeks = 0;
+    todayWalkTimeTotalSeconds = 0;
+    thisWeekWalkTimeTotalSeconds = 0;
+    recommended = 0;
+    thisWeekAchievement = 0;
+    totalWeekAchievement = 7;
+    weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
   }
 
   void initThisWeekAchievement() {
@@ -103,30 +114,45 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void acceptResponse() async {
+    bool isSameDate(DateTime date1, DateTime date2) {
+      return date1.year == date2.year &&
+          date1.month == date2.month &&
+          date1.day == date2.day;
+    }
+
     getRecordResponse apiResponse = await getRecords();
     setState(() {
       if (apiResponse.isSuccess) {
         DateTime now = DateTime.now();
+
         DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
         DateTime endOfWeek =
-            now.add(Duration(days: DateTime.daysPerWeek - now.weekday));
+            now.add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
 
         for (int i = 0; i < apiResponse.result.length; i++) {
+          DateTime apiDate = apiResponse.result[i].date;
+          int apiCompletedTimeSeconds =
+              apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
+          int diffrence = apiDate.difference(startOfWeek).inDays + 1;
           // 이번주 총 산책 시간 계산
           if (apiResponse.result[i].date.isAfter(startOfWeek) &&
               apiResponse.result[i].date.isBefore(endOfWeek)) {
+            // 요일별 시간 저장
+            weekWalkTime[diffrence] += apiCompletedTimeSeconds;
             thisWeekWalkTimeTotalSeconds +=
                 apiResponse.result[i].completedTimeSeconds;
-            // 요일별 산책 시간 저장
-            weekWalkTime[i] =
-                apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
           }
 
           // 오늘 산책 시간 계산
-          apiResponse.result[i].date.isAtSameMomentAs(now)
+          isSameDate(apiDate, now)
               ? todayWalkTimeTotalSeconds +=
                   apiResponse.result[i].completedTimeSeconds
               : null;
+        }
+        for (int i = 0; i < weekWalkTime.length; i++) {
+          if (weekWalkTime[i] > recommended * 0.9) {
+            thisWeekAchievement++;
+          }
         }
       }
     });
@@ -159,8 +185,9 @@ class _Header extends StatelessWidget {
             top: 10,
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.4,
-              child: Image.asset("asset/image/mamasteps_logo.png",
-              fit: BoxFit.cover,
+              child: Image.asset(
+                "asset/image/mamasteps_logo.png",
+                fit: BoxFit.cover,
               ),
             ),
           ),
