@@ -9,7 +9,7 @@
 
 
     <application
-        android:label="google_map_proj"
+        android:label="mamasteps"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
