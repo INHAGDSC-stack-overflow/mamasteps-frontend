@@ -170,3 +170,15 @@ class SignInDemoState extends State<SignInDemo> {
 //   print("getCalendar response : " + response.toString());
 //   // #enddocregion CreateAPIClient
 // }
+
+Future<Events> getEvents(CalendarApi calendarApi) async {
+  final Events response = await calendarApi.events.list('primary');
+
+  return response;
+}
+
+Future<Event> insertEvents(CalendarApi calendarApi, Event data)  async {
+  final Event response = await calendarApi.events.insert(data, 'primary');
+
+  return response;
+}
