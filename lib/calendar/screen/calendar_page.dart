@@ -42,7 +42,7 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
   void initState() {
     super.initState();
     selectedEvents = ValueNotifier(_getEventsForDay(selectedDay));
-    initGoogleCalendar();
+    //initGoogleCalendar();
   }
 
   @override
@@ -51,13 +51,13 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
     super.dispose();
   }
 
-  void initGoogleCalendar() async {
-    calendar = await initCalendarApi();
-    primaryCalendar = await getCalendar(calendar, 'primary');
-    await getEvent(calendar);
-    calendarv3.Event myEvent = calendarv3.Event(end: calendarv3.EventDateTime(date: DateTime.now()), start: calendarv3.EventDateTime(), description: 'test');
-    await insertEvent(calendar, myEvent);
-  }
+  // void initGoogleCalendar() async {
+  //   calendar = await initCalendarApi();
+  //   primaryCalendar = await getCalendar(calendar, 'primary');
+  //   await getEvent(calendar);
+  //   calendarv3.Event myEvent = calendarv3.Event(end: calendarv3.EventDateTime(date: DateTime.now()), start: calendarv3.EventDateTime(), description: 'test');
+  //   await insertEvent(calendar, myEvent);
+  // }
 
   void acceptResponse() async {
     getScheduleResponse apiResponse = await getSchdule();
