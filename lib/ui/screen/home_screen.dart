@@ -14,6 +14,7 @@ class HomeScreen extends StatefulWidget {
   // final int thisWeekWalkTimeMin = 26;
   // final int thisWeekAchievement = 10;
   // final int totalWeekAchievement = 20;
+
   const HomeScreen({
     super.key,
   });
@@ -73,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
     thisWeekWalkTimeTotalSeconds = 0;
     recommended = 0;
     thisWeekAchievement = 0;
-    totalWeekAchievement = 7;
+    totalWeekAchievement = 2;
     weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
   }
 
@@ -128,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
         DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
         DateTime endOfWeek =
             now.add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
-
+        int tempWeekTask =0;
         for (int i = 0; i < apiResponse.result.length; i++) {
           DateTime apiDate = apiResponse.result[i].date;
           int apiCompletedTimeSeconds =
@@ -138,11 +139,12 @@ class _HomeScreenState extends State<HomeScreen> {
           if (apiResponse.result[i].date.isAfter(startOfWeek) &&
               apiResponse.result[i].date.isBefore(endOfWeek)) {
             // 요일별 시간 저장
+            tempWeekTask++;
             weekWalkTime[diffrence] += apiCompletedTimeSeconds;
             thisWeekWalkTimeTotalSeconds +=
                 apiResponse.result[i].completedTimeSeconds;
           }
-
+          totalWeekAchievement = tempWeekTask;
           // 오늘 산책 시간 계산
           isSameDate(apiDate, now)
               ? todayWalkTimeTotalSeconds +=

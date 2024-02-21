@@ -107,9 +107,9 @@ class _userProfilePageState extends State<userProfilePage> {
         profileImageUrl:
             'https://lh3.googleusercontent.com/a/ACg8ocIr5TFXGf6UJATm6xjdXZ64DRBZfiEn3zdBFKG2EGQbrpg',
         email: 'tlgusld03@gmail.com',
-        name: '김태훈',
+        name: '김영래',
         age: 28,
-        pregnancyStartDate: DateTime.parse('2021-08-01'),
+        pregnancyStartDate: DateTime.parse('2024-01-13'),
         guardianPhoneNumber: '010-1234-5678',
         activityLevel: '보통',
         walkPreferences: [

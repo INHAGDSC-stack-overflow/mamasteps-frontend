@@ -92,8 +92,7 @@ class _MapPageState extends State<MapPage> {
     //     currentPosition = value;
     //   });
     // });
-    // setOrigin(currentPosition);
-    // createRequestProfile();
+    setOrigin(currentPosition);
     userInitSetting();
   }
 
@@ -574,6 +573,7 @@ class _MapPageState extends State<MapPage> {
                               // setState(() {
                               //   timeConvert();
                               // });
+                              createRequestProfile();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -646,6 +646,7 @@ class _MapPageState extends State<MapPage> {
                               // final response = widget.makeRequest();
                               // widget.acceptResponse(response);
                               // onCheckChange();
+                              createRequestProfile();
                               acceptResponse();
                             },
                             child: Text(

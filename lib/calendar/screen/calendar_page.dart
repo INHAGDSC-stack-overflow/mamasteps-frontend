@@ -26,7 +26,17 @@ class TableCalendarPage extends StatefulWidget {
 class _TableCalendarPageState extends State<TableCalendarPage> {
   late calendarv3.CalendarApi calendar;
   late calendarv3.Calendar primaryCalendar;
-  final Map<DateTime, List<Event>> events = {};
+  final Map<DateTime, List<Event>> events = {
+    DateTime.utc(2024, 2, 1): [Event('13 분', DateTime.utc(2024, 2, 1,15,20))],
+    DateTime.utc(2024, 2, 3): [Event('13 분', DateTime.utc(2024, 2, 3,15,20))],
+    DateTime.utc(2024, 2, 15): [Event('17 분', DateTime.utc(2024, 2, 15,13,15))],
+    DateTime.utc(2024, 2, 11): [Event('23 분', DateTime.utc(2024, 2, 11,17,15))],
+    DateTime.utc(2024, 2, 20): [Event('23 분', DateTime.utc(2024, 2, 20,17,15))],
+    DateTime.utc(2024, 1, 14): [Event('20 분', DateTime.utc(2024, 1, 14,13,40))],
+    DateTime.utc(2024, 2, 5): [Event('13 분', DateTime.utc(2024, 2, 5,15,20))],
+    DateTime.utc(2024, 2, 8): [Event('13 분', DateTime.utc(2024, 2, 8,15,20))],
+    DateTime.utc(2024, 2, 21): [Event('13 분', DateTime.utc(2024, 2, 21,15,20))],
+  };
 
   DateTime selectedDay = DateTime(
     DateTime.now().year,
@@ -62,22 +72,24 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
   void acceptResponse() async {
     getScheduleResponse apiResponse = await getSchdule();
     if (apiResponse.isSuccess) {
-      for (int i = 0; i < apiResponse.result.length; i++) {
-        DateTime date = apiResponse.result[i].date;
-        int completedTimeSeconds = apiResponse.result[i].targetTimeSeconds;
-        int hours = completedTimeSeconds ~/ 3600;
-        int minutes = (completedTimeSeconds % 3600) ~/ 60;
-        String time =
-            '${minutes.toString().padLeft(2, '0')} 분';
-        DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
-        if (events[eventDate] != null) {
-          // 해당날짜에 이벤트가 이미 있는 경우
-          events[eventDate]!.add(Event(time, apiResponse.result[i].date));
-        } else {
+      setState(() {
+        for (int i = 0; i < apiResponse.result.length; i++) {
+          DateTime date = apiResponse.result[i].date;
+          int completedTimeSeconds = apiResponse.result[i].targetTimeSeconds;
+          int hours = completedTimeSeconds ~/ 3600;
+          int minutes = (completedTimeSeconds % 3600) ~/ 60;
+          String time =
+              '${minutes.toString().padLeft(2, '0')} 분';
+          DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
+          // if (events[eventDate] != null) {
+          //   // 해당날짜에 이벤트가 이미 있는 경우
+          //   events[eventDate]!.add(Event(time, apiResponse.result[i].date));
+          // } else {
           // 해당날짜에 이벤트가 없는 경우
           events[eventDate] = [Event(time, apiResponse.result[i].date)];
+          //}
         }
-      }
+      });
     }
   }
 
