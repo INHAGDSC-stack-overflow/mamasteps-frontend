@@ -19,7 +19,13 @@ List<Coordinate> convertMarkersToList(Set<Marker> markers) {
   }).toList();
 }
 
-Future<void>editRequestProfile(BuildContext context, totalSec, currentPosition, startClosewayPoints, endClosewayPoints, ) async {
+Future<void> editRequestProfile(
+  BuildContext context,
+  totalSec,
+  currentPosition,
+  startClosewayPoints,
+  endClosewayPoints,
+) async {
   final url = 'https://dev.mamasteps.dev/api/v1/routes/editRequestProfile';
   final AccessToken = await storage.read(key: 'access_token');
 
@@ -27,15 +33,15 @@ Future<void>editRequestProfile(BuildContext context, totalSec, currentPosition, 
   List<Coordinate> blueMarker = convertMarkersToList(endClosewayPoints);
 
   var requestData = RequestData(
-      targetTime: totalSec,
-      walkSpeed: 3,
-      origin: Coordinate(
-          latitude: currentPosition.latitude,
-          longitude: currentPosition.longitude),
-      startCloseWaypoints: redMarker,
-      endCloseWaypoints: blueMarker,
-      createdAt: DateTime.now().toString(),
-      updatedAt: DateTime.now().toString(),
+    targetTime: totalSec,
+    walkSpeed: 3,
+    origin: Coordinate(
+        latitude: currentPosition.latitude,
+        longitude: currentPosition.longitude),
+    startCloseWaypoints: redMarker,
+    endCloseWaypoints: blueMarker,
+    createdAt: DateTime.now().toString(),
+    updatedAt: DateTime.now().toString(),
   );
 
   Map<String, dynamic> jsonData = requestData.toJson();
@@ -67,7 +73,7 @@ Future<void>editRequestProfile(BuildContext context, totalSec, currentPosition, 
         MaterialPageRoute(
           builder: (context) => GoogleLogin(),
         ),
-            (route) => false,
+        (route) => false,
       );
       return Future.error('server error');
     }
@@ -244,7 +250,6 @@ Future SaveRoute(data) async {
   }
 }
 
-
 Future<getRequestResponse> getRequestProfile(BuildContext context) async {
   final url = 'https://dev.mamasteps.dev/api/v1/routes/getRequestProfile';
   final AccessToken = await storage.read(key: 'access_token');
@@ -262,7 +267,8 @@ Future<getRequestResponse> getRequestProfile(BuildContext context) async {
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      final getRequestResponse apiResponse = getRequestResponse.fromJson(jsonResponse);
+      final getRequestResponse apiResponse =
+          getRequestResponse.fromJson(jsonResponse);
       return apiResponse;
     } else {
       Navigator.pushAndRemoveUntil(
@@ -270,11 +276,68 @@ Future<getRequestResponse> getRequestProfile(BuildContext context) async {
         MaterialPageRoute(
           builder: (context) => GoogleLogin(),
         ),
-            (route) => false,
+        (route) => false,
       );
       return Future.error('server error');
     }
   } catch (error) {
     return Future.error(error);
+  }
+}
+
+Future<void> optimizeSpeed(double distanceMeters, int completeTimeSeconds) async {
+  final url = 'https://dev.mamasteps.dev/api/v1/optimize/optimize-speed';
+  final AccessToken = await storage.read(key: 'access_token');
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $AccessToken',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'distanceMeters': distanceMeters,
+        'completeTimeSeconds': completeTimeSeconds,
+      }),
+    );
+
+    print('optimize-speed Server Response: ${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      print('optimize-speed Server Response: ${response.statusCode}');
+    } else {
+      print('optimize-speed Server Error');
+    }
+  } catch (error) {
+    print('optimize-speed Server Error : $error');
+  }
+}
+
+Future<void> feedbackTime(int feedback) async {
+  final url = 'https://dev.mamasteps.dev/api/v1/optimize/feedback-time';
+  final AccessToken = await storage.read(key: 'access_token');
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $AccessToken',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'feedback': feedback,
+      }),
+    );
+
+    print('feedback-time Server Response: ${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      print('feedback-time Server Response: ${response.statusCode}');
+    } else {
+      print('feedback-time Server Error');
+    }
+  } catch (error) {
+    print('optimize-speed Server Error : $error');
   }
 }

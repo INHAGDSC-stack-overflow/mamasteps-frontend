@@ -10,20 +10,25 @@ import 'package:mamasteps_frontend/map/component/google_map/drawmarker.dart';
 import 'package:mamasteps_frontend/map/component/google_map/pointlatlng_to_latlng.dart';
 import 'package:mamasteps_frontend/map/component/timer/convert.dart';
 import 'package:mamasteps_frontend/map/component/timer/count_down_timer.dart';
+import 'package:mamasteps_frontend/map/component/util/map_server_communication.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
+import 'package:mamasteps_frontend/storage/user/user_data.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
+import 'package:numberpicker/numberpicker.dart';
 import 'package:telephony/telephony.dart';
 
 class TrackingScreen extends StatefulWidget {
   final String Path;
   final int totalSeconds;
   final Position currentInitPosition;
+  final double totalMeter;
 
   const TrackingScreen({
     super.key,
     required this.Path,
     required this.currentInitPosition,
     required this.totalSeconds,
+    required this.totalMeter,
   });
 
   @override
@@ -39,6 +44,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   late Position currentPosition;
   late Duration duration;
   late StreamSubscription<Position>? positionSubscription;
+  late int afterRating = 0;
 
   //polyline들의 집합
   Set<Polyline> polylines = {};
@@ -51,6 +57,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   late int second;
   bool isRunning = false;
   bool isSelect = false;
+  bool ismiddle = false;
 
   @override
   void initState() {
@@ -175,45 +182,47 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 ),
               ),
             ),
-            isSelect ? Positioned(
-              bottom: 25,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        isRunning ? pauseTimer() : resumeTimer();
-                      },
-                      child: Icon(isRunning ? Icons.pause : Icons.play_arrow),
+            isSelect
+                ? Positioned(
+                    bottom: 25,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              isRunning ? pauseTimer() : resumeTimer();
+                            },
+                            child: Icon(
+                                isRunning ? Icons.pause : Icons.play_arrow),
+                          ),
+                          const SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              showStopDialog();
+                            },
+                            child: Icon(Icons.stop),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
+                  )
+                : Positioned(
+                    bottom: 25,
+                    right: 25,
+                    child: ElevatedButton(
                       onPressed: () {
-                        showStopDialog();
+                        setState(() {
+                          isSelect = true;
+                          startTimer();
+                        });
                       },
-                      child: Icon(Icons.stop),
+                      child: Text('산책 시작'),
                     ),
-                  ],
-                ),
-              ),
-            )
-            : Positioned(
-              bottom: 25,
-              right: 25,
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    isSelect = true;
-                    startTimer();
-                  });
-                },
-                child: Text('산책 시작'),
-              ),
-            ),
+                  ),
           ],
         ),
       ),
@@ -283,9 +292,9 @@ class _TrackingScreenState extends State<TrackingScreen> {
             if (distance < 10) {
               if (movementTimer == null) {
                 movementTimer = Timer(
-                  Duration(seconds: 5),
+                  Duration(seconds: 10),
                   () {
-                    if(isRunning){
+                    if (isRunning) {
                       pauseTimer();
                     }
                     showSendSmsDialog();
@@ -305,20 +314,17 @@ class _TrackingScreenState extends State<TrackingScreen> {
             position.latitude,
             position.longitude,
           );
-          if (minute == 0 && second == 0 && hour == 0 && initDistance < 10) {
-            // 목적지에 도착했을 때, 시간과 거리로 판단
+          // 목적지에 도착했을 때, 최대로 멀리간 거리 기준으로 판단
+          if (initDistance > widget.totalMeter * 0.5 && !ismiddle) {
+            ismiddle = true;
+          } else if (initDistance < 25 && ismiddle) {
+            int completeTimeSeconds = widget.totalSeconds - duration.inSeconds;
             movementTimer?.cancel();
             movementTimer = null;
             _stopTracking();
             addRecord(widget.totalSeconds);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (_) => RootTab(),
-              ),
-              (route) => false,
-            );
+            optimizeSpeed(widget.totalMeter, completeTimeSeconds);
           }
-
           // 마지막 위치 업데이트
           lastPosition = position;
         },
@@ -329,16 +335,56 @@ class _TrackingScreenState extends State<TrackingScreen> {
     });
   }
 
+  void afterTrackingDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('산책 완료'),
+          content: Column(
+            children: [
+              Text('산책의 만족도를 평가해 주세요'),
+              NumberPicker(
+                  axis: Axis.horizontal,
+                  minValue: -9,
+                  maxValue: 9,
+                  value: afterRating,
+                  onChanged: (value) {
+                    setState(() {
+                      afterRating = value;
+                    });
+                  })
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                feedbackTime(afterRating);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => RootTab()),
+                  (route) => false,
+                );
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // 보호자 문자 보내기 팝업 창
   void showSendSmsDialog() {
-    Timer? timer;
+    Timer? localtimer;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        timer = Timer(Duration(seconds: 5), () {
-          sendSmsMessageToGuardian('테스트용 문자', ['01000000000']);
-          timer?.cancel();
+        localtimer = Timer(Duration(seconds: 5), () {
+          String recipient = user_storage.read(key: 'guardian_phone').toString();
+          sendSmsMessageToGuardian('테스트용 문자', [recipient]);
+          localtimer?.cancel();
           Navigator.pop(context);
           afterSendSmsDialog();
         });
@@ -348,7 +394,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                timer?.cancel();
+                localtimer?.cancel();
+                resumeTimer();
                 Navigator.pop(context);
               },
               child: Text('취소'),
