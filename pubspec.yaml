@@ -50,6 +50,7 @@ dependencies:
   googleapis: ^12.0.0
   googleapis_auth: ^1.4.1
   extension_google_sign_in_as_googleapis_auth: ^2.0.12
+  flutter_dotenv: ^5.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -78,6 +79,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - asset/image/
+    - .env
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

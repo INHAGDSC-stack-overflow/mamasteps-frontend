@@ -28,9 +28,22 @@ Future<void> editRequestProfile(
 ) async {
   final url = 'https://dev.mamasteps.dev/api/v1/routes/editRequestProfile';
   final AccessToken = await storage.read(key: 'access_token');
-
-  List<Coordinate> redMarker = convertMarkersToList(startClosewayPoints);
-  List<Coordinate> blueMarker = convertMarkersToList(endClosewayPoints);
+  List<Coordinate> redMarker;
+  List<Coordinate> blueMarker;
+  if(startClosewayPoints.isEmpty){
+    redMarker = [];
+  }
+  else{
+    redMarker = convertMarkersToList(startClosewayPoints);
+  }
+  if(endClosewayPoints.isEmpty){
+    blueMarker = [];
+  }
+  else{
+    blueMarker = convertMarkersToList(endClosewayPoints);
+  }
+  // List<Coordinate> redMarker = convertMarkersToList(startClosewayPoints);
+  // List<Coordinate> blueMarker = convertMarkersToList(endClosewayPoints);
 
   var requestData = RequestData(
     targetTime: totalSec,

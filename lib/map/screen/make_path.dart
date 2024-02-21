@@ -172,7 +172,7 @@ class _MakePathState extends State<MakePath> {
               title: '경유지',
               snippet: '탭하여 수정',
               onTap: () {
-                showWayPointDialog(markerId, red_marker);
+                //showWayPointDialog(markerId, red_marker);
               },
             ),
           ),
