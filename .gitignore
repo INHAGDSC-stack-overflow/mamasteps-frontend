@@ -52,3 +52,5 @@ app.*.map.json
 
 # Ignore Gradle build output directory
 build
+
+.donotcommit.dart
