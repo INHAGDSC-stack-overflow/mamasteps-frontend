@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+String apikey = dotenv.env['myClientId'].toString();
 final GoogleSignIn _googleSignIn = GoogleSignIn(
   // Optional clientId
   // clientId: '[YOUR_OAUTH_2_CLIENT_ID]',
@@ -40,6 +42,7 @@ class SignInDemoState extends State<SignInDemo> {
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
       setState(() {
         _currentUser = account;
+        print("currentUser : " + _currentUser.toString());
       });
       if (_currentUser != null) {
         _handleGetContact();
@@ -63,14 +66,36 @@ class SignInDemoState extends State<SignInDemo> {
     final CalendarApi calendarApi = CalendarApi(client!);
     // Retrieve a list of the `names` of my `connections`
     final Calendar response =
-    await calendarApi.calendarList.get('primary') as Calendar;
+        await calendarApi.calendars.get('tlgusdl03@gmail.com') as Calendar;
+    print("getCalendar response : " + response.id.toString());
     // #enddocregion CreateAPIClient
+    //getCalendar(client);
 
-    setState(() {
+    final Events eventResponse =
+        await calendarApi.events.list('primary') as Events;
 
-    });
+    if (eventResponse.items?.first.start?.date?.day != null) {
+      // 여기서는 `!` 연산자 대신 `?.` 연산자를 사용했기 때문에 안전합니다.
+      var date = eventResponse.items!.first.start?.date?.day.toString();
+      print("getEventCalendar response : " + date.toString());
+    } else {
+      print("response doesn`t exist");
+    }
+
+    var tempEvent = Event(
+        summary: "testEvent",
+        start: EventDateTime(
+          dateTime: DateTime.now().add(Duration(hours:2)),
+        ),
+        end: EventDateTime(
+          dateTime: DateTime.now().add(Duration(hours: 3)),
+        ));
+
+    final Event insertResponse =
+        await calendarApi.events.insert(tempEvent, 'primary');
+
+    print(insertResponse.toString());
   }
-
 
   Future<void> _handleSignIn() async {
     try {
@@ -134,3 +159,14 @@ class SignInDemoState extends State<SignInDemo> {
   }
 }
 
+// Future<void> getCalendar(auth.AuthClient client) async {
+// // #docregion CreateAPIClient
+//   // Retrieve an [auth.AuthClient] from the current [GoogleSignIn] instance.
+//   // Prepare a People Service authenticated client.
+//   final CalendarApi calendarApi = CalendarApi(client!);
+//   // Retrieve a list of the `names` of my `connections`
+//   final Calendar response =
+//       await calendarApi.calendarList.get('primary') as Calendar;
+//   print("getCalendar response : " + response.toString());
+//   // #enddocregion CreateAPIClient
+// }

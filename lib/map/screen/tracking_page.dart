@@ -292,7 +292,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             if (distance < 10) {
               if (movementTimer == null) {
                 movementTimer = Timer(
-                  Duration(minutes: 5),
+                  Duration(seconds: 5),
                   () {
                     if (isRunning) {
                       pauseTimer();
@@ -316,7 +316,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             position.longitude,
           );
           // 목적지에 도착했을 때, 최대로 멀리간 거리 기준으로 판단
-          if (initDistance > widget.totalMeter * 0.5 && !ismiddle) {
+          if (initDistance > widget.totalMeter * 0.12 && !ismiddle) {
             print('중간지점 도착');
             ismiddle = true;
           } else if (initDistance < 25 && ismiddle) {
@@ -397,10 +397,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        localtimer = Timer(Duration(minutes: 1), () {
+        localtimer = Timer(Duration(seconds: 5), () {
           String recipient = user_storage.read(key: 'guardian_phone').toString();
           print('보호자 번호: $recipient');
-          sendSmsMessageToGuardian('테스트용 문자', [recipient]);
+          sendSmsMessageToGuardian('[Mamasteps 발송] 산모가 움직이지 않습니다.', ['01081314240']);
           localtimer?.cancel();
           Navigator.pop(context);
           afterSendSmsDialog();

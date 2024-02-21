@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // late int thisWeekWalkTimeHour = 0;
   // late int thisWeekWalkTimeMin = 0;
   late int thisWeekAchievement = 0;
-  late int totalWeekAchievement = 7;
+  late int totalWeekAchievement;
   late List<int> weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
 
   @override
@@ -129,7 +129,6 @@ class _HomeScreenState extends State<HomeScreen> {
         DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
         DateTime endOfWeek =
             now.add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
-        int tempWeekTask =0;
         for (int i = 0; i < apiResponse.result.length; i++) {
           DateTime apiDate = apiResponse.result[i].date;
           int apiCompletedTimeSeconds =
@@ -139,12 +138,10 @@ class _HomeScreenState extends State<HomeScreen> {
           if (apiResponse.result[i].date.isAfter(startOfWeek) &&
               apiResponse.result[i].date.isBefore(endOfWeek)) {
             // 요일별 시간 저장
-            tempWeekTask++;
             weekWalkTime[diffrence] += apiCompletedTimeSeconds;
             thisWeekWalkTimeTotalSeconds +=
                 apiResponse.result[i].completedTimeSeconds;
           }
-          totalWeekAchievement = tempWeekTask;
           // 오늘 산책 시간 계산
           isSameDate(apiDate, now)
               ? todayWalkTimeTotalSeconds +=
@@ -337,7 +334,7 @@ List<Widget> buildWidgetsList(
   // int todayWalkTimeMin,
   // int thisWeekWalkTimeHour,
   // int thisWeekWalkTimeMin,
-  int totdayWalkTimeTotalSeconds,
+  int todayWalkTimeTotalSeconds,
   int thisWeekWalkTimeTotalSeconds,
   int thisWeekAchievement,
   int totalWeekAchievement,
@@ -345,8 +342,8 @@ List<Widget> buildWidgetsList(
   int recommended,
   double progressBarWidth,
 ) {
-  int todayHours = totdayWalkTimeTotalSeconds ~/ 3600;
-  int todayMinutes = (totdayWalkTimeTotalSeconds % 3600) ~/ 60;
+  int todayHours = todayWalkTimeTotalSeconds ~/ 3600;
+  int todayMinutes = (todayWalkTimeTotalSeconds % 3600) ~/ 60;
   int thisWeekWalkTimeHour = thisWeekWalkTimeTotalSeconds ~/ 3600;
   int thisWeekWalkTimeMin = (thisWeekWalkTimeTotalSeconds % 3600) ~/ 60;
 
