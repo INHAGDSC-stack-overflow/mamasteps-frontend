@@ -100,8 +100,8 @@ class getRecordResult {
       dateList[2],
       dateList[3],
       dateList[4],
-      dateList[5],
-      dateList[6] ~/ 1000000,
+      //dateList[5],
+      //dateList[6] ~/ 1000000,
     );
     return getRecordResult(
       id: json['id'],
