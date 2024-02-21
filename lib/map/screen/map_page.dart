@@ -157,7 +157,7 @@ class _MapPageState extends State<MapPage> {
         floatingActionButton: (apiResponse.isSuccess)
             ? SizedBox(
                 width: 80,
-              child: FloatingActionButton(
+                child: FloatingActionButton(
                   onPressed: () {
                     int index = currentPage.toInt();
                     setState(() {
@@ -165,15 +165,18 @@ class _MapPageState extends State<MapPage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => TrackingScreen(
-                                Path: serverRoute[index].polyLine,
-                                currentInitPosition: currentPosition,
-                                totalSeconds: serverRoute[index].totalTimeSeconds),
+                              Path: serverRoute[index].polyLine,
+                              currentInitPosition: currentPosition,
+                              totalSeconds: serverRoute[index].totalTimeSeconds,
+                              totalMeter:
+                                  serverRoute[index].totalDistanceMeters,
+                            ),
                           ));
                     });
                   },
                   child: Text('산책 하기'),
                 ),
-            )
+              )
             : null,
         backgroundColor: Color(0xFFF5F5F5),
         body: Column(
@@ -303,7 +306,8 @@ class _MapPageState extends State<MapPage> {
   }
 
   void acceptEditResponse() async {
-    await editRequestProfile(context, totalSec, currentPosition, startClosewayPoints, endClosewayPoints);
+    await editRequestProfile(context, totalSec, currentPosition,
+        startClosewayPoints, endClosewayPoints);
     // print(value.result[0].polyLine);
     // setState(() {
     //   manageRouteList(value.result, 'addAll');
@@ -378,9 +382,13 @@ class _MapPageState extends State<MapPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => TrackingScreen(
-                                      Path: serverRoute[index].polyLine,
-                                      currentInitPosition: currentPosition,
-                                      totalSeconds: serverRoute[index].totalTimeSeconds),
+                                    Path: serverRoute[index].polyLine,
+                                    currentInitPosition: currentPosition,
+                                    totalSeconds:
+                                        serverRoute[index].totalTimeSeconds,
+                                    totalMeter:
+                                        serverRoute[index].totalDistanceMeters,
+                                  ),
                                 ));
                           });
                         },
@@ -425,9 +433,12 @@ class _MapPageState extends State<MapPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => TrackingScreen(
-                                  Path: apiResponse.result[index].polyLine,
-                                  currentInitPosition: currentPosition,
-                                  totalSeconds: totalSec),
+                                Path: apiResponse.result[index].polyLine,
+                                currentInitPosition: currentPosition,
+                                totalSeconds: totalSec,
+                                totalMeter: apiResponse
+                                    .result[index].totalDistanceMeters,
+                              ),
                             ));
                       });
                     },
@@ -474,7 +485,7 @@ class _MapPageState extends State<MapPage> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceEvenly,
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Container(
                                       alignment: Alignment.center,
@@ -570,8 +581,7 @@ class _MapPageState extends State<MapPage> {
                                     currentPosition: currentPosition,
                                     targetTime: totalSec,
                                     endClosewayPoints: endClosewayPoints,
-                                    startClosewayPoints:
-                                    startClosewayPoints,
+                                    startClosewayPoints: startClosewayPoints,
                                     makeRequest: acceptEditResponse,
                                   ),
                                 ),
@@ -580,8 +590,8 @@ class _MapPageState extends State<MapPage> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: (currentHour == 0 &&
-                                  currentMin == 0 &&
-                                  currentSec == 0)
+                                      currentMin == 0 &&
+                                      currentSec == 0)
                                   ? Colors.grey
                                   : Colors.blue,
                             ),
@@ -646,8 +656,8 @@ class _MapPageState extends State<MapPage> {
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: (currentHour == 0 &&
-                                  currentMin == 0 &&
-                                  currentSec == 0)
+                                      currentMin == 0 &&
+                                      currentSec == 0)
                                   ? Colors.grey
                                   : Colors.blue,
                             ),
