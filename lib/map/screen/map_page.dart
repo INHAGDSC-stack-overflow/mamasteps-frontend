@@ -235,21 +235,31 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+  void deleteMarkers(){
+    setState(() {
+      startClosewayPoints.clear();
+      endClosewayPoints.clear();
+    });
+  }
+
   void onHourChanged(value) {
     setState(() {
       currentHour = value;
+      print("시간 변경 ${currentHour}");
     });
   }
 
   void onMinChanged(value) {
     setState(() {
       currentMin = value;
+      print("분 변경 ${currentMin}");
     });
   }
 
   void onSecChanged(value) {
     setState(() {
       currentSec = value;
+      print("초 변경 ${currentSec}");
     });
   }
 
@@ -295,7 +305,11 @@ class _MapPageState extends State<MapPage> {
   //   });
   // }
 
-  void acceptResponse() async {
+  Future<void> acceptResponse() async {
+    //clientToServerTimeConvert();
+    var seconds = currentHour*3600 + currentMin*60 +currentSec;
+    await editRequestProfile(context, seconds, currentPosition,
+        startClosewayPoints, endClosewayPoints);
     final value = await computeRoutes(context);
     print(value.result[0].polyLine);
     setState(() {
@@ -304,15 +318,17 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  void acceptEditResponse() async {
-    await editRequestProfile(context, totalSec, currentPosition,
+  Future<void> acceptEditResponse() async {
+    //clientToServerTimeConvert();
+    var seconds = currentHour*3600 + currentMin*60 +currentSec;
+    await editRequestProfile(context, seconds, currentPosition,
         startClosewayPoints, endClosewayPoints);
     // print(value.result[0].polyLine);
     // setState(() {
     //   manageRouteList(value.result, 'addAll');
     //   apiResponse = value;
     // });
-    acceptResponse();
+    await acceptResponse();
   }
 
   void manageRouteList(data, order) {
@@ -583,6 +599,7 @@ class _MapPageState extends State<MapPage> {
                                     endClosewayPoints: endClosewayPoints,
                                     startClosewayPoints: startClosewayPoints,
                                     makeRequest: acceptEditResponse,
+                                    deleteMarkers: deleteMarkers,
                                   ),
                                 ),
                               );
@@ -646,7 +663,6 @@ class _MapPageState extends State<MapPage> {
                               // final response = widget.makeRequest();
                               // widget.acceptResponse(response);
                               // onCheckChange();
-                              createRequestProfile();
                               acceptResponse();
                             },
                             child: Text(
