@@ -29,22 +29,63 @@ Future<void> addRecord(int completedTimeSeconds) async {
       }),
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('addRecord Server Response: ${response.statusCode}');
+    print('addRecord Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
-      print('success');
+      print('addRecord success');
       final jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
       // final ApiResponse apiResponse = ApiResponse.fromJson(jsonResponse);
       // return apiResponse;
     } else {
-      print('server error');
+      print('addRecord server error');
     }
   } catch (error) {
     print(error);
   }
 }
+
+Future<void> addSchedule(int completedTimeSeconds, int id) async {
+  final url = 'https://dev.mamasteps.dev/api/v1/calendar/addRecord';
+  final AccessToken = await storage.read(key: 'access_token');
+  DateTime date = DateTime.now();
+  String isoDate = date.toIso8601String();
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Authorization': 'Bearer $AccessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id': id,
+        'routeId': id,
+        'date': isoDate,
+        'completedTimeSeconds': completedTimeSeconds,
+        'createdAt': isoDate,
+        'updatedAt': isoDate,
+      }),
+    );
+
+    print('addSchedule Server Response: ${response.statusCode}');
+    print('addSchedule Server Response: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('addSchedule Server success');
+      final jsonResponse = jsonDecode(response.body);
+      print(jsonResponse);
+      // final ApiResponse apiResponse = ApiResponse.fromJson(jsonResponse);
+      // return apiResponse;
+    } else {
+      print('addSchedule Server error');
+    }
+  } catch (error) {
+    print(error);
+  }
+}
+
 
 Future<void> createAutoSchedule() async {
   final url = 'https://dev.mamasteps.dev/api/v1/calendar/createAutoSchedule';
@@ -58,23 +99,23 @@ Future<void> createAutoSchedule() async {
       },
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('createAutoSchedule Server Response: ${response.statusCode}');
+    print('createAutoSchedule Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
-      print('success');
+      print('createAutoSchedule : success');
       final jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
 
     } else {
-      return Future.error('server error');
+      return Future.error('createAutoSchedule server error');
     }
   } catch (error) {
     return Future.error(error);
   }
 }
 
-Future<getScheduleResponse> getSchdule() async {
+Future<getScheduleResponse> getSchedule() async {
   final url = 'https://dev.mamasteps.dev/api/v1/calendar/getSchedules';
   final AccessToken = await storage.read(key: 'access_token');
 
@@ -86,18 +127,18 @@ Future<getScheduleResponse> getSchdule() async {
       },
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('getSchedule Server Response: ${response.statusCode}');
+    print('getSchedule Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
-      print('success');
+      print('getSchedule success');
       final jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
       final getScheduleResponse apiResponse =
       getScheduleResponse.fromJson(jsonResponse);
       return apiResponse;
     } else {
-      return Future.error('server error');
+      return Future.error('getSchedule server error');
     }
   } catch (error) {
     return Future.error(error);
@@ -115,18 +156,18 @@ Future<getRecordResponse> getRecords() async {
       },
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('getRecords Server Response: ${response.statusCode}');
+    print('getRecords Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
-      print('success');
+      print('getRecords success');
       final jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
       final getRecordResponse apiResponse =
       getRecordResponse.fromJson(jsonResponse);
       return apiResponse;
     } else {
-      return Future.error('server error');
+      return Future.error('getRecords server error');
     }
   } catch (error) {
     return Future.error(error);

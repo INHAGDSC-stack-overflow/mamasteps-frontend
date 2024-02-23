@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter_updated/flutter.dart' as charts;
 import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
 import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
+import 'package:mamasteps_frontend/login/screen/login_page.dart';
+import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/storage/user/user_data.dart';
 import 'package:mamasteps_frontend/ui/component/user_server_comunication.dart';
 import 'package:mamasteps_frontend/ui/layout/home_screen_default_layout.dart';
@@ -194,7 +196,10 @@ class _Header extends StatelessWidget {
             right: 0,
             child: IconButton(
               icon: Icon(Icons.settings),
-              onPressed: () {},
+              onPressed: () {
+                deleteAll();
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => GoogleLogin()), (route) => false);
+              },
             ),
           ),
           Positioned(
