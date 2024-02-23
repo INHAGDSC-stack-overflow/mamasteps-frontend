@@ -71,8 +71,8 @@ Future<void> editRequestProfile(
       body: jsonString,
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('editRequestProfile Server Response: ${response.statusCode}');
+    print('editRequestProfile Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
       print('success');
@@ -88,7 +88,7 @@ Future<void> editRequestProfile(
         ),
         (route) => false,
       );
-      return Future.error('server error');
+      return Future.error('editRequestProfile server error');
     }
   } catch (error) {
     return Future.error(error);
@@ -114,7 +114,7 @@ Future<void> setOrigin(Position currentPosition) async {
     );
 
     print('set-origin Server Response: ${response.statusCode}');
-    print('set-origin Exception: ${response.body}');
+    print('set-origin Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
       print('set-origin Server Response: ${response.statusCode}');
@@ -139,7 +139,7 @@ Future<void> createRequestProfile() async {
     );
 
     print('createRequestProfile Server Response: ${response.statusCode}');
-    print('createRequestProfile Exception: ${response.body}');
+    print('createRequestProfile Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
       print('createRequestProfile Server Response: ${response.statusCode}');
@@ -163,8 +163,8 @@ Future<ApiResponse> getRoutes(BuildContext context) async {
       },
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('getRoutes Server Response: ${response.statusCode}');
+    print('getRoutes Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
@@ -178,7 +178,7 @@ Future<ApiResponse> getRoutes(BuildContext context) async {
         ),
         (route) => false,
       );
-      return Future.error('server error');
+      return Future.error('getRoutes server error');
     }
   } catch (error) {
     return Future.error(error);
@@ -197,8 +197,8 @@ Future<ApiResponse> computeRoutes(BuildContext context) async {
       },
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('computeRoutes Server Response: ${response.statusCode}');
+    print('computeRoutes Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
       print('success');
@@ -214,7 +214,7 @@ Future<ApiResponse> computeRoutes(BuildContext context) async {
         ),
         (route) => false,
       );
-      return Future.error('server error');
+      return Future.error('computeRoutes server error');
     }
   } catch (error) {
     return Future.error(error);
@@ -250,16 +250,16 @@ Future SaveRoute(data) async {
       body: jsonString,
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('SaveRoute Server Response: ${response.statusCode}');
+    print('SaveRoute Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
-      print('Server Response: ${response.statusCode}');
+      print('SaveRoute Server Response: ${response.statusCode}');
     } else {
-      print('Server Error');
+      print('SaveRoute Server Error');
     }
   } catch (error) {
-    print('Server Error');
+    print('SaveRoute Server Error');
   }
 }
 
@@ -275,8 +275,8 @@ Future<getRequestResponse> getRequestProfile(BuildContext context) async {
       },
     );
 
-    print('Server Response: ${response.statusCode}');
-    print('Exception: ${response.body}');
+    print('getRequestProfile Server Response: ${response.statusCode}');
+    print('getRequestProfile Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
@@ -291,7 +291,7 @@ Future<getRequestResponse> getRequestProfile(BuildContext context) async {
         ),
         (route) => false,
       );
-      return Future.error('server error');
+      return Future.error('getRequestProfile server error');
     }
   } catch (error) {
     return Future.error(error);
@@ -351,6 +351,6 @@ Future<void> feedbackTime(int feedback) async {
       print('feedback-time Server Error');
     }
   } catch (error) {
-    print('optimize-speed Server Error : $error');
+    print('feedback-time Server Error : $error');
   }
 }

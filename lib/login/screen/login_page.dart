@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:googleapis/calendar/v3.dart';
 import 'package:mamasteps_frontend/login/const/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:dio/dio.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'dart:async';
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 import 'package:mamasteps_frontend/ui/screen/sign_up_page.dart';
 import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
+
+
+final GoogleSignIn myGoogleSignIn = GoogleSignIn(
+  // Optional clientId
+  // clientId: '[YOUR_OAUTH_2_CLIENT_ID]',
+  scopes: <String>[CalendarApi.calendarScope],
+);
 
 class GoogleLogin extends StatefulWidget {
   const GoogleLogin({Key? key}) : super(key: key);
@@ -22,9 +30,13 @@ class _GoogleLoginState extends State<GoogleLogin> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
 
   void signInWithGoogle() async {
-    deleteAll();
-    await GoogleSignIn().signOut();
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    // deleteAll();
+    // await GoogleSignIn().signOut();
+    final GoogleSignInAccount? googleUser = await myGoogleSignIn.signIn();
+
+
+    // 로그인
+
     if (googleUser != null) {
       print('name = ${googleUser.email}');
       print('email = ${googleUser.email}');
@@ -71,7 +83,8 @@ class _GoogleLoginState extends State<GoogleLogin> {
                     userEmail: googleUser.email,
                     userId: googleUser.id,
                     userName: googleUser.displayName,
-                    userPhotoUrl: googleUser.photoUrl),
+                    userPhotoUrl: googleUser.photoUrl,
+                ),
               ));
         }
       } catch (error) {
