@@ -18,6 +18,7 @@ class MakePath extends StatefulWidget {
   final Set<Marker> endClosewayPoints;
   // final void Function(Function(String), BuildContext) makeRequest;
   final VoidCallback makeRequest;
+  final VoidCallback deleteMarkers;
   // final void callback;
   // final VoidCallback onCheckChange;
   const MakePath({
@@ -26,6 +27,7 @@ class MakePath extends StatefulWidget {
     required this.startClosewayPoints,
     required this.endClosewayPoints,
     required this.makeRequest,
+    required this.deleteMarkers,
     // required this.callback,
     // required this.onCheckChange,
     super.key,
@@ -51,6 +53,11 @@ class _MakePathState extends State<MakePath> {
     setRedMarker();
     setBlueMarker();
   }
+
+  void dispose(){
+    widget.deleteMarkers();
+  }
+
 
   @override
   Widget build(BuildContext context) {
