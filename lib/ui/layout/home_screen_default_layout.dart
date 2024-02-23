@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mamasteps_frontend/map/component/util/get_position.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
+import 'package:mamasteps_frontend/ui/component/user_server_comunication.dart';
+import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
 
-class HomeScreenDefaultLayout extends StatelessWidget {
+class HomeScreenDefaultLayout extends StatefulWidget {
   final Widget Header;
   final List<Widget> Body;
 
@@ -12,6 +14,29 @@ class HomeScreenDefaultLayout extends StatelessWidget {
     required this.Header,
     required this.Body,
   });
+
+  @override
+  State<HomeScreenDefaultLayout> createState() => _HomeScreenDefaultLayoutState();
+}
+
+class _HomeScreenDefaultLayoutState extends State<HomeScreenDefaultLayout> {
+  late int walkSpeed;
+
+  void acceptGetInfo() async {
+    myInfo apiResponse = await getMyInfo(context);
+    setState(() {
+      if (apiResponse.isSuccess) {
+        walkSpeed = apiResponse.walkSpeed;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    acceptGetInfo();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +51,7 @@ class HomeScreenDefaultLayout extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => MapPage(
+                    walkSpeed: walkSpeed,
                   ),
                 ),
               );
@@ -53,11 +79,11 @@ class HomeScreenDefaultLayout extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Header,
+                widget.Header,
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    children: Body,
+                    children: widget.Body,
                   ),
                 ),
               ],

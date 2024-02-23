@@ -157,7 +157,6 @@ Future<getRecordResponse> getRecords() async {
     );
 
     print('getRecords Server Response: ${response.statusCode}');
-    print('getRecords Server Response: ${response.body}');
 
     if (response.statusCode == 200) {
       print('getRecords success');

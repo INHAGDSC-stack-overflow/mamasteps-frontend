@@ -10,15 +10,23 @@ import 'package:mamasteps_frontend/ui/layout/home_screen_default_layout.dart';
 import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
 
 class HomeScreen extends StatefulWidget {
-  // final int weeks = 16;
-  // final int todayWalkTimeMin = 17;
-  // final int thisWeekWalkTimeHour = 1;
-  // final int thisWeekWalkTimeMin = 26;
-  // final int thisWeekAchievement = 10;
-  // final int totalWeekAchievement = 20;
+  final int weeks;
+  final int todayWalkTimeTotalSeconds;
+  final int thisWeekWalkTimeTotalSeconds;
+  final int recommended;
+  final int thisWeekAchievement;
+  final int totalWeekAchievement;
+  final List<int> weekWalkTime;
 
   const HomeScreen({
     super.key,
+    required this.weeks,
+    required this.todayWalkTimeTotalSeconds,
+    required this.thisWeekWalkTimeTotalSeconds,
+    required this.recommended,
+    required this.thisWeekAchievement,
+    required this.totalWeekAchievement,
+    required this.weekWalkTime,
   });
 
   @override
@@ -26,142 +34,143 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late int weeks = 0;
-  late int todayWalkTimeTotalSeconds = 0;
-  // late int todayWalkTimeMin = 0;
-  late int thisWeekWalkTimeTotalSeconds = 0;
-  late int recommended = 0;
-  // late int thisWeekWalkTimeHour = 0;
-  // late int thisWeekWalkTimeMin = 0;
-  late int thisWeekAchievement = 0;
-  late int totalWeekAchievement;
-  late List<int> weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
+  // late int weeks = 0;
+  // late int todayWalkTimeTotalSeconds = 0;
+  // // late int todayWalkTimeMin = 0;
+  // late int thisWeekWalkTimeTotalSeconds = 0;
+  // late int recommended = 0;
+  // // late int thisWeekWalkTimeHour = 0;
+  // // late int thisWeekWalkTimeMin = 0;
+  // late int thisWeekAchievement = 0;
+  // late int totalWeekAchievement;
+  // late List<int> weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
 
   @override
   void initState() {
     super.initState();
-    pageInit();
-    acceptResponse();
-    acceptUserResponse();
-    acceptGetInfo();
+    // pageInit();
+    // acceptResponse();
+    // acceptUserResponse();
+    // acceptGetInfo();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double progressRatio = thisWeekAchievement / totalWeekAchievement;
+    double progressRatio = widget.thisWeekAchievement / widget.totalWeekAchievement;
     double progressBarWidth = screenWidth * progressRatio;
     return HomeScreenDefaultLayout(
         Header: _Header(
-          weeks: weeks,
+          weeks: widget.weeks,
         ),
         Body: buildWidgetsList(
           screenWidth,
           // todayWalkTimeMin,
           // thisWeekWalkTimeHour,
           // thisWeekWalkTimeMin,
-          todayWalkTimeTotalSeconds,
-          thisWeekWalkTimeTotalSeconds,
-          thisWeekAchievement,
-          totalWeekAchievement,
-          weekWalkTime,
-          recommended,
+          widget.todayWalkTimeTotalSeconds,
+          widget.thisWeekWalkTimeTotalSeconds,
+          widget.thisWeekAchievement,
+          widget.totalWeekAchievement,
+          widget.weekWalkTime,
+          widget.recommended,
           progressBarWidth,
         ));
   }
 
-  void pageInit() {
-    weeks = 0;
-    todayWalkTimeTotalSeconds = 0;
-    thisWeekWalkTimeTotalSeconds = 0;
-    recommended = 0;
-    thisWeekAchievement = 0;
-    totalWeekAchievement = 2;
-    weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
-  }
-
-  void initThisWeekAchievement() {
-    setState(() {
-      for (int i = 0; i < weekWalkTime.length; i++) {
-        if (weekWalkTime[i] > recommended * 0.9) {
-          thisWeekAchievement++;
-        }
-      }
-    });
-  }
-
-  void acceptGetInfo() async {
-    myInfo apiResponse = await getMyInfo();
-    setState(() {
-      if (apiResponse.isSuccess) {
-        recommended = apiResponse.targetTime ~/ 60;
-      }
-    });
-  }
-
-  void acceptUserResponse() async {
-    getMeResponse apiResponse = await getMe();
-    setState(() {
-      DateTime now = DateTime.now();
-      Duration difference = now.difference(DateTime(
-          apiResponse.pregnancyStartDate[0],
-          apiResponse.pregnancyStartDate[1],
-          apiResponse.pregnancyStartDate[2]));
-      weeks = difference.inDays ~/ 7;
-      // if (apiResponse.isSuccess) {
-      //   weeks = weeks;
-      // }
-      user_storage.write(
-          key: 'guardianPhoneNumber', value: apiResponse.guardianPhoneNumber);
-    });
-  }
-
-  void acceptResponse() async {
-    bool isSameDate(DateTime date1, DateTime date2) {
-      return date1.year == date2.year &&
-          date1.month == date2.month &&
-          date1.day == date2.day;
-    }
-
-    getRecordResponse apiResponse = await getRecords();
-    setState(() {
-      if (apiResponse.isSuccess) {
-        DateTime now = DateTime.now();
-
-        DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-        DateTime endOfWeek =
-            now.add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
-        for (int i = 0; i < apiResponse.result.length; i++) {
-          DateTime apiDate = apiResponse.result[i].date;
-          int apiCompletedTimeSeconds =
-              apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
-          int diffrence = apiDate.difference(startOfWeek).inDays + 1;
-          // 이번주 총 산책 시간 계산
-          if (apiResponse.result[i].date.isAfter(startOfWeek) &&
-              apiResponse.result[i].date.isBefore(endOfWeek)) {
-            // 요일별 시간 저장
-            weekWalkTime[diffrence] += apiCompletedTimeSeconds;
-            thisWeekWalkTimeTotalSeconds +=
-                apiResponse.result[i].completedTimeSeconds;
-          }
-          // 오늘 산책 시간 계산
-          isSameDate(apiDate, now)
-              ? todayWalkTimeTotalSeconds +=
-                  apiResponse.result[i].completedTimeSeconds
-              : null;
-        }
-        for (int i = 0; i < weekWalkTime.length; i++) {
-          if (weekWalkTime[i] > recommended * 0.9) {
-            thisWeekAchievement++;
-          }
-        }
-      }
-    });
-  }
+  // void pageInit() {
+  //   weeks = 0;
+  //   todayWalkTimeTotalSeconds = 0;
+  //   thisWeekWalkTimeTotalSeconds = 0;
+  //   recommended = 0;
+  //   thisWeekAchievement = 0;
+  //   totalWeekAchievement = 2;
+  //   weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
+  // }
+  //
+  // void initThisWeekAchievement() {
+  //   setState(() {
+  //     for (int i = 0; i < weekWalkTime.length; i++) {
+  //       if (weekWalkTime[i] > recommended * 0.9) {
+  //         thisWeekAchievement++;
+  //       }
+  //     }
+  //   });
+  // }
+  //
+  // void acceptGetInfo() async {
+  //   myInfo apiResponse = await getMyInfo();
+  //   setState(() {
+  //     if (apiResponse.isSuccess) {
+  //       recommended = apiResponse.targetTime ~/ 60;
+  //     }
+  //   });
+  // }
+  //
+  // void acceptUserResponse() async {
+  //   getMeResponse apiResponse = await getMe();
+  //   setState(() {
+  //     DateTime now = DateTime.now();
+  //     Duration difference = now.difference(DateTime(
+  //         apiResponse.pregnancyStartDate[0],
+  //         apiResponse.pregnancyStartDate[1],
+  //         apiResponse.pregnancyStartDate[2]));
+  //     weeks = difference.inDays ~/ 7;
+  //     // if (apiResponse.isSuccess) {
+  //     //   weeks = weeks;
+  //     // }
+  //     user_storage.write(
+  //         key: 'guardianPhoneNumber', value: apiResponse.guardianPhoneNumber);
+  //   });
+  // }
+  //
+  // void acceptResponse() async {
+  //   bool isSameDate(DateTime date1, DateTime date2) {
+  //     return date1.year == date2.year &&
+  //         date1.month == date2.month &&
+  //         date1.day == date2.day;
+  //   }
+  //
+  //   getRecordResponse apiResponse = await getRecords();
+  //   setState(() {
+  //     if (apiResponse.isSuccess) {
+  //       DateTime now = DateTime.now();
+  //
+  //       DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+  //       DateTime endOfWeek =
+  //           now.add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
+  //       for (int i = 0; i < apiResponse.result.length; i++) {
+  //         DateTime apiDate = apiResponse.result[i].date;
+  //         int apiCompletedTimeSeconds =
+  //             apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
+  //         int diffrence = apiDate.difference(startOfWeek).inDays + 1;
+  //         // 이번주 총 산책 시간 계산
+  //         if (apiResponse.result[i].date.isAfter(startOfWeek) &&
+  //             apiResponse.result[i].date.isBefore(endOfWeek)) {
+  //           // 요일별 시간 저장
+  //           weekWalkTime[diffrence] += apiCompletedTimeSeconds;
+  //           thisWeekWalkTimeTotalSeconds +=
+  //               apiResponse.result[i].completedTimeSeconds;
+  //         }
+  //         // 오늘 산책 시간 계산
+  //         isSameDate(apiDate, now)
+  //             ? todayWalkTimeTotalSeconds +=
+  //                 apiResponse.result[i].completedTimeSeconds
+  //             : null;
+  //       }
+  //       for (int i = 0; i < weekWalkTime.length; i++) {
+  //         if (weekWalkTime[i] > recommended * 0.9) {
+  //           thisWeekAchievement++;
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
 }
 
 class _Header extends StatelessWidget {
   final int weeks;
+
   const _Header({
     super.key,
     required this.weeks,
@@ -249,9 +258,9 @@ class _Header extends StatelessWidget {
 
 class walkTime {
   final String day_of_week;
-  final int sales;
+  final int times;
 
-  walkTime(this.day_of_week, this.sales);
+  walkTime(this.day_of_week, this.times);
 }
 
 class SimpleBarChart extends StatelessWidget {
@@ -299,10 +308,10 @@ class SimpleBarChart extends StatelessWidget {
 
     List<charts.Series<walkTime, String>> series = [
       charts.Series(
-        id: 'Sales',
+        id: 'Times',
         data: seriesList,
         domainFn: (walkTime day_of_week, _) => day_of_week.day_of_week,
-        measureFn: (walkTime time, _) => time.sales,
+        measureFn: (walkTime time, _) => time.times,
       ),
     ];
 

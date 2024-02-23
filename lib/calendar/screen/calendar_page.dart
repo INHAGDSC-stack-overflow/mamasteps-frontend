@@ -236,9 +236,13 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                               itemBuilder: (context, index) {
                                 print(value[index].date.hour);
                                 String formatTime;
-                                if(value[index].date.hour >= 12){
+                                if(value[index].date.hour > 12){
                                   formatTime = "오후 ${value[index].date.hour % 12}시";
-                                }else{
+                                }
+                                else if(value[index].date.hour==12){
+                                  formatTime = "오후 12시";
+                                }
+                                else{
                                   formatTime = "오전 ${value[index].date.hour}시";
                                 }
                                 return ListTile(
@@ -258,7 +262,6 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                                                 Text(
                                                   "${formatTime} ${value[index].date.minute.toString().padLeft(2,'0')}분",
                                                   style: TextStyle(
-
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w400,
                                                   ),

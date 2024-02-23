@@ -6,6 +6,9 @@ import 'package:mamasteps_frontend/calendar/component/calendar_server_communicat
 import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
 import 'package:mamasteps_frontend/calendar/screen/calendar_page.dart';
 import 'package:mamasteps_frontend/login/screen/login_page.dart';
+import 'package:mamasteps_frontend/storage/user/user_data.dart';
+import 'package:mamasteps_frontend/ui/component/user_server_comunication.dart';
+import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
 import 'package:mamasteps_frontend/ui/screen/home_screen.dart';
 import 'package:mamasteps_frontend/ui/screen/user_profile_page.dart';
 import 'package:mamasteps_frontend/calendar/component/google_calendar.dart'
@@ -20,8 +23,10 @@ final GoogleSignIn myGoogleSignIn = GoogleSignIn(
 );
 
 class RootTab extends StatefulWidget {
+  final VoidCallback? acceptGetInfo;
   const RootTab({
     super.key,
+    this.acceptGetInfo,
   });
 
   @override
@@ -29,6 +34,23 @@ class RootTab extends StatefulWidget {
 }
 
 class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
+  //유저 정보 관련
+  late getMeResponse getMeApiResponse = getMeResponse(
+      isSuccess: false,
+      code: "code",
+      message: "message",
+      pregnancyStartDate: [0, 0, 0, 0, 0],
+      guardianPhoneNumber: "0",
+      result: UserProfile(
+          profileImageUrl: "profileImageUrl",
+          email: "email",
+          name: "name",
+          age: 0,
+          pregnancyStartDate: DateTime.now(),
+          guardianPhoneNumber: "0",
+          activityLevel: "low",
+          walkPreferences: []));
+
   //탭바 컨트롤 관련
   late TabController controller;
   int index = 0;
@@ -40,10 +62,6 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
   final Map<DateTime, List<Event>> events =
       SplayTreeMap<DateTime, List<Event>>();
 
-  //유저의 첫번째 스케쥴
-  //late DateTime usersFirstScheduleDate;
-  //유저의 마지막 스케쥴
-  //late DateTime usersLastScheduleDate;
   // 특정 기간 내의 검색된 구글 스케쥴의 목록
   late calendarv3.Events googleEvents = calendarv3.Events();
   //2. 선택한 날짜의 스케쥴 리스트
@@ -124,7 +142,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         for (int i = 0; i < apiResponse.result.length; i++) {
           DateTime date = apiResponse.result[i].date;
           print(date.toString());
-          int id= apiResponse.result[i].id;
+          int id = apiResponse.result[i].id;
           int? routeId = apiResponse.result[i].routeId;
           int completedTimeSeconds = apiResponse.result[i].targetTimeSeconds;
           int minutes = (completedTimeSeconds % 3600) ~/ 60;
@@ -133,7 +151,8 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
           // DateTime endTime = apiResponse.result[i].date
           //     .add(Duration(seconds: completedTimeSeconds));
 
-          var localTempEvent = Event(id, routeId, time, date, completedTimeSeconds);
+          var localTempEvent =
+              Event(id, routeId, time, date, completedTimeSeconds);
 
           DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
           bool isDuplicate = events[eventDate]?.any((existingEvent) =>
@@ -162,7 +181,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         if (events.isNotEmpty) {
           usersFirstScheduleDate = events.keys.first;
           usersLastScheduleDate = events.keys.last.add(Duration(days: 1));
-          print("userFirstScheduleDate :"+usersFirstScheduleDate.toString());
+          print("userFirstScheduleDate :" + usersFirstScheduleDate.toString());
           print("userLastScheduleDate :" + usersLastScheduleDate.toString());
         }
         print("events length: ${events.length}");
@@ -185,15 +204,20 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
             List<Event> dayEvents = events[date]!;
             for (Event localElement in dayEvents) {
               bool isExist = false;
-              var summary = "${(localElement.totalTime ~/ 60).toString().padLeft(2,'0')}분 산책일정";
-              var start =localElement.date;
-              var end = localElement.date.add(Duration(seconds: localElement.totalTime));
+              var summary =
+                  "${(localElement.totalTime ~/ 60).toString().padLeft(2, '0')}분 산책일정";
+              var start = localElement.date;
+              var end = localElement.date
+                  .add(Duration(seconds: localElement.totalTime));
               var tempEvent = calendarv3.Event(
-                  summary: summary,
-                  start: calendarv3.EventDateTime(dateTime: start),
-                  end: calendarv3.EventDateTime(dateTime: end)
+                summary: summary,
+                start: calendarv3.EventDateTime(dateTime: start),
+                end: calendarv3.EventDateTime(dateTime: end),
+                // reminders: calendarv3.EventReminders(
+                // overrides: [calendarv3.EventReminder(method: 'popup', minutes: 0),]
+                // ),
               );
-              print("${summary} ${start} ${end} ${tempEvent}");
+              //print("${summary} ${start} ${end} ${tempEvent}");
               // Google 캘린더의 이벤트와 비교 로직 (for 루프 사용)
               for (var element in googleEvents.items ?? []) {
                 if (isSameEvent(localElement, element)) {
@@ -204,12 +228,12 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
               }
               if (!isExist) {
                 // 이벤트 추가 로직
-                calendarApi.events.insert(tempEvent, 'primary');
-                print("새 이벤트 추가: ${summary} ${start} ${end}");
+                await calendarApi.events.insert(tempEvent, 'primary');
+                //print("새 이벤트 추가: ${summary} ${start} ${end}");
               }
             }
           }
-          googleEvents.items?.forEach((e) => print("구글 이벤트 리스트 :${e.start?.dateTime?.toIso8601String()} : ${e.summary}"));
+          //googleEvents.items?.forEach((e) => print("구글 이벤트 리스트 :${e.start?.dateTime?.toIso8601String()} : ${e.summary}"));
         }
       } catch (e) {
         // API 호출 실패나 다른 예외 발생 시 출력
@@ -219,6 +243,113 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
   }
 
   //Record
+  late int weeks = 0;
+  late int todayWalkTimeTotalSeconds = 0;
+  // late int todayWalkTimeMin = 0;
+  late int thisWeekWalkTimeTotalSeconds = 0;
+  late int recommended = 0;
+  // late int thisWeekWalkTimeHour = 0;
+  // late int thisWeekWalkTimeMin = 0;
+  late int thisWeekAchievement = 0;
+  late int totalWeekAchievement;
+  late List<int> weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
+
+  void pageInit() {
+    weeks = 0;
+    todayWalkTimeTotalSeconds = 0;
+    thisWeekWalkTimeTotalSeconds = 0;
+    recommended = 0;
+    thisWeekAchievement = 0;
+    totalWeekAchievement = 2;
+    weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
+  }
+
+  void initThisWeekAchievement() {
+    setState(() {
+      for (int i = 0; i < weekWalkTime.length; i++) {
+        if (weekWalkTime[i] > recommended * 0.9) {
+          thisWeekAchievement++;
+        }
+      }
+    });
+  }
+
+  void acceptGetInfo() async {
+    myInfo apiResponse = await getMyInfo(context);
+    setState(() {
+      if (apiResponse.isSuccess) {
+        recommended = apiResponse.targetTime ~/ 60;
+      }
+    });
+  }
+
+  void acceptUserResponse() async {
+    getMeResponse apiResponse = await getMe();
+    setState(() {
+      getMeApiResponse = apiResponse;
+      print(getMeApiResponse.code);
+      DateTime now = DateTime.now();
+      Duration difference = now.difference(DateTime(
+          apiResponse.pregnancyStartDate[0],
+          apiResponse.pregnancyStartDate[1],
+          apiResponse.pregnancyStartDate[2]));
+      weeks = difference.inDays ~/ 7;
+      // if (apiResponse.isSuccess) {
+      //   weeks = weeks;
+      // }
+      user_storage.write(
+          key: 'guardianPhoneNumber', value: apiResponse.guardianPhoneNumber);
+    });
+  }
+
+  void acceptGetRecords() async {
+    bool isSameDate(DateTime date1, DateTime date2) {
+      return date1.year == date2.year &&
+          date1.month == date2.month &&
+          date1.day == date2.day;
+    }
+
+    getRecordResponse apiResponse = await getRecords();
+    setState(() {
+      if (apiResponse.isSuccess) {
+        DateTime now = DateTime.now();
+
+        DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        DateTime endOfWeek =
+            now.add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
+        for (int i = 0; i < apiResponse.result.length; i++) {
+          DateTime apiDate = apiResponse.result[i].date;
+          int apiCompletedTimeSeconds =
+              apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
+          int difference = apiDate.difference(startOfWeek).inDays + 1;
+          // 이번주 총 산책 시간 계산
+          if (apiResponse.result[i].date.isAfter(startOfWeek) &&
+              apiResponse.result[i].date.isBefore(endOfWeek)) {
+            // 요일별 시간 저장
+            weekWalkTime[difference] += apiCompletedTimeSeconds;
+            thisWeekWalkTimeTotalSeconds +=
+                apiResponse.result[i].completedTimeSeconds;
+          }
+          // 오늘 산책 시간 계산
+          isSameDate(apiDate, now)
+              ? todayWalkTimeTotalSeconds +=
+                  apiResponse.result[i].completedTimeSeconds
+              : null;
+        }
+        for (int i = 0; i < weekWalkTime.length; i++) {
+          if (weekWalkTime[i] > recommended * 0.9) {
+            thisWeekAchievement++;
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    await myGoogleSignIn.signOut();
+  }
 
   @override
   void initState() {
@@ -237,7 +368,12 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         // _handleGetContact();
       }
     });
+    pageInit();
     initSchedule();
+    acceptResponse();
+    acceptUserResponse();
+    acceptGetRecords();
+    acceptGetInfo();
   }
 
   void tabListener() {
@@ -279,7 +415,16 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                 children: [
                   Center(
                     child: Container(
-                      child: HomeScreen(),
+                      child: HomeScreen(
+                        weeks: weeks,
+                        todayWalkTimeTotalSeconds: todayWalkTimeTotalSeconds,
+                        thisWeekWalkTimeTotalSeconds:
+                            thisWeekWalkTimeTotalSeconds,
+                        recommended: recommended,
+                        thisWeekAchievement: thisWeekAchievement,
+                        totalWeekAchievement: totalWeekAchievement,
+                        weekWalkTime: weekWalkTime,
+                      ),
                     ),
                   ),
                   Center(
@@ -299,7 +444,18 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   ),
                   Center(
                     child: Container(
-                      child: userProfilePage(),
+                      child: userProfilePage(
+                        imageUrl: getMeApiResponse.result.profileImageUrl,
+                        userEmail: getMeApiResponse.result.email,
+                        name: getMeApiResponse.result.name,
+                        age: getMeApiResponse.result.age,
+                        pregnancyStartDate: getMeApiResponse.result.pregnancyStartDate,
+                        guardianPhoneNumber:
+                            getMeApiResponse.result.guardianPhoneNumber,
+                        activityLevel: getMeApiResponse.result.activityLevel,
+                        walkPreferences:
+                            getMeApiResponse.result.walkPreferences,
+                      ),
                     ),
                   ),
                 ],
@@ -343,12 +499,12 @@ bool isSameTime(DateTime? dateA, DateTime? dateB) {
 
 //구글 캘린더 이벤트와 로컬 이벤트가 같은 이벤트인지 비교하는 함수 같으면 true 다르면 false를 리턴함
 bool isSameEvent(Event eventA, calendarv3.Event eventB) {
-  print("${eventA.title}과 ${eventB.summary}의 비교");
+  //print("${eventA.title}과 ${eventB.summary}의 비교");
   var UtcDateAStart = eventA.date;
   var UtcDateAEnd = UtcDateAStart.add(Duration(seconds: eventA.totalTime));
   var UtcDateBStart = eventB.start?.dateTime?.toLocal();
   var UtcDateBEnd = eventB.end?.dateTime?.toLocal();
-  print("UtcDate start and End : ${UtcDateAStart}, ${UtcDateAEnd}, ${UtcDateBStart}, ${UtcDateBEnd}, ${eventB.summary}");
+  //print("UtcDate start and End : ${UtcDateAStart}, ${UtcDateAEnd}, ${UtcDateBStart}, ${UtcDateBEnd}, ${eventB.summary}");
   return (isSameTime(UtcDateAStart, UtcDateBStart) &&
       isSameTime(UtcDateAEnd, UtcDateBEnd));
 }

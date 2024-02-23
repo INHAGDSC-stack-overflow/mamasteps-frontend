@@ -25,6 +25,7 @@ Future<void> editRequestProfile(
   currentPosition,
   startClosewayPoints,
   endClosewayPoints,
+    walkSpeed,
 ) async {
   final url = 'https://dev.mamasteps.dev/api/v1/routes/editRequestProfile';
   final AccessToken = await storage.read(key: 'access_token');
@@ -47,7 +48,7 @@ Future<void> editRequestProfile(
 
   var requestData = RequestData(
     targetTime: totalSec,
-    walkSpeed: 3,
+    walkSpeed: walkSpeed,
     origin: Coordinate(
         latitude: currentPosition.latitude,
         longitude: currentPosition.longitude),

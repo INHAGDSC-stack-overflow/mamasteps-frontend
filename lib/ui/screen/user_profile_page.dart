@@ -1,12 +1,27 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mamasteps_frontend/login/screen/login_page.dart';
-import 'package:mamasteps_frontend/storage/login/login_data.dart';
+import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
 
 class userProfilePage extends StatefulWidget {
-  const userProfilePage({super.key});
+  final String? imageUrl;
+  final String userEmail;
+  final String name;
+  final int age;
+  final DateTime pregnancyStartDate;
+  final String guardianPhoneNumber;
+  final String activityLevel;
+  final List<WalkPreference> walkPreferences;
+  const userProfilePage({
+    super.key,
+    required this.imageUrl,
+    required this.userEmail,
+    required this.name,
+    required this.age,
+    required this.pregnancyStartDate,
+    required this.guardianPhoneNumber,
+    required this.activityLevel,
+    required this.walkPreferences,
+  });
 
   @override
   State<userProfilePage> createState() => _userProfilePageState();
@@ -19,26 +34,25 @@ class _userProfilePageState extends State<userProfilePage> {
   final guardianPhoneNumberController = TextEditingController();
   final activityLevelController = TextEditingController();
   final walkTimeController = TextEditingController();
-  late ApiResponse futureApiResponse;
+  // late ApiResponse futureApiResponse;
 
   @override
   void initState() {
     super.initState();
-    initSetting().then((value) {
-      setState(() {
-        futureApiResponse = value;
-        nameTextController.text = futureApiResponse.result.name;
-        ageTextController.text = futureApiResponse.result.age.toString();
-        pregnancyStartTextController.text = DateFormat('yyyy년 MM월 dd일')
-            .format(futureApiResponse.result.pregnancyStartDate);
-        guardianPhoneNumberController.text =
-            futureApiResponse.result.guardianPhoneNumber;
-        activityLevelController.text = futureApiResponse.result.activityLevel;
-        walkTimeController.text = futureApiResponse.result.walkPreferences
-            .map((e) => e.dayOfWeek + ' ' + e.startTime + ' ~ ' + e.endTime)
-            .join('\n');
-      });
-    });
+    nameTextController.text = widget.userEmail;
+    ageTextController.text = widget.age.toString();
+    pregnancyStartTextController.text =
+        DateFormat("yyyy년 MM월 dd일").format(widget.pregnancyStartDate);
+    guardianPhoneNumberController.text = widget.guardianPhoneNumber;
+    activityLevelController.text = widget.activityLevel;
+    // walkTimeController.text = widget.walkPreferences
+    //     .map((e) =>
+    //         e.dayOfWeek +
+    //         ' ' +
+    //         e.startTime.toString() +
+    //         ' ~ ' +
+    //         e.endTime.toString())
+    //     .join('\n');
   }
 
   @override
@@ -53,7 +67,9 @@ class _userProfilePageState extends State<userProfilePage> {
         ),
         body: Column(
           children: [
-            _Header(),
+            _Header(
+              ImageUrl: widget.imageUrl,
+            ),
             _Body(
               nameTextController: nameTextController,
               ageTextController: ageTextController,
@@ -61,7 +77,8 @@ class _userProfilePageState extends State<userProfilePage> {
               guardianPhoneNumberController: guardianPhoneNumberController,
               activityLevelController: activityLevelController,
               walkTimeController: walkTimeController,
-              futureApiResponse: initSetting(),
+              walkPreferences: widget.walkPreferences,
+              // futureApiResponse: initSetting(),
             ),
           ],
         ),
@@ -98,122 +115,126 @@ class _userProfilePageState extends State<userProfilePage> {
   //   }
   // }
 
-  Future<ApiResponse> initSetting() async {
-    return ApiResponse(
-      isSuccess: true,
-      code: '200',
-      message: '성공',
-      result: UserProfile(
-        profileImageUrl:
-            'https://lh3.googleusercontent.com/a/ACg8ocIr5TFXGf6UJATm6xjdXZ64DRBZfiEn3zdBFKG2EGQbrpg',
-        email: 'tlgusld03@gmail.com',
-        name: '김영래',
-        age: 28,
-        pregnancyStartDate: DateTime.parse('2024-01-13'),
-        guardianPhoneNumber: '010-1234-5678',
-        activityLevel: '보통',
-        walkPreferences: [
-          WalkPreference(
-              dayOfWeek: '월요일', startTime: '10:00', endTime: '11:00'),
-          WalkPreference(
-              dayOfWeek: '화요일', startTime: '10:00', endTime: '11:00'),
-          WalkPreference(
-              dayOfWeek: '수요일', startTime: '10:00', endTime: '11:00'),
-          WalkPreference(
-              dayOfWeek: '목요일', startTime: '10:00', endTime: '11:00'),
-          WalkPreference(
-              dayOfWeek: '금요일', startTime: '10:00', endTime: '11:00'),
-          WalkPreference(
-              dayOfWeek: '토요일', startTime: '10:00', endTime: '11:00'),
-          WalkPreference(
-              dayOfWeek: '일요일', startTime: '10:00', endTime: '11:00'),
-        ],
-      ),
-    );
-  }
+  // Future<ApiResponse> initSetting() async {
+  //   return ApiResponse(
+  //     isSuccess: true,
+  //     code: '200',
+  //     message: '성공',
+  //     result: UserProfile(
+  //       profileImageUrl:
+  //           'https://lh3.googleusercontent.com/a/ACg8ocIr5TFXGf6UJATm6xjdXZ64DRBZfiEn3zdBFKG2EGQbrpg',
+  //       email: 'tlgusld03@gmail.com',
+  //       name: '김영래',
+  //       age: 28,
+  //       pregnancyStartDate: DateTime.parse('2024-01-13'),
+  //       guardianPhoneNumber: '010-1234-5678',
+  //       activityLevel: '보통',
+  //       walkPreferences: [
+  //         WalkPreference(
+  //             dayOfWeek: '월요일', startTime: '10:00', endTime: '11:00'),
+  //         WalkPreference(
+  //             dayOfWeek: '화요일', startTime: '10:00', endTime: '11:00'),
+  //         WalkPreference(
+  //             dayOfWeek: '수요일', startTime: '10:00', endTime: '11:00'),
+  //         WalkPreference(
+  //             dayOfWeek: '목요일', startTime: '10:00', endTime: '11:00'),
+  //         WalkPreference(
+  //             dayOfWeek: '금요일', startTime: '10:00', endTime: '11:00'),
+  //         WalkPreference(
+  //             dayOfWeek: '토요일', startTime: '10:00', endTime: '11:00'),
+  //         WalkPreference(
+  //             dayOfWeek: '일요일', startTime: '10:00', endTime: '11:00'),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
-class ApiResponse {
-  bool isSuccess;
-  String code;
-  String message;
-  UserProfile result;
+// class ApiResponse {
+//   bool isSuccess;
+//   String code;
+//   String message;
+//   UserProfile result;
+//
+//   ApiResponse(
+//       {required this.isSuccess,
+//       required this.code,
+//       required this.message,
+//       required this.result});
+//
+//   factory ApiResponse.fromJson(Map<String, dynamic> json) {
+//     return ApiResponse(
+//       isSuccess: json['isSuccess'],
+//       code: json['code'],
+//       message: json['message'],
+//       result: UserProfile.fromJson(json['result']),
+//     );
+//   }
+// }
 
-  ApiResponse(
-      {required this.isSuccess,
-      required this.code,
-      required this.message,
-      required this.result});
+// class UserProfile {
+//   String profileImageUrl;
+//   String email;
+//   String name;
+//   int age;
+//   DateTime pregnancyStartDate;
+//   String guardianPhoneNumber;
+//   String activityLevel;
+//   List<WalkPreference> walkPreferences;
+//
+//   UserProfile({
+//     required this.profileImageUrl,
+//     required this.email,
+//     required this.name,
+//     required this.age,
+//     required this.pregnancyStartDate,
+//     required this.guardianPhoneNumber,
+//     required this.activityLevel,
+//     required this.walkPreferences,
+//   });
+//
+//   factory UserProfile.fromJson(Map<String, dynamic> json) {
+//     var list = json['walkPreferences'] as List;
+//     List<WalkPreference> walkPreferencesList =
+//         list.map((i) => WalkPreference.fromJson(i)).toList();
+//     return UserProfile(
+//       profileImageUrl: json['profileImageUrl'],
+//       email: json['email'],
+//       name: json['name'],
+//       age: json['age'],
+//       pregnancyStartDate: DateTime.parse(json['pregnancyStartDate']),
+//       guardianPhoneNumber: json['guardianPhoneNumber'],
+//       activityLevel: json['activityLevel'],
+//       walkPreferences: walkPreferencesList,
+//     );
+//   }
+// }
 
-  factory ApiResponse.fromJson(Map<String, dynamic> json) {
-    return ApiResponse(
-      isSuccess: json['isSuccess'],
-      code: json['code'],
-      message: json['message'],
-      result: UserProfile.fromJson(json['result']),
-    );
-  }
-}
-
-class UserProfile {
-  String profileImageUrl;
-  String email;
-  String name;
-  int age;
-  DateTime pregnancyStartDate;
-  String guardianPhoneNumber;
-  String activityLevel;
-  List<WalkPreference> walkPreferences;
-
-  UserProfile({
-    required this.profileImageUrl,
-    required this.email,
-    required this.name,
-    required this.age,
-    required this.pregnancyStartDate,
-    required this.guardianPhoneNumber,
-    required this.activityLevel,
-    required this.walkPreferences,
-  });
-
-  factory UserProfile.fromJson(Map<String, dynamic> json) {
-    var list = json['walkPreferences'] as List;
-    List<WalkPreference> walkPreferencesList =
-        list.map((i) => WalkPreference.fromJson(i)).toList();
-    return UserProfile(
-      profileImageUrl: json['profileImageUrl'],
-      email: json['email'],
-      name: json['name'],
-      age: json['age'],
-      pregnancyStartDate: DateTime.parse(json['pregnancyStartDate']),
-      guardianPhoneNumber: json['guardianPhoneNumber'],
-      activityLevel: json['activityLevel'],
-      walkPreferences: walkPreferencesList,
-    );
-  }
-}
-
-class WalkPreference {
-  String dayOfWeek;
-  String startTime;
-  String endTime;
-
-  WalkPreference(
-      {required this.dayOfWeek,
-      required this.startTime,
-      required this.endTime});
-
-  factory WalkPreference.fromJson(Map<String, dynamic> json) {
-    return WalkPreference(
-      dayOfWeek: json['dayOfWeek'],
-      startTime: json['startTime'],
-      endTime: json['endTime'],
-    );
-  }
-}
+// class WalkPreference {
+//   String dayOfWeek;
+//   String startTime;
+//   String endTime;
+//
+//   WalkPreference(
+//       {required this.dayOfWeek,
+//       required this.startTime,
+//       required this.endTime});
+//
+//   factory WalkPreference.fromJson(Map<String, dynamic> json) {
+//     return WalkPreference(
+//       dayOfWeek: json['dayOfWeek'],
+//       startTime: json['startTime'],
+//       endTime: json['endTime'],
+//     );
+//   }
+// }
 
 class _Header extends StatelessWidget {
-  const _Header({super.key});
+  final String? ImageUrl;
+  const _Header({
+    super.key,
+    required this.ImageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -262,8 +283,8 @@ class _Header extends StatelessWidget {
                 ),
                 child: Image(
                   fit: BoxFit.cover,
-                  image: NetworkImage(
-                      'https://lh3.googleusercontent.com/a/ACg8ocIr5TFXGf6UJATm6xjdXZ64DRBZfiEn3zdBFKG2EGQbrpg'),
+                  image: NetworkImage(ImageUrl ??
+                      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png'),
                 ),
               ),
             ),
@@ -281,7 +302,8 @@ class _Body extends StatefulWidget {
   final TextEditingController guardianPhoneNumberController;
   final TextEditingController activityLevelController;
   final TextEditingController walkTimeController;
-  final Future<ApiResponse> futureApiResponse;
+  final List<WalkPreference> walkPreferences;
+  // final Future<ApiResponse> futureApiResponse;
 
   const _Body({
     super.key,
@@ -291,7 +313,8 @@ class _Body extends StatefulWidget {
     required this.guardianPhoneNumberController,
     required this.activityLevelController,
     required this.walkTimeController,
-    required this.futureApiResponse,
+    required this.walkPreferences,
+    // required this.futureApiResponse,
   });
 
   @override
@@ -302,6 +325,26 @@ class _BodyState extends State<_Body> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+
+    String dayOfWeekToKorean(String day) {
+      Map<String, String> dayOfWeekKorean = {
+        "Monday": "월요일",
+        "Tuesday": "화요일",
+        "Wednesday": "수요일",
+        "Thursday": "목요일",
+        "Friday": "금요일",
+        "Saturday": "토요일",
+        "Sunday": "일요일",
+      };
+
+      // 문자열의 첫 글자를 대문자로 변환하고 나머지는 소문자로 변환하여
+      // 맵에서 정확한 키를 찾을 수 있도록 합니다.
+      String formattedDay =
+          day[0].toUpperCase() + day.substring(1).toLowerCase();
+
+      return dayOfWeekKorean[formattedDay] ?? "알 수 없는 요일";
+    }
+
     return Expanded(
       flex: 1,
       child: SingleChildScrollView(
@@ -315,7 +358,7 @@ class _BodyState extends State<_Body> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ProfileFormField(
-                  labelText: '이름',
+                  labelText: '유저 이메일',
                   controller: widget.nameTextController,
                 ),
                 Divider(),
@@ -341,57 +384,43 @@ class _BodyState extends State<_Body> {
                 Container(
                   width: screenWidth,
                   height: 80,
-                  child: FutureBuilder(
-                    future: widget.futureApiResponse, // 비동기 작업의 결과를 기다리는 Future
-                    builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        // 데이터를 기다리는 동안 로딩 인디케이터를 보여줍니다.
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        // 에러가 발생하면 에러 메시지를 보여줍니다.
-                        return Text('Error: ${snapshot.error}');
-                      } else if (snapshot.hasData) {
-                        // 데이터가 정상적으로 반환되었으면, walkPreferences 리스트를 사용하여 위젯을 생성합니다.
-                        var walkPreferences =
-                            snapshot.data.result.walkPreferences;
-                        return Container(
+                  child: Container(
+                    width: screenWidth,
+                    height: 110,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '산책 선호시간',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
                           width: screenWidth,
-                          height: 110,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '산책 선호시간',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8),
-                              Container(
-                                width: screenWidth,
-                                height: 50,
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: walkPreferences
-                                          .map<Widget>((WalkPreference e) =>
-                                              Text(e.dayOfWeek +
-                                                  ' ' +
-                                                  e.startTime +
-                                                  ' ~ ' +
-                                                  e.endTime))
-                                          .toList()),
-                                ),
-                              ),
-                            ],
+                          height: 50,
+                          child: SingleChildScrollView(
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: widget.walkPreferences
+                                    .map<Widget>(
+                                      (WalkPreference e) => Text(
+                                          dayOfWeekToKorean(e.dayOfWeek) +
+                                              ' : ' +
+                                              e.startTime.hour.toString() +
+                                              "시 " +
+                                              e.startTime.minute.toString() +
+                                              "분 ~ "+
+                                              e.endTime.hour.toString() +
+                                              "시 " +
+                                              e.endTime.minute.toString() +
+                                              "분"),
+                                    )
+                                    .toList()),
                           ),
-                        );
-                      } else {
-                        return ProfileFormField(
-                            labelText: '산책 선호시간',
-                            controller: widget.walkTimeController);
-                      }
-                    },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -440,3 +469,56 @@ class _ProfileFormFieldState extends State<ProfileFormField> {
     );
   }
 }
+
+// FutureBuilder(
+// future: widget.futureApiResponse, // 비동기 작업의 결과를 기다리는 Future
+// builder: (BuildContext context, AsyncSnapshot snapshot) {
+// if (snapshot.connectionState == ConnectionState.waiting) {
+// // 데이터를 기다리는 동안 로딩 인디케이터를 보여줍니다.
+// return CircularProgressIndicator();
+// } else if (snapshot.hasError) {
+// // 에러가 발생하면 에러 메시지를 보여줍니다.
+// return Text('Error: ${snapshot.error}');
+// } else if (snapshot.hasData) {
+// // 데이터가 정상적으로 반환되었으면, walkPreferences 리스트를 사용하여 위젯을 생성합니다.
+// var walkPreferences =
+// snapshot.data.result.walkPreferences;
+// return Container(
+// width: screenWidth,
+// height: 110,
+// child: Column(
+// crossAxisAlignment: CrossAxisAlignment.start,
+// children: [
+// Text(
+// '산책 선호시간',
+// style: TextStyle(fontWeight: FontWeight.bold),
+// ),
+// const SizedBox(height: 8),
+// Container(
+// width: screenWidth,
+// height: 50,
+// child: SingleChildScrollView(
+// child: Column(
+// mainAxisSize: MainAxisSize.min,
+// crossAxisAlignment:
+// CrossAxisAlignment.start,
+// children: walkPreferences
+//     .map<Widget>((WalkPreference e) =>
+// Text(e.dayOfWeek +
+// ' ' +
+// e.startTime.toString() +
+// ' ~ ' +
+// e.endTime.toString()))
+//     .toList()),
+// ),
+// ),
+// ],
+// ),
+// );
+// } else {
+// return ProfileFormField(
+// labelText: '산책 선호시간',
+// controller: widget.walkTimeController);
+// }
+// },
+// ),
