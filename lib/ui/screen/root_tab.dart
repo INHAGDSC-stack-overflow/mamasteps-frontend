@@ -57,7 +57,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
 
   //Schedule
   //0.
-  GoogleSignInAccount? _currentUser;
+  late GoogleSignInAccount? _currentUser;
   //1. 전체 스케쥴 리스트(key(DateTime), value(event.date)를 기준으로 정렬됨)
   final Map<DateTime, List<Event>> events =
       SplayTreeMap<DateTime, List<Event>>();
@@ -92,20 +92,22 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
   }
 
   //7. 구글 캘린더 초기화 함수
-  void googleInit() async {
-    await myGoogleSignIn.signIn();
-    final auth.AuthClient? client = await myGoogleSignIn.authenticatedClient();
-    assert(client != null, 'Authenticated client missing!');
-    if (client != null) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => GoogleLogin()),
-        (route) => false,
-      );
-    }
-    final calendarv3.CalendarApi calendarApi = calendarv3.CalendarApi(client!);
-    //acceptResponse(calendarApi);
-  }
+  // void googleInit() async {
+  // if(_currentUser == null){
+  //   _currentUser = await myGoogleSignIn.signIn();
+  // }
+  // final auth.AuthClient? client = await myGoogleSignIn.authenticatedClient();
+  // assert(client != null, 'Authenticated client missing!');
+  // if (client != null) {
+  //   Navigator.pushAndRemoveUntil(
+  //     context,
+  //     MaterialPageRoute(builder: (_) => GoogleLogin()),
+  //     (route) => false,
+  //   );
+  // }
+  // final calendarv3.CalendarApi calendarApi = calendarv3.CalendarApi(client!);
+  // //acceptResponse(calendarApi);
+  // }
 
   //8. + 버튼 클릭시 수행되는 콜백 함수, 자동 일정 추가기능
   void acceptResponse() async {
@@ -121,6 +123,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
 
   //12. 스케쥴
   void initSchedule() async {
+    _currentUser = await myGoogleSignIn.signIn();
     //var tempEvent = calendarv3.Event();
     DateTime usersFirstScheduleDate =
         DateTime.now().subtract(Duration(days: 240));
@@ -139,7 +142,19 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     getScheduleResponse apiResponse = await getSchedule();
     if (apiResponse.isSuccess) {
       setState(() {
+        DateTime now = DateTime.now();
+        DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
+        DateTime startOfWeek =
+        todayZeroHour.subtract(Duration(days: now.weekday - 1));
+        print("일주일의 시작" + startOfWeek.toString());
+        DateTime endOfWeek = todayZeroHour
+            .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
+        print("일주일의 끝" + endOfWeek.toString());
         for (int i = 0; i < apiResponse.result.length; i++) {
+          DateTime apiDate = apiResponse.result[i].date;
+          int difference = apiDate.difference(startOfWeek).inDays + 1;
+          // 이번주 총 산책 시간 계산
+
           DateTime date = apiResponse.result[i].date;
           print(date.toString());
           int id = apiResponse.result[i].id;
@@ -161,7 +176,16 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   existingEvent.date.day == localTempEvent.date.day) ??
               false;
           if (!isDuplicate) {
+            print("삽입되는 로컬 스케쥴 : " +
+                localTempEvent.title +
+                localTempEvent.date.toString());
             events.putIfAbsent(eventDate, () => []).add(localTempEvent);
+            if (localTempEvent.date.isAfter(startOfWeek) &&
+                localTempEvent.date.isBefore(endOfWeek)) {
+              // 이번주에 산책 일정이 몇개인지
+              totalWeekAchievement++;
+              print("totalWeekAchievement : " + totalWeekAchievement.toString());
+            }
           }
 
           // events[eventDate] = [Event(time, date, completedTimeSeconds)];
@@ -260,19 +284,19 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     thisWeekWalkTimeTotalSeconds = 0;
     recommended = 0;
     thisWeekAchievement = 0;
-    totalWeekAchievement = 2;
+    totalWeekAchievement = 0;
     weekWalkTime = [0, 0, 0, 0, 0, 0, 0];
   }
 
-  void initThisWeekAchievement() {
-    setState(() {
-      for (int i = 0; i < weekWalkTime.length; i++) {
-        if (weekWalkTime[i] > recommended * 0.9) {
-          thisWeekAchievement++;
-        }
-      }
-    });
-  }
+  // void initThisWeekAchievement() {
+  //   setState(() {
+  //     for (int i = 0; i < weekWalkTime.length; i++) {
+  //       if (weekWalkTime[i] > recommended * 0.9) {
+  //         thisWeekAchievement++;
+  //       }
+  //     }
+  //   });
+  // }
 
   void acceptGetInfo() async {
     myInfo apiResponse = await getMyInfo(context);
@@ -303,20 +327,16 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
   }
 
   void acceptGetRecords() async {
-    bool isSameDate(DateTime date1, DateTime date2) {
-      return date1.year == date2.year &&
-          date1.month == date2.month &&
-          date1.day == date2.day;
-    }
-
     getRecordResponse apiResponse = await getRecords();
     setState(() {
       if (apiResponse.isSuccess) {
         DateTime now = DateTime.now();
-
-        DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-        DateTime endOfWeek =
-            now.add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
+        DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
+        DateTime startOfWeek =
+            todayZeroHour.subtract(Duration(days: now.weekday - 1));
+        print("일주일의 시작" + startOfWeek.toString());
+        DateTime endOfWeek = todayZeroHour
+            .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
         for (int i = 0; i < apiResponse.result.length; i++) {
           DateTime apiDate = apiResponse.result[i].date;
           int apiCompletedTimeSeconds =
@@ -329,6 +349,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
             weekWalkTime[difference] += apiCompletedTimeSeconds;
             thisWeekWalkTimeTotalSeconds +=
                 apiResponse.result[i].completedTimeSeconds;
+            // 이번주에 몇 번 산책했는지
           }
           // 오늘 산책 시간 계산
           isSameDate(apiDate, now)
@@ -336,11 +357,17 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   apiResponse.result[i].completedTimeSeconds
               : null;
         }
-        for (int i = 0; i < weekWalkTime.length; i++) {
-          if (weekWalkTime[i] > recommended * 0.9) {
+        for (int i = 0; i < 7; i++) {
+          if (weekWalkTime[i] > 0) {
             thisWeekAchievement++;
+            print("이번주 산책 횟수 : " + thisWeekAchievement.toString());
           }
         }
+        // for (int i = 0; i < weekWalkTime.length; i++) {
+        //   if (weekWalkTime[i] > recommended * 0.9) {
+        //     thisWeekAchievement++;
+        //   }
+        // }
       }
     });
   }
@@ -436,9 +463,9 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                         selectedDay: selectedDay,
                         focusedDay: focusedDay,
                         onDaySelected: onDaySelected,
-                        googleinit: googleInit,
                         acceptResponse: acceptResponse,
                         initSetting: initSchedule,
+                        onFABTap: showSelectDialog,
                       ),
                     ),
                   ),
@@ -449,7 +476,8 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                         userEmail: getMeApiResponse.result.email,
                         name: getMeApiResponse.result.name,
                         age: getMeApiResponse.result.age,
-                        pregnancyStartDate: getMeApiResponse.result.pregnancyStartDate,
+                        pregnancyStartDate:
+                            getMeApiResponse.result.pregnancyStartDate,
                         guardianPhoneNumber:
                             getMeApiResponse.result.guardianPhoneNumber,
                         activityLevel: getMeApiResponse.result.activityLevel,
@@ -484,6 +512,115 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
       ),
     );
   }
+
+  void showSelectDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('이벤트 추가'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              setState(() {
+                acceptResponse();
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text('자동 추가 하기'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // showAddDialog();
+            },
+            child: Text('직접 입력 하기'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // void showAddDialog() {
+  //   final TextEditingController _eventController = TextEditingController();
+  //
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: Text('Add Event'),
+  //       content: TextField(
+  //         controller: _eventController,
+  //         decoration: InputDecoration(hintText: 'Event Name'),
+  //       ),
+  //       actions: <Widget>[
+  //         TextButton(
+  //           onPressed: () => Navigator.of(context).pop(),
+  //           child: Text('Cancel'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () {
+  //             if (_eventController.text.isEmpty) return;
+  //             setState(
+  //                   () {
+  //                 if (events[selectedDay] != null) {
+  //                   events[selectedDay]!.add(Event(_eventController.text, selectedDay));
+  //                 } else {
+  //                   events[selectedDay] = [Event(_eventController.text, selectedDay)];
+  //                 }
+  //               },
+  //             );
+  //             _eventController.clear();
+  //             Navigator.of(context).pop();
+  //           },
+  //           child: Text('Save'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // void _showEditDialog(index) {
+  //   final TextEditingController _eventController = TextEditingController();
+  //   _eventController.text = events[selectedDay]![index].title;
+  //
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: Text('Edit Event'),
+  //       content: TextField(
+  //         controller: _eventController,
+  //         decoration: InputDecoration(hintText: 'Event Name'),
+  //       ),
+  //       actions: <Widget>[
+  //         TextButton(
+  //           onPressed: () => Navigator.of(context).pop(),
+  //           child: Text('Cancel'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () {
+  //             if (_eventController.text.isEmpty) return;
+  //             setState(() {
+  //               events[selectedDay]![index].title = _eventController.text;
+  //             });
+  //             _eventController.clear();
+  //             Navigator.of(context).pop();
+  //           },
+  //           child: Text('Save'),
+  //         ),
+  //         TextButton(
+  //           child: Text('delete'),
+  //           onPressed: () {
+  //             setState(
+  //                   () {
+  //                 events[selectedDay]!.removeAt(index);
+  //               },
+  //             );
+  //             Navigator.of(context).pop();
+  //           },
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
 // 시간 비교 함수
@@ -507,4 +644,10 @@ bool isSameEvent(Event eventA, calendarv3.Event eventB) {
   //print("UtcDate start and End : ${UtcDateAStart}, ${UtcDateAEnd}, ${UtcDateBStart}, ${UtcDateBEnd}, ${eventB.summary}");
   return (isSameTime(UtcDateAStart, UtcDateBStart) &&
       isSameTime(UtcDateAEnd, UtcDateBEnd));
+}
+
+bool isSameDate(DateTime date1, DateTime date2) {
+  return date1.year == date2.year &&
+      date1.month == date2.month &&
+      date1.day == date2.day;
 }
