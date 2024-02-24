@@ -57,7 +57,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double progressRatio = widget.thisWeekAchievement / widget.totalWeekAchievement;
+    double progressRatio;
+    if (widget.thisWeekAchievement > widget.totalWeekAchievement) {
+      progressRatio = 1;
+    } else {
+      progressRatio = widget.thisWeekAchievement / widget.totalWeekAchievement;
+    }
     double progressBarWidth = screenWidth * progressRatio;
     return HomeScreenDefaultLayout(
         Header: _Header(
@@ -207,7 +212,10 @@ class _Header extends StatelessWidget {
               icon: Icon(Icons.settings),
               onPressed: () {
                 deleteAll();
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => GoogleLogin()), (route) => false);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => GoogleLogin()),
+                    (route) => false);
               },
             ),
           ),
@@ -495,7 +503,7 @@ List<Widget> buildWidgetsList(
                     alignment: Alignment.centerLeft,
                     child: Container(
                       height: 20,
-                      width: progressBarWidth,
+                      width: progressBarWidth * 0.9,
                       decoration: BoxDecoration(
                         color: Color(0xffa412db),
                         borderRadius: BorderRadius.circular(10),

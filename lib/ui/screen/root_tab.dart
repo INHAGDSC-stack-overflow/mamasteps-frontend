@@ -16,6 +16,8 @@ import 'package:mamasteps_frontend/calendar/component/google_calendar.dart'
 import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
 import 'dart:collection';
 
+import 'package:numberpicker/numberpicker.dart';
+
 final GoogleSignIn myGoogleSignIn = GoogleSignIn(
   // Optional clientId
   // clientId: dotenv.get("myClientId"),
@@ -145,7 +147,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         DateTime now = DateTime.now();
         DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
         DateTime startOfWeek =
-        todayZeroHour.subtract(Duration(days: now.weekday - 1));
+            todayZeroHour.subtract(Duration(days: now.weekday - 1));
         print("일주일의 시작" + startOfWeek.toString());
         DateTime endOfWeek = todayZeroHour
             .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
@@ -184,7 +186,8 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                 localTempEvent.date.isBefore(endOfWeek)) {
               // 이번주에 산책 일정이 몇개인지
               totalWeekAchievement++;
-              print("totalWeekAchievement : " + totalWeekAchievement.toString());
+              print(
+                  "totalWeekAchievement : " + totalWeekAchievement.toString());
             }
           }
 
@@ -198,7 +201,9 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
           // events[eventDate] = [Event(time, date, completedTimeSeconds)];
           // }
         }
-
+        if(totalWeekAchievement == 0){
+          totalWeekAchievement=1;
+        }
         events.forEach((key, value) {
           value.sort((a, b) => a.date.compareTo(b.date));
         });
@@ -531,7 +536,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              // showAddDialog();
+              showAddDialog();
             },
             child: Text('직접 입력 하기'),
           ),
@@ -540,43 +545,81 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     );
   }
 
-  // void showAddDialog() {
-  //   final TextEditingController _eventController = TextEditingController();
-  //
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text('Add Event'),
-  //       content: TextField(
-  //         controller: _eventController,
-  //         decoration: InputDecoration(hintText: 'Event Name'),
-  //       ),
-  //       actions: <Widget>[
-  //         TextButton(
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           child: Text('Cancel'),
-  //         ),
-  //         TextButton(
-  //           onPressed: () {
-  //             if (_eventController.text.isEmpty) return;
-  //             setState(
-  //                   () {
-  //                 if (events[selectedDay] != null) {
-  //                   events[selectedDay]!.add(Event(_eventController.text, selectedDay));
-  //                 } else {
-  //                   events[selectedDay] = [Event(_eventController.text, selectedDay)];
-  //                 }
-  //               },
-  //             );
-  //             _eventController.clear();
-  //             Navigator.of(context).pop();
-  //           },
-  //           child: Text('Save'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  void showAddDialog() {
+    final TextEditingController _timeController = TextEditingController();
+    final TextEditingController _miniuteController = TextEditingController();
+    final TextEditingController _walkTimeController = TextEditingController();
+    var _hour=0, _min=0, _time=0;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Add Event'),
+        content: Container(
+          height: 300,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              TextFormField(
+                decoration: InputDecoration(
+                  hintText: "산책 시작 시간을 입력해 주세요 (시)",
+                  labelText: "산책 시작 시간",
+                ),
+                controller: _timeController,
+                onChanged: (value){
+                  _timeController.text=value;
+                  _hour = int.parse(value);
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  hintText: "산책 시작 시간을 입력해 주세요 (분)",
+                  labelText: "산책 시작 시간",
+                ),
+                controller: _miniuteController,
+                onChanged: (value){
+                  _miniuteController.text=value;
+                  _min = int.parse(value);
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(
+                  hintText: "산책 시간을 입력해 주세요 (분)",
+                  labelText: "산책 시간",
+                ),
+                controller: _walkTimeController,
+                onChanged: (value){
+                  _walkTimeController.text=value;
+                  _time = int.parse(value);
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              var now = DateTime.now();
+              var id = now.year + now.month * 12 + now.day * 30;
+              var dateTime = DateTime(selectedDay.year, selectedDay.month,
+                  selectedDay.day, _hour, _min);
+              var targetTimeSeconds = _time * 60;
+              await addSchedule(dateTime, targetTimeSeconds, id);
+              setState(() {
+                initSchedule();
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
 
   // void _showEditDialog(index) {
   //   final TextEditingController _eventController = TextEditingController();
@@ -651,3 +694,4 @@ bool isSameDate(DateTime date1, DateTime date2) {
       date1.month == date2.month &&
       date1.day == date2.day;
 }
+

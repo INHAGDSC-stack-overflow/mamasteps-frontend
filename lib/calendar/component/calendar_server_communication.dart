@@ -46,10 +46,9 @@ Future<void> addRecord(int completedTimeSeconds) async {
   }
 }
 
-Future<void> addSchedule(int completedTimeSeconds, int id) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/calendar/addRecord';
+Future<void> addSchedule(DateTime date, int targetTimeSeconds, int id) async {
+  final url = 'https://dev.mamasteps.dev/api/v1/calendar/addSchedule';
   final AccessToken = await storage.read(key: 'access_token');
-  DateTime date = DateTime.now();
   String isoDate = date.toIso8601String();
 
   try {
@@ -63,7 +62,7 @@ Future<void> addSchedule(int completedTimeSeconds, int id) async {
         'id': id,
         'routeId': id,
         'date': isoDate,
-        'completedTimeSeconds': completedTimeSeconds,
+        'targetTimeSeconds': targetTimeSeconds,
         'createdAt': isoDate,
         'updatedAt': isoDate,
       }),
