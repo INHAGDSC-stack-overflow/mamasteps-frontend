@@ -116,8 +116,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
-                            onPressed:
-                                currentPage > 0 ? onPrevPressed : null,
+                            onPressed: currentPage > 0 ? onPrevPressed : null,
                             child: Text(
                               '이전',
                               style: TextStyle(color: Colors.white),
@@ -202,8 +201,9 @@ class _SignUpPageState extends State<SignUpPage> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (context) => RootTab(),),
-                (route) => false,
+              builder: (context) => RootTab(),
+            ),
+            (route) => false,
           );
         });
       } else {
@@ -433,6 +433,10 @@ class _activitiesSubPage extends StatefulWidget {
 }
 
 class _activitiesSubPageState extends State<_activitiesSubPage> {
+  bool highIsSelected = false;
+  bool midIsSelected = false;
+  bool lowIsSelected = false;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -446,40 +450,70 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
         const SizedBox(height: 16.0),
         Container(
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-          OutlinedButton(
+          ElevatedButton(
               onPressed: () {
+                setState(() {
+                  highIsSelected = true;
+                  midIsSelected = false;
+                  lowIsSelected = false;
+                });
                 widget.onhighChanged();
               },
-              child: Text('하루에 30분 이상 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
+              child: Text(
+                '하루에 30분 이상 가벼운 운동 / 산책',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: highIsSelected ? Colors.grey : Colors.blue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
+                fixedSize: Size(MediaQuery.of(context).size.width * 0.8, 50),
                 side: BorderSide(
                   width: 2,
                 ),
               )),
-          OutlinedButton(
+          const SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
               onPressed: () {
+                setState(() {
+                  highIsSelected = false;
+                  midIsSelected = true;
+                  lowIsSelected = false;
+                });
                 widget.onmiddleChanged();
               },
               child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: midIsSelected ? Colors.grey : Colors.blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
+                  fixedSize: Size(MediaQuery.of(context).size.width * 0.8, 50),
                   side: BorderSide(
                     width: 2,
                   ))),
-          OutlinedButton(
+          const SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
               onPressed: () {
+                setState(() {
+                  highIsSelected = false;
+                  midIsSelected = false;
+                  lowIsSelected = true;
+                });
                 widget.onlowChanged();
               },
               child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
-              style: OutlinedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: lowIsSelected ? Colors.grey : Colors.blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
+                  fixedSize: Size(MediaQuery.of(context).size.width * 0.8, 50),
                   side: BorderSide(
                     width: 2,
                   ))),

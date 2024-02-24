@@ -201,8 +201,8 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
           // events[eventDate] = [Event(time, date, completedTimeSeconds)];
           // }
         }
-        if(totalWeekAchievement == 0){
-          totalWeekAchievement=1;
+        if (totalWeekAchievement == 0) {
+          totalWeekAchievement = 1;
         }
         events.forEach((key, value) {
           value.sort((a, b) => a.date.compareTo(b.date));
@@ -242,9 +242,10 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                 summary: summary,
                 start: calendarv3.EventDateTime(dateTime: start),
                 end: calendarv3.EventDateTime(dateTime: end),
-                // reminders: calendarv3.EventReminders(
-                // overrides: [calendarv3.EventReminder(method: 'popup', minutes: 0),]
-                // ),
+                reminders:
+                    calendarv3.EventReminders(useDefault: false, overrides: [
+                  calendarv3.EventReminder(method: 'popup', minutes: 0),
+                ]),
               );
               //print("${summary} ${start} ${end} ${tempEvent}");
               // Google 캘린더의 이벤트와 비교 로직 (for 루프 사용)
@@ -549,7 +550,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     final TextEditingController _timeController = TextEditingController();
     final TextEditingController _miniuteController = TextEditingController();
     final TextEditingController _walkTimeController = TextEditingController();
-    var _hour=0, _min=0, _time=0;
+    var _hour = 0, _min = 0, _time = 0;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -566,8 +567,8 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   labelText: "산책 시작 시간",
                 ),
                 controller: _timeController,
-                onChanged: (value){
-                  _timeController.text=value;
+                onChanged: (value) {
+                  _timeController.text = value;
                   _hour = int.parse(value);
                 },
               ),
@@ -577,8 +578,8 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   labelText: "산책 시작 시간",
                 ),
                 controller: _miniuteController,
-                onChanged: (value){
-                  _miniuteController.text=value;
+                onChanged: (value) {
+                  _miniuteController.text = value;
                   _min = int.parse(value);
                 },
               ),
@@ -588,8 +589,8 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   labelText: "산책 시간",
                 ),
                 controller: _walkTimeController,
-                onChanged: (value){
-                  _walkTimeController.text=value;
+                onChanged: (value) {
+                  _walkTimeController.text = value;
                   _time = int.parse(value);
                 },
               ),
@@ -694,4 +695,3 @@ bool isSameDate(DateTime date1, DateTime date2) {
       date1.month == date2.month &&
       date1.day == date2.day;
 }
-

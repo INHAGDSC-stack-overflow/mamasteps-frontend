@@ -449,42 +449,47 @@ List<Widget> buildWidgetsList(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Flex(
+              direction: Axis.vertical,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    '이번 주 목표 달성률',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: screenWidth * 0.17,
-                  height: 23,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: BorderSide(
-                        color: Colors.blue,
-                        width: 2,
-                      ),
-                    ),
-                    margin: EdgeInsets.symmetric(horizontal: 10),
-                    elevation: 2,
-                    shadowColor: Colors.blue,
-                    child: Center(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
-                        '$thisWeekAchievement/$totalWeekAchievement',
+                        '이번 주 목표 달성률',
                         style: TextStyle(
-                          color: Colors.blue,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ),
+                    SizedBox(
+                      width: screenWidth * 0.17,
+                      height: 23,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                            color: Colors.blue,
+                            width: 2,
+                          ),
+                        ),
+                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        elevation: 2,
+                        shadowColor: Colors.blue,
+                        child: Center(
+                          child: Text(
+                            '$thisWeekAchievement/$totalWeekAchievement',
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -492,18 +497,19 @@ List<Widget> buildWidgetsList(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Stack(
                 children: <Widget>[
-                  Container(
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
+                  Positioned(
                     child: Container(
                       height: 20,
-                      width: progressBarWidth * 0.9,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    child: Container(
+                      height: 20,
+                      width: progressBarWidth.isNaN ? 0 : progressBarWidth * 0.9,
                       decoration: BoxDecoration(
                         color: Color(0xffa412db),
                         borderRadius: BorderRadius.circular(10),
@@ -549,6 +555,9 @@ List<Widget> buildWidgetsList(
           ],
         ),
       ),
+    ),
+    const SizedBox(
+      height: 60,
     ),
   ];
 }
