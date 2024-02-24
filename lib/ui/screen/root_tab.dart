@@ -18,17 +18,19 @@ import 'dart:collection';
 
 import 'package:numberpicker/numberpicker.dart';
 
-final GoogleSignIn myGoogleSignIn = GoogleSignIn(
-  // Optional clientId
-  // clientId: dotenv.get("myClientId"),
-  scopes: <String>[calendarv3.CalendarApi.calendarScope],
-);
+// final GoogleSignIn myGoogleSignIn = GoogleSignIn(
+//   // Optional clientId
+//   // clientId: dotenv.get("myClientId"),
+//   scopes: <String>[calendarv3.CalendarApi.calendarScope],
+// );
 
 class RootTab extends StatefulWidget {
+  // final GoogleSignIn? myGoogleSignIn;
   final VoidCallback? acceptGetInfo;
   const RootTab({
     super.key,
     this.acceptGetInfo,
+    // this.myGoogleSignIn,
   });
 
   @override
@@ -125,7 +127,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
 
   //12. 스케쥴
   void initSchedule() async {
-    _currentUser = await myGoogleSignIn.signIn();
+    //_currentUser = await myGoogleSignIn.signIn();
     //var tempEvent = calendarv3.Event();
     DateTime usersFirstScheduleDate =
         DateTime.now().subtract(Duration(days: 240));
@@ -141,7 +143,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
       );
     }
     final calendarv3.CalendarApi calendarApi = calendarv3.CalendarApi(client!);
-    getScheduleResponse apiResponse = await getSchedule();
+    getScheduleResponse apiResponse = await getSchedule(); //로컬 스케쥴 목록이 추가되는 곳
     if (apiResponse.isSuccess) {
       setState(() {
         DateTime now = DateTime.now();
@@ -154,7 +156,6 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         print("일주일의 끝" + endOfWeek.toString());
         for (int i = 0; i < apiResponse.result.length; i++) {
           DateTime apiDate = apiResponse.result[i].date;
-          int difference = apiDate.difference(startOfWeek).inDays + 1;
           // 이번주 총 산책 시간 계산
 
           DateTime date = apiResponse.result[i].date;
@@ -172,10 +173,11 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
               Event(id, routeId, time, date, completedTimeSeconds);
 
           DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
-          bool isDuplicate = events[eventDate]?.any((existingEvent) =>
-                  existingEvent.date.year == localTempEvent.date.year &&
-                  existingEvent.date.month == localTempEvent.date.month &&
-                  existingEvent.date.day == localTempEvent.date.day) ??
+          bool isDuplicate = events[eventDate]?.any(
+                  (existingEvent) => // 유저가 매뉴얼로 입력하는 코드에서 변경해야 할 부분
+                      existingEvent.date.year == localTempEvent.date.year &&
+                      existingEvent.date.month == localTempEvent.date.month &&
+                      existingEvent.date.day == localTempEvent.date.day) ??
               false;
           if (!isDuplicate) {
             print("삽입되는 로컬 스케쥴 : " +
@@ -218,6 +220,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
 
       try {
         googleEvents = await calendarApi.events.list(
+          //구글 스케쥴 리스트가 들어오는 곳
           'primary',
           timeMin: usersFirstScheduleDate,
           timeMax: usersLastScheduleDate,
@@ -228,6 +231,30 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
 
         if (googleEvents.items == null) {
           print('구글 이벤트 리스트가 비어있음');
+          for (DateTime date in events.keys) {
+            List<Event> dayEvents = events[date]!;
+            for (Event localElement in dayEvents) {
+              var summary =
+                  "${(localElement.totalTime ~/ 60).toString().padLeft(2, '0')}분 산책일정";
+              var start = localElement.date;
+              var end = localElement.date
+                  .add(Duration(seconds: localElement.totalTime));
+              var tempEvent = calendarv3.Event(
+                summary: summary,
+                start: calendarv3.EventDateTime(dateTime: start),
+                end: calendarv3.EventDateTime(dateTime: end),
+                reminders:
+                    calendarv3.EventReminders(useDefault: false, overrides: [
+                  calendarv3.EventReminder(method: 'popup', minutes: 0),
+                ]),
+              );
+              //print("${summary} ${start} ${end} ${tempEvent}");
+              // Google 캘린더의 이벤트와 비교 로직 (for 루프 사용)
+              // 이벤트 추가 로직
+              await calendarApi.events.insert(tempEvent, 'primary');
+              //print("새 이벤트 추가: ${summary} ${start} ${end}");
+            }
+          }
         } else {
           for (DateTime date in events.keys) {
             List<Event> dayEvents = events[date]!;
@@ -271,6 +298,182 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
       }
     }
   }
+
+  // void userManualAdd() async {
+  //   //_currentUser = await myGoogleSignIn.signIn();
+  //   //var tempEvent = calendarv3.Event();
+  //   DateTime usersFirstScheduleDate =
+  //       DateTime.now().subtract(Duration(days: 240));
+  //   DateTime usersLastScheduleDate = DateTime.now().add(Duration(days: 240));
+  //   //await myGoogleSignIn.signInSilently();
+  //   final auth.AuthClient? client = await myGoogleSignIn.authenticatedClient();
+  //   assert(client != null, 'Authenticated client missing!');
+  //   if (client == null) {
+  //     Navigator.pushAndRemoveUntil(
+  //       context,
+  //       MaterialPageRoute(builder: (_) => GoogleLogin()),
+  //       (route) => false,
+  //     );
+  //   }
+  //   final calendarv3.CalendarApi calendarApi = calendarv3.CalendarApi(client!);
+  //   getScheduleResponse apiResponse = await getSchedule(); //로컬 스케쥴 목록이 추가되는 곳
+  //   if (apiResponse.isSuccess) {
+  //     setState(() {
+  //       DateTime now = DateTime.now();
+  //       DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
+  //       DateTime startOfWeek =
+  //           todayZeroHour.subtract(Duration(days: now.weekday - 1));
+  //       print("일주일의 시작" + startOfWeek.toString());
+  //       DateTime endOfWeek = todayZeroHour
+  //           .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
+  //       print("일주일의 끝" + endOfWeek.toString());
+  //       for (int i = 0; i < apiResponse.result.length; i++) {
+  //         DateTime apiDate = apiResponse.result[i].date;
+  //         // 이번주 총 산책 시간 계산
+  //
+  //         DateTime date = apiResponse.result[i].date;
+  //         print(date.toString());
+  //         int id = apiResponse.result[i].id;
+  //         int? routeId = apiResponse.result[i].routeId;
+  //         int completedTimeSeconds = apiResponse.result[i].targetTimeSeconds;
+  //         int minutes = (completedTimeSeconds % 3600) ~/ 60;
+  //         String time = '${minutes.toString().padLeft(2, '0')} 분';
+  //
+  //         // DateTime endTime = apiResponse.result[i].date
+  //         //     .add(Duration(seconds: completedTimeSeconds));
+  //
+  //         var localTempEvent =
+  //             Event(id, routeId, time, date, completedTimeSeconds);
+  //
+  //         DateTime eventDate = DateTime.utc(date.year, date.month, date.day);
+  //         bool isDuplicate = events[eventDate]?.any(
+  //                 (existingEvent) => // 유저가 매뉴얼로 입력하는 코드에서 변경해야 할 부분
+  //                     existingEvent.date.year == localTempEvent.date.year &&
+  //                     existingEvent.date.month == localTempEvent.date.month &&
+  //                     existingEvent.date.day == localTempEvent.date.day &&
+  //                     existingEvent.date.hour == localTempEvent.date.hour &&
+  //                     existingEvent.date.minute ==
+  //                         localTempEvent.date.minute) ??
+  //             false;
+  //         if (!isDuplicate) {
+  //           print("삽입되는 로컬 스케쥴 : " +
+  //               localTempEvent.title +
+  //               localTempEvent.date.toString());
+  //           events.putIfAbsent(eventDate, () => []).add(localTempEvent);
+  //           if (localTempEvent.date.isAfter(startOfWeek) &&
+  //               localTempEvent.date.isBefore(endOfWeek)) {
+  //             // 이번주에 산책 일정이 몇개인지
+  //             totalWeekAchievement++;
+  //             print(
+  //                 "totalWeekAchievement : " + totalWeekAchievement.toString());
+  //           }
+  //         }
+  //
+  //         // events[eventDate] = [Event(time, date, completedTimeSeconds)];
+  //
+  //         // if (events[eventDate] != null) {
+  //         //   // 해당날짜에 이벤트가 이미 있는 경우
+  //         //   events[eventDate]!.add(Event(time, apiResponse.result[i].date, completedTimeSeconds));
+  //         // } else {
+  //         // //해당날짜에 이벤트가 없는 경우
+  //         // events[eventDate] = [Event(time, date, completedTimeSeconds)];
+  //         // }
+  //       }
+  //       if (totalWeekAchievement == 0) {
+  //         totalWeekAchievement = 1;
+  //       }
+  //       events.forEach((key, value) {
+  //         value.sort((a, b) => a.date.compareTo(b.date));
+  //       });
+  //       if (events.isNotEmpty) {
+  //         usersFirstScheduleDate = events.keys.first;
+  //         usersLastScheduleDate = events.keys.last.add(Duration(days: 1));
+  //         print("userFirstScheduleDate :" + usersFirstScheduleDate.toString());
+  //         print("userLastScheduleDate :" + usersLastScheduleDate.toString());
+  //       }
+  //       print("events length: ${events.length}");
+  //     });
+  //
+  //     try {
+  //       googleEvents = await calendarApi.events.list(
+  //         //구글 스케쥴 리스트가 들어오는 곳
+  //         'primary',
+  //         timeMin: usersFirstScheduleDate,
+  //         timeMax: usersLastScheduleDate,
+  //         maxResults: 10000,
+  //         singleEvents: true,
+  //         orderBy: 'startTime',
+  //       );
+  //
+  //       if (googleEvents.items == null) {
+  //         print('구글 이벤트 리스트가 비어있음');
+  //         for (DateTime date in events.keys) {
+  //           List<Event> dayEvents = events[date]!;
+  //           for (Event localElement in dayEvents) {
+  //             var summary =
+  //                 "${(localElement.totalTime ~/ 60).toString().padLeft(2, '0')}분 산책일정";
+  //             var start = localElement.date;
+  //             var end = localElement.date
+  //                 .add(Duration(seconds: localElement.totalTime));
+  //             var tempEvent = calendarv3.Event(
+  //               summary: summary,
+  //               start: calendarv3.EventDateTime(dateTime: start),
+  //               end: calendarv3.EventDateTime(dateTime: end),
+  //               reminders:
+  //                   calendarv3.EventReminders(useDefault: false, overrides: [
+  //                 calendarv3.EventReminder(method: 'popup', minutes: 0),
+  //               ]),
+  //             );
+  //             //print("${summary} ${start} ${end} ${tempEvent}");
+  //             // Google 캘린더의 이벤트와 비교 로직 (for 루프 사용)
+  //             // 이벤트 추가 로직
+  //             await calendarApi.events.insert(tempEvent, 'primary');
+  //             //print("새 이벤트 추가: ${summary} ${start} ${end}");
+  //           }
+  //         }
+  //       } else {
+  //         for (DateTime date in events.keys) {
+  //           List<Event> dayEvents = events[date]!;
+  //           for (Event localElement in dayEvents) {
+  //             bool isExist = false;
+  //             var summary =
+  //                 "${(localElement.totalTime ~/ 60).toString().padLeft(2, '0')}분 산책일정";
+  //             var start = localElement.date;
+  //             var end = localElement.date
+  //                 .add(Duration(seconds: localElement.totalTime));
+  //             var tempEvent = calendarv3.Event(
+  //               summary: summary,
+  //               start: calendarv3.EventDateTime(dateTime: start),
+  //               end: calendarv3.EventDateTime(dateTime: end),
+  //               reminders:
+  //                   calendarv3.EventReminders(useDefault: false, overrides: [
+  //                 calendarv3.EventReminder(method: 'popup', minutes: 0),
+  //               ]),
+  //             );
+  //             //print("${summary} ${start} ${end} ${tempEvent}");
+  //             // Google 캘린더의 이벤트와 비교 로직 (for 루프 사용)
+  //             for (var element in googleEvents.items ?? []) {
+  //               if (isSameEvent(localElement, element)) {
+  //                 // 일치하는 이벤트가 있으면 처리
+  //                 isExist = true;
+  //                 break;
+  //               }
+  //             }
+  //             if (!isExist) {
+  //               // 이벤트 추가 로직
+  //               await calendarApi.events.insert(tempEvent, 'primary');
+  //               //print("새 이벤트 추가: ${summary} ${start} ${end}");
+  //             }
+  //           }
+  //         }
+  //         //googleEvents.items?.forEach((e) => print("구글 이벤트 리스트 :${e.start?.dateTime?.toIso8601String()} : ${e.summary}"));
+  //       }
+  //     } catch (e) {
+  //       // API 호출 실패나 다른 예외 발생 시 출력
+  //       print('API 호출 중 오류 발생: $e');
+  //     }
+  //   }
+  // }
 
   //Record
   late int weeks = 0;
@@ -347,7 +550,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
           DateTime apiDate = apiResponse.result[i].date;
           int apiCompletedTimeSeconds =
               apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
-          int difference = apiDate.difference(startOfWeek).inDays + 1;
+          int difference = apiDate.difference(startOfWeek).inDays;
           // 이번주 총 산책 시간 계산
           if (apiResponse.result[i].date.isAfter(startOfWeek) &&
               apiResponse.result[i].date.isBefore(endOfWeek)) {
@@ -391,18 +594,21 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     controller = TabController(length: 3, vsync: this);
     controller.addListener(tabListener);
     selectedEvents = ValueNotifier(getEventsForDay(selectedDay));
-    myGoogleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
-      setState(() {
-        _currentUser = account;
-        print("currentUser : " + _currentUser.toString());
-      });
-      if (_currentUser != null) {
-        //로그인이 되어있는 경우 실행되는 구문
-        // _handleGetContact();
-      }
-    });
-    pageInit();
+
+    // myGoogleSignIn.onCurrentUserChanged.listen(
+    //   (GoogleSignInAccount? account) {
+    //     setState(() {
+    //       _currentUser = account;
+    //       print("currentUser : " + _currentUser.toString());
+    //     });
+    //     if (_currentUser != null) {
+    //       //로그인이 되어있는 경우 실행되는 구문
+    //
+    //     }
+    //   },
+    // );
     initSchedule();
+    pageInit();
     acceptResponse();
     acceptUserResponse();
     acceptGetRecords();

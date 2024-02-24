@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:googleapis/calendar/v3.dart';
+import 'package:googleapis/calendar/v3.dart' as calendarv3;
 import 'package:mamasteps_frontend/login/const/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:dio/dio.dart';
-import 'package:mamasteps_frontend/map/screen/map_page.dart';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -13,10 +12,15 @@ import 'package:mamasteps_frontend/ui/screen/sign_up_page.dart';
 import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
 
 
+// final GoogleSignIn myGoogleSignIn = GoogleSignIn(
+//   // Optional clientId
+//   // clientId: '[YOUR_OAUTH_2_CLIENT_ID]',
+//   // scopes: <String>[CalendarApi.calendarScope],
+// );
 final GoogleSignIn myGoogleSignIn = GoogleSignIn(
   // Optional clientId
-  // clientId: '[YOUR_OAUTH_2_CLIENT_ID]',
-  // scopes: <String>[CalendarApi.calendarScope],
+  // clientId: dotenv.get("myClientId"),
+  scopes: <String>[calendarv3.CalendarApi.calendarScope],
 );
 
 class GoogleLogin extends StatefulWidget {
@@ -104,18 +108,21 @@ class _GoogleLoginState extends State<GoogleLogin> {
     }
   }
 
-  void signOut() async {
-    switch (_loginPlatform) {
-      case LoginPlatform.google:
-        await GoogleSignIn().signOut();
-        break;
-      default:
-        break;
-    }
-
-    setState(() {
-      _loginPlatform = LoginPlatform.none;
-    });
+  // void signOut() async {
+  //   switch (_loginPlatform) {
+  //     case LoginPlatform.google:
+  //       await GoogleSignIn().signOut();
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  //
+  //   setState(() {
+  //     _loginPlatform = LoginPlatform.none;
+  //   });
+  // }
+  @override void dispose()async{
+    await GoogleSignIn().signOut();
   }
 
   @override
