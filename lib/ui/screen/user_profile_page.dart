@@ -34,6 +34,7 @@ class _userProfilePageState extends State<userProfilePage> {
   final guardianPhoneNumberController = TextEditingController();
   final activityLevelController = TextEditingController();
   final walkTimeController = TextEditingController();
+
   // late ApiResponse futureApiResponse;
 
   @override
@@ -45,189 +46,55 @@ class _userProfilePageState extends State<userProfilePage> {
         DateFormat("yyyy년 MM월 dd일").format(widget.pregnancyStartDate);
     guardianPhoneNumberController.text = widget.guardianPhoneNumber;
     activityLevelController.text = widget.activityLevel;
-    // walkTimeController.text = widget.walkPreferences
-    //     .map((e) =>
-    //         e.dayOfWeek +
-    //         ' ' +
-    //         e.startTime.toString() +
-    //         ' ~ ' +
-    //         e.endTime.toString())
-    //     .join('\n');
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     return SafeArea(
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
           child: Icon(Icons.edit),
         ),
-        body: Column(
-          children: [
-            _Header(
-              ImageUrl: widget.imageUrl,
-            ),
-            _Body(
-              nameTextController: nameTextController,
-              ageTextController: ageTextController,
-              pregnancyStartTextController: pregnancyStartTextController,
-              guardianPhoneNumberController: guardianPhoneNumberController,
-              activityLevelController: activityLevelController,
-              walkTimeController: walkTimeController,
-              walkPreferences: widget.walkPreferences,
-              // futureApiResponse: initSetting(),
-            ),
-          ],
+        body: Container(
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          child: Column(
+            children: [
+              _Header(
+                ImageUrl: widget.imageUrl,
+              ),
+              _Body(
+                nameTextController: nameTextController,
+                ageTextController: ageTextController,
+                pregnancyStartTextController: pregnancyStartTextController,
+                guardianPhoneNumberController: guardianPhoneNumberController,
+                activityLevelController: activityLevelController,
+                walkTimeController: walkTimeController,
+                walkPreferences: widget.walkPreferences,
+                // futureApiResponse: initSetting(),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-
-  // Future<dynamic> initSetting() async {
-  //   final url = 'https://dev.mamasteps.dev/api/v1/users/me';
-  //   final Access_Token = await storage.read(key: ACCESS_TOKEN_KEY);
-  //   try {
-  //     final response = await http.post(
-  //       Uri.parse(url),
-  //       headers: <String, String>{
-  //         'Authorization': 'Bearer $Access_Token',
-  //         'Content-Type': 'application/json',
-  //       },
-  //     );
-  //
-  //     print('Server Response: ${response.statusCode}');
-  //     print('Exception: ${response.body}');
-  //
-  //     if (response.statusCode == 200) {
-  //       return ApiResponse.fromJson(jsonDecode(response.body));
-  //     } else {
-  //       Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => GoogleLogin(),
-  //           ));
-  //     }
-  //   } catch (error) {
-  //     print('Error sending POST request: $error');
-  //   }
-  // }
-
-  // Future<ApiResponse> initSetting() async {
-  //   return ApiResponse(
-  //     isSuccess: true,
-  //     code: '200',
-  //     message: '성공',
-  //     result: UserProfile(
-  //       profileImageUrl:
-  //           'https://lh3.googleusercontent.com/a/ACg8ocIr5TFXGf6UJATm6xjdXZ64DRBZfiEn3zdBFKG2EGQbrpg',
-  //       email: 'tlgusld03@gmail.com',
-  //       name: '김영래',
-  //       age: 28,
-  //       pregnancyStartDate: DateTime.parse('2024-01-13'),
-  //       guardianPhoneNumber: '010-1234-5678',
-  //       activityLevel: '보통',
-  //       walkPreferences: [
-  //         WalkPreference(
-  //             dayOfWeek: '월요일', startTime: '10:00', endTime: '11:00'),
-  //         WalkPreference(
-  //             dayOfWeek: '화요일', startTime: '10:00', endTime: '11:00'),
-  //         WalkPreference(
-  //             dayOfWeek: '수요일', startTime: '10:00', endTime: '11:00'),
-  //         WalkPreference(
-  //             dayOfWeek: '목요일', startTime: '10:00', endTime: '11:00'),
-  //         WalkPreference(
-  //             dayOfWeek: '금요일', startTime: '10:00', endTime: '11:00'),
-  //         WalkPreference(
-  //             dayOfWeek: '토요일', startTime: '10:00', endTime: '11:00'),
-  //         WalkPreference(
-  //             dayOfWeek: '일요일', startTime: '10:00', endTime: '11:00'),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
-
-// class ApiResponse {
-//   bool isSuccess;
-//   String code;
-//   String message;
-//   UserProfile result;
-//
-//   ApiResponse(
-//       {required this.isSuccess,
-//       required this.code,
-//       required this.message,
-//       required this.result});
-//
-//   factory ApiResponse.fromJson(Map<String, dynamic> json) {
-//     return ApiResponse(
-//       isSuccess: json['isSuccess'],
-//       code: json['code'],
-//       message: json['message'],
-//       result: UserProfile.fromJson(json['result']),
-//     );
-//   }
-// }
-
-// class UserProfile {
-//   String profileImageUrl;
-//   String email;
-//   String name;
-//   int age;
-//   DateTime pregnancyStartDate;
-//   String guardianPhoneNumber;
-//   String activityLevel;
-//   List<WalkPreference> walkPreferences;
-//
-//   UserProfile({
-//     required this.profileImageUrl,
-//     required this.email,
-//     required this.name,
-//     required this.age,
-//     required this.pregnancyStartDate,
-//     required this.guardianPhoneNumber,
-//     required this.activityLevel,
-//     required this.walkPreferences,
-//   });
-//
-//   factory UserProfile.fromJson(Map<String, dynamic> json) {
-//     var list = json['walkPreferences'] as List;
-//     List<WalkPreference> walkPreferencesList =
-//         list.map((i) => WalkPreference.fromJson(i)).toList();
-//     return UserProfile(
-//       profileImageUrl: json['profileImageUrl'],
-//       email: json['email'],
-//       name: json['name'],
-//       age: json['age'],
-//       pregnancyStartDate: DateTime.parse(json['pregnancyStartDate']),
-//       guardianPhoneNumber: json['guardianPhoneNumber'],
-//       activityLevel: json['activityLevel'],
-//       walkPreferences: walkPreferencesList,
-//     );
-//   }
-// }
-
-// class WalkPreference {
-//   String dayOfWeek;
-//   String startTime;
-//   String endTime;
-//
-//   WalkPreference(
-//       {required this.dayOfWeek,
-//       required this.startTime,
-//       required this.endTime});
-//
-//   factory WalkPreference.fromJson(Map<String, dynamic> json) {
-//     return WalkPreference(
-//       dayOfWeek: json['dayOfWeek'],
-//       startTime: json['startTime'],
-//       endTime: json['endTime'],
-//     );
-//   }
-// }
 
 class _Header extends StatelessWidget {
   final String? ImageUrl;

@@ -31,14 +31,12 @@ class GoogleLogin extends StatefulWidget {
 }
 
 class _GoogleLoginState extends State<GoogleLogin> {
-  LoginPlatform _loginPlatform = LoginPlatform.none;
+  // LoginPlatform _loginPlatform = LoginPlatform.none;
 
   void signInWithGoogle() async {
     // deleteAll();
     await GoogleSignIn().signOut();
     final GoogleSignInAccount? googleUser = await myGoogleSignIn.signIn();
-
-
     // 로그인
 
     if (googleUser != null) {
@@ -121,9 +119,9 @@ class _GoogleLoginState extends State<GoogleLogin> {
   //     _loginPlatform = LoginPlatform.none;
   //   });
   // }
-  @override void dispose()async{
-    await GoogleSignIn().signOut();
-  }
+  // @override void dispose()async{
+  //   await GoogleSignIn().signOut();
+  // }
 
   @override
   Widget build(BuildContext context) {
