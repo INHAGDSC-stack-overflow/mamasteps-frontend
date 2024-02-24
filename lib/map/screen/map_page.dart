@@ -27,8 +27,10 @@ final List<String> resultsString = [
 ];
 
 class MapPage extends StatefulWidget {
+  final int walkSpeed;
   const MapPage({
     super.key,
+    required this.walkSpeed,
   });
 
   @override
@@ -43,6 +45,8 @@ class _MapPageState extends State<MapPage> {
   int currentMin = 0;
   int currentSec = 0;
   int totalSec = 0;
+
+
 
   Set<Marker> startClosewayPoints = {};
   Set<Marker> endClosewayPoints = {};
@@ -87,11 +91,11 @@ class _MapPageState extends State<MapPage> {
         currentPage = pageController.page!.toDouble();
       });
     });
-    // getInitPosition().then((value) {
-    //   setState(() {
-    //     currentPosition = value;
-    //   });
-    // });
+    getInitPosition().then((value) {
+      setState(() {
+        currentPosition = value;
+      });
+    });
     setOrigin(currentPosition);
     userInitSetting();
   }
@@ -309,7 +313,7 @@ class _MapPageState extends State<MapPage> {
     //clientToServerTimeConvert();
     var seconds = currentHour*3600 + currentMin*60 +currentSec;
     await editRequestProfile(context, seconds, currentPosition,
-        startClosewayPoints, endClosewayPoints);
+        startClosewayPoints, endClosewayPoints, widget.walkSpeed);
     final value = await computeRoutes(context);
     print(value.result[0].polyLine);
     setState(() {
@@ -322,7 +326,7 @@ class _MapPageState extends State<MapPage> {
     //clientToServerTimeConvert();
     var seconds = currentHour*3600 + currentMin*60 +currentSec;
     await editRequestProfile(context, seconds, currentPosition,
-        startClosewayPoints, endClosewayPoints);
+        startClosewayPoints, endClosewayPoints, widget.walkSpeed);
     // print(value.result[0].polyLine);
     // setState(() {
     //   manageRouteList(value.result, 'addAll');

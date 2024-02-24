@@ -16,7 +16,7 @@ import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
 final GoogleSignIn myGoogleSignIn = GoogleSignIn(
   // Optional clientId
   // clientId: '[YOUR_OAUTH_2_CLIENT_ID]',
-  scopes: <String>[CalendarApi.calendarScope],
+  // scopes: <String>[CalendarApi.calendarScope],
 );
 
 class GoogleLogin extends StatefulWidget {
@@ -31,7 +31,7 @@ class _GoogleLoginState extends State<GoogleLogin> {
 
   void signInWithGoogle() async {
     // deleteAll();
-    // await GoogleSignIn().signOut();
+    await GoogleSignIn().signOut();
     final GoogleSignInAccount? googleUser = await myGoogleSignIn.signIn();
 
 
@@ -62,11 +62,11 @@ class _GoogleLoginState extends State<GoogleLogin> {
           body: jsonEncode(requestData),
         );
 
-        print('Server Response: ${response.statusCode}');
-        print('Exception: ${response.body}');
+        print('Google_Login Server Response: ${response.statusCode}');
 
         if (response.statusCode == 200) {
           Map<String, dynamic> data = jsonDecode(response.body);
+          print(data);
           String accessToken = data['result']['access_token'];
           await storage.write(key: 'access_token', value: accessToken);
           Navigator.pushAndRemoveUntil(

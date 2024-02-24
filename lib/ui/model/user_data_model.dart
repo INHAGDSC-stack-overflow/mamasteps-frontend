@@ -1,10 +1,12 @@
+import 'package:googleapis/cloudsearch/v1.dart';
+
 class getMeResponse {
   final bool isSuccess;
   final String code;
   final String message;
   final List<dynamic> pregnancyStartDate;
   final String guardianPhoneNumber;
-  // final UserProfile result;
+  final UserProfile result;
 
   getMeResponse({
     required this.isSuccess,
@@ -12,7 +14,7 @@ class getMeResponse {
     required this.message,
     required this.pregnancyStartDate,
     required this.guardianPhoneNumber,
-    // required this.result,
+    required this.result,
   });
 
   factory getMeResponse.fromJson(Map<String, dynamic> json) {
@@ -22,20 +24,20 @@ class getMeResponse {
       message: json['message'],
       pregnancyStartDate: json['result']['pregnancyStartDate'],
       guardianPhoneNumber: json['result']['guardianPhoneNumber'],
-      // result: UserProfile.fromJson(json['result']),
+      result: UserProfile.fromJson(json['result']),
     );
   }
 }
 
 class UserProfile {
-  final String profileImageUrl;
+  final String? profileImageUrl;
   final String email;
   final String name;
   final int age;
   final DateTime pregnancyStartDate;
   final String guardianPhoneNumber;
   final String activityLevel;
-  // final List<WalkPreference> walkPreferences;
+  final List<WalkPreference> walkPreferences;
 
   UserProfile({
     required this.profileImageUrl,
@@ -45,7 +47,7 @@ class UserProfile {
     required this.pregnancyStartDate,
     required this.guardianPhoneNumber,
     required this.activityLevel,
-    // required this.walkPreferences,
+    required this.walkPreferences,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -57,6 +59,9 @@ class UserProfile {
       dateList[3],
       dateList[4],
     );
+    var prefsJson = json['walkPreferences'] as List<dynamic>;
+    print(prefsJson);
+    List<WalkPreference> prefs = prefsJson.map((prefJson) => WalkPreference.fromJson(prefJson as Map<String, dynamic>)).toList();
     return UserProfile(
       profileImageUrl: json['profileImageUrl'],
       email: json['email'],
@@ -65,17 +70,15 @@ class UserProfile {
       pregnancyStartDate: date,
       guardianPhoneNumber: json['guardianPhoneNumber'],
       activityLevel: json['activityLevel'],
-      // walkPreferences: (json['walkPreferences'] as List)
-      //     .map((x) => WalkPreference.fromJson(x as Map<String, dynamic>))
-      //     .toList(),
+      walkPreferences: prefs,
     );
   }
 }
 
 class WalkPreference {
   final String dayOfWeek;
-  final Time startTime;
-  final Time endTime;
+  final DateTime startTime;
+  final DateTime endTime;
 
   WalkPreference({
     required this.dayOfWeek,
@@ -84,11 +87,15 @@ class WalkPreference {
   });
 
   factory WalkPreference.fromJson(Map<String, dynamic> json) {
+    var startTimeList = json['startTime'] as List<dynamic>;
+    var endTimeList = json['endTime'] as List<dynamic>;
+    DateTime startTime = DateTime(0, 0, 0, startTimeList[0], startTimeList[1]);
+    DateTime endTime = DateTime(0, 0, 0, endTimeList[0], endTimeList[1]);
 
     return WalkPreference(
       dayOfWeek: json['dayOfWeek'],
-      startTime: Time.fromJson(json['startTime']),
-      endTime: Time.fromJson(json['endTime']),
+      startTime: startTime,
+      endTime: endTime,
     );
   }
 }
@@ -96,22 +103,22 @@ class WalkPreference {
 class Time {
   final int hour;
   final int minute;
-  final int second;
-  final int nano;
+  //final int second;
+  //final int nano;
 
   Time({
     required this.hour,
     required this.minute,
-    required this.second,
-    required this.nano,
+    //required this.second,
+    //required this.nano,
   });
 
   factory Time.fromJson(Map<String, dynamic> json) {
     return Time(
       hour: json['hour'],
       minute: json['minute'],
-      second: json['second'],
-      nano: json['nano'],
+      //second: json['second'],
+      //nano: json['nano'],
     );
   }
 }
@@ -121,7 +128,7 @@ class myInfo{
   final String code;
   final String message;
   final int targetTime;
-  final double walkSpeed;
+  final int walkSpeed;
 
   myInfo({
     required this.isSuccess,
@@ -137,7 +144,7 @@ class myInfo{
       code: json['code'],
       message: json['message'],
       targetTime: json['result']['targetTime'],
-      walkSpeed: json['result']['walkSpeed'],
+      walkSpeed: json['result']['walkSpeed'].toInt(),
     );
   }
 }

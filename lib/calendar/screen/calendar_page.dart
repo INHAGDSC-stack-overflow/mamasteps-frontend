@@ -26,9 +26,9 @@ class TableCalendarPage extends StatefulWidget {
   final DateTime selectedDay;
   final DateTime focusedDay;
   final void Function(DateTime, DateTime) onDaySelected;
-  final void googleinit;
   final VoidCallback acceptResponse;
   final VoidCallback initSetting;
+  final VoidCallback onFABTap;
 
   const TableCalendarPage({super.key,
     required this.events,
@@ -37,9 +37,9 @@ class TableCalendarPage extends StatefulWidget {
     required this.selectedDay,
     required this.focusedDay,
     required this.onDaySelected,
-    required this.googleinit,
     required this.acceptResponse,
-    required this.initSetting
+    required this.initSetting,
+    required this.onFABTap,
   });
 
   @override
@@ -155,7 +155,7 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
             child: Icon(Icons.add),
             onPressed: () {
               // _showSelectDialog();
-              widget.acceptResponse();
+              widget.onFABTap();
             }),
         body: SingleChildScrollView(
           child: Column(
@@ -236,9 +236,13 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                               itemBuilder: (context, index) {
                                 print(value[index].date.hour);
                                 String formatTime;
-                                if(value[index].date.hour >= 12){
+                                if(value[index].date.hour > 12){
                                   formatTime = "오후 ${value[index].date.hour % 12}시";
-                                }else{
+                                }
+                                else if(value[index].date.hour==12){
+                                  formatTime = "오후 12시";
+                                }
+                                else{
                                   formatTime = "오전 ${value[index].date.hour}시";
                                 }
                                 return ListTile(
@@ -258,7 +262,6 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                                                 Text(
                                                   "${formatTime} ${value[index].date.minute.toString().padLeft(2,'0')}분",
                                                   style: TextStyle(
-
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w400,
                                                   ),
@@ -293,125 +296,6 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
       ),
     );
   }
-
-  // void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-  //   if (!isSameDay(this.selectedDay, selectedDay)) {
-  //     setState(() {
-  //       this.selectedDay = selectedDay;
-  //       this.focusedDay = focusedDay;
-  //     });
-  //     this.selectedEvents.value = _getEventsForDay(selectedDay);
-  //   }
-  // }
-
-//   void _showSelectDialog() {
-//     showDialog(
-//       context: context,
-//       builder: (context) => AlertDialog(
-//         title: Text('이벤트 추가'),
-//         actions: <Widget>[
-//           TextButton(
-//             onPressed: () {
-//               setState(() {
-//                 acceptResponse();
-//               });
-//               Navigator.of(context).pop();
-//             },
-//             child: Text('자동 추가 하기'),
-//           ),
-//           TextButton(
-//             onPressed: () {
-//               Navigator.of(context).pop();
-//               _showAddDialog();
-//             },
-//             child: Text('직접 입력 하기'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   void _showAddDialog() {
-//     final TextEditingController _eventController = TextEditingController();
-//
-//     showDialog(
-//       context: context,
-//       builder: (context) => AlertDialog(
-//         title: Text('Add Event'),
-//         content: TextField(
-//           controller: _eventController,
-//           decoration: InputDecoration(hintText: 'Event Name'),
-//         ),
-//         actions: <Widget>[
-//           TextButton(
-//             onPressed: () => Navigator.of(context).pop(),
-//             child: Text('Cancel'),
-//           ),
-//           TextButton(
-//             onPressed: () {
-//               if (_eventController.text.isEmpty) return;
-//               setState(
-//                 () {
-//                   if (events[selectedDay] != null) {
-//                     events[selectedDay]!.add(Event(_eventController.text, selectedDay));
-//                   } else {
-//                     events[selectedDay] = [Event(_eventController.text, selectedDay)];
-//                   }
-//                 },
-//               );
-//               _eventController.clear();
-//               Navigator.of(context).pop();
-//             },
-//             child: Text('Save'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   void _showEditDialog(index) {
-//     final TextEditingController _eventController = TextEditingController();
-//     _eventController.text = events[selectedDay]![index].title;
-//
-//     showDialog(
-//       context: context,
-//       builder: (context) => AlertDialog(
-//         title: Text('Edit Event'),
-//         content: TextField(
-//           controller: _eventController,
-//           decoration: InputDecoration(hintText: 'Event Name'),
-//         ),
-//         actions: <Widget>[
-//           TextButton(
-//             onPressed: () => Navigator.of(context).pop(),
-//             child: Text('Cancel'),
-//           ),
-//           TextButton(
-//             onPressed: () {
-//               if (_eventController.text.isEmpty) return;
-//               setState(() {
-//                 events[selectedDay]![index].title = _eventController.text;
-//               });
-//               _eventController.clear();
-//               Navigator.of(context).pop();
-//             },
-//             child: Text('Save'),
-//           ),
-//           TextButton(
-//             child: Text('delete'),
-//             onPressed: () {
-//               setState(
-//                 () {
-//                   events[selectedDay]!.removeAt(index);
-//                 },
-//               );
-//               Navigator.of(context).pop();
-//             },
-//           ),
-//         ],
-//       ),
-//     );
-//   }
 }
 
 
