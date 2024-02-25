@@ -59,6 +59,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
   bool isRunning = false;
   bool isSelect = false;
   bool ismiddle = false;
+  bool isMovementTimerRunning = false;
+
+  Position? lastPosition;
+  Timer? movementTimer;
 
   @override
   void initState() {
@@ -72,6 +76,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
     initTimer();
     // startTimer();
     _determinePosition();
+    initSettingLastPosition();
+  }
+
+  void initSettingLastPosition(){
+    lastPosition = widget.currentInitPosition;
   }
 
   Future<void> initPhoneNumber() async {
@@ -268,8 +277,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
       return Future.error('위치 권한이 영구적으로 거부되었습니다, 설정에서 변경해주세요.');
     }
 
-    Position? lastPosition;
-    Timer? movementTimer;
+    // Position? lastPosition;
+    // Timer? movementTimer;
 
     setState(() {
       positionSubscription = Geolocator.getPositionStream().listen(
@@ -300,10 +309,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
             // 사용자가 움직이지 않음
             if (distance < 10) {
-              if (movementTimer == null) {
+              if (isMovementTimerRunning==false) {
                 movementTimer = Timer(
                   Duration(minutes: 7),
                   () {
+                    isMovementTimerRunning = true;
                     if (isRunning) {
                       pauseTimer();
                     }
@@ -402,6 +412,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   // 보호자 문자 보내기 팝업 창
   void showSendSmsDialog() {
+    positionSubscription?.pause();
+    isMovementTimerRunning = false;
+    movementTimer?.cancel();
+    movementTimer=null;
     Timer? localtimer;
     showDialog(
       context: context,
@@ -423,6 +437,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 localtimer?.cancel();
                 resumeTimer();
                 Navigator.pop(context);
+                positionSubscription?.resume();
               },
               child: Text('취소'),
             ),
