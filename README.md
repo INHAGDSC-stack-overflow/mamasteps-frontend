@@ -1,4 +1,11 @@
 # mamasteps-frontend
 INHA GDSC - Team stack_overflow
 
-실행방법
+
+
+## Getting Started
+
+※ This app only works on Android OS.
+
+1. Download the apk file in the release folder.
+2. Run the downloaded apk file.
