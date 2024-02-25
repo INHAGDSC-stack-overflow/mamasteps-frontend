@@ -1,10 +1,5 @@
 import 'dart:async';
-import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart';
-import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // String apikey = dotenv.env['myClientId'].toString();
 // final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -172,13 +167,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 // }
 
 Future<Events> getEvents(CalendarApi calendarApi) async {
-  final Events response = await calendarApi.events.list('primary') as Events;
+  final Events response = await calendarApi.events.list('primary');
 
   return response;
 }
 
 Future<Event> insertEvents(CalendarApi calendarApi, Event data)  async {
   final Event response = await calendarApi.events.insert(data, 'primary');
-  print("insert Events response : " + response.toString());
+  print("insert Events response : $response");
   return response;
 }

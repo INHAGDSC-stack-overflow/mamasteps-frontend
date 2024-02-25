@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:mamasteps_frontend/map/component/util/get_position.dart';
 import 'package:mamasteps_frontend/map/screen/map_page.dart';
 import 'package:mamasteps_frontend/ui/component/user_server_comunication.dart';
 import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
@@ -56,19 +54,19 @@ class _HomeScreenDefaultLayoutState extends State<HomeScreenDefaultLayout> {
                 ),
               );
             },
-            child: Text(
+            backgroundColor: const Color(0xFFA412DB),
+            // 버튼의 모양을 정의
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(40), // 여기서 원하는 둥근 정도를 조정하세요
+              ),
+            ),
+            child: const Text(
               '산책시작',
               style: TextStyle(
                 fontSize: 20, // FloatingActionButton의 크기에 맞게 텍스트 크기 조정
                 fontWeight: FontWeight.normal,
                 color: Colors.white,
-              ),
-            ),
-            backgroundColor: Color(0xFFA412DB),
-            // 버튼의 모양을 정의
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(40), // 여기서 원하는 둥근 정도를 조정하세요
               ),
             ),
           ),

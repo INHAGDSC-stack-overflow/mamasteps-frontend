@@ -6,7 +6,7 @@ drawMarkers(Set<Marker> markers,List<LatLng> resultList) async {
 
   markers.add(
     Marker(
-      markerId: MarkerId("origin"),
+      markerId: const MarkerId("origin"),
       visible: true,
       icon: BitmapDescriptor.defaultMarker,
       position: resultList[0],
@@ -14,7 +14,7 @@ drawMarkers(Set<Marker> markers,List<LatLng> resultList) async {
   );
   markers.add(
     Marker(
-      markerId: MarkerId("destination"),
+      markerId: const MarkerId("destination"),
       icon: BitmapDescriptor.defaultMarker,
       position: resultList[resultList.length - 1],
     ),

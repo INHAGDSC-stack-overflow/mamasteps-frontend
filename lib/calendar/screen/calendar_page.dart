@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:googleapis/calendar/v3.dart' as calendarv3;
 
-import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-import 'dart:async';
 import 'package:intl/intl.dart';
-import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
-import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:mamasteps_frontend/calendar/component/google_calendar.dart' as myGoogleCalendar;
 
 class Event {
   int id;
@@ -150,9 +144,9 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color(0xFFF5F5F5),
+        backgroundColor: const Color(0xFFF5F5F5),
         floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
+            child: const Icon(Icons.add),
             onPressed: () {
               // _showSelectDialog();
               widget.onFABTap();
@@ -172,11 +166,11 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    Positioned(
+                    const Positioned(
                       left: 0,
                       top: 40,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           "산책 일정 관리",
                           style: TextStyle(
@@ -220,7 +214,7 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             DateFormat('yyyy년 MM월 dd일 산책일정').format(widget.selectedDay),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.normal),
                           ),
                         ),
@@ -255,28 +249,28 @@ class _TableCalendarPageState extends State<TableCalendarPage> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8.0),
                                         child: Align(
+                                            alignment: Alignment.centerLeft,
                                             child: Column(
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "${formatTime} ${value[index].date.minute.toString().padLeft(2,'0')}분",
-                                                  style: TextStyle(
+                                                  "$formatTime ${value[index].date.minute.toString().padLeft(2,'0')}분",
+                                                  style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w400,
                                                   ),
                                                 ),
                                                 Text(
                                                   value[index].title,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     color: Color(0xffa412db),
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
                                               ],
-                                            ),
-                                            alignment: Alignment.centerLeft),
+                                            )),
                                       ),
                                     ),
                                   ),

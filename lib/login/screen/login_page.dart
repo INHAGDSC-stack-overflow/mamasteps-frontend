@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:googleapis/calendar/v3.dart' as calendarv3;
-import 'package:mamasteps_frontend/login/const/login_platform.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:async';
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 import 'package:mamasteps_frontend/ui/screen/sign_up_page.dart';
-import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
 
 
 // final GoogleSignIn myGoogleSignIn = GoogleSignIn(
@@ -45,11 +42,11 @@ class _GoogleLoginState extends State<GoogleLogin> {
       print('id = ${googleUser.displayName}');
       print('photoUrl = ${googleUser.photoUrl}');
 
-      final url = 'https://dev.mamasteps.dev/api/v1/auth/google-login';
+      const url = 'https://dev.mamasteps.dev/api/v1/auth/google-login';
 
       final Map<String, dynamic> requestData = {
-        "email": "${googleUser.email}",
-        "name": "${googleUser.email}",
+        "email": googleUser.email,
+        "name": googleUser.email,
         "id": "${googleUser.displayName}",
       };
 
@@ -74,7 +71,7 @@ class _GoogleLoginState extends State<GoogleLogin> {
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (context) => RootTab(),
+                builder: (context) => const RootTab(),
               ),
               (route) => false);
         } else {
@@ -127,7 +124,7 @@ class _GoogleLoginState extends State<GoogleLogin> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Color(0xffa412db),
+        color: const Color(0xffa412db),
         width: double.infinity,
         child: Center(
           child: Column(
@@ -147,8 +144,8 @@ class _GoogleLoginState extends State<GoogleLogin> {
 
   Widget _loginButton(String path, VoidCallback onTap) {
     return InkWell(
-      child: Image.asset('asset/image/$path.png', width: 200),
       onTap: onTap,
+      child: Image.asset('asset/image/$path.png', width: 200),
     );
   }
 }

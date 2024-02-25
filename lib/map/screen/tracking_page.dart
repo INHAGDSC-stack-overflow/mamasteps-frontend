@@ -3,18 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:dio/dio.dart';
 import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
 import 'package:mamasteps_frontend/map/component/google_map/drawpolyline.dart';
 import 'package:mamasteps_frontend/map/component/google_map/drawmarker.dart';
 import 'package:mamasteps_frontend/map/component/google_map/pointlatlng_to_latlng.dart';
-import 'package:mamasteps_frontend/map/component/timer/convert.dart';
-import 'package:mamasteps_frontend/map/component/timer/count_down_timer.dart';
 import 'package:mamasteps_frontend/map/component/util/map_server_communication.dart';
-import 'package:mamasteps_frontend/map/screen/map_page.dart';
 import 'package:mamasteps_frontend/storage/user/user_data.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'package:telephony/telephony.dart';
 
 class TrackingScreen extends StatefulWidget {
@@ -46,6 +41,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   late StreamSubscription<Position>? positionSubscription;
   late int afterRating = 0;
   late String recipient;
+  bool? permissions;
 
   //polyline들의 집합
   Set<Polyline> polylines = {};
@@ -77,15 +73,31 @@ class _TrackingScreenState extends State<TrackingScreen> {
     // startTimer();
     _determinePosition();
     initSettingLastPosition();
+    printInformation();
+    smsPermission();
   }
+
+  void smsPermission() async{
+    final Telephony telephony = Telephony.instance;
+    permissions = await telephony.requestPhoneAndSmsPermissions;
+  }
+
+  void printInformation(){
+    print("print : Path, currentInitPosition, totalSeconds, totalMeter");
+    print(widget.Path);
+    print(widget.currentInitPosition);
+    print(widget.totalSeconds);
+    print(widget.totalMeter);
+  }
+
 
   void initSettingLastPosition(){
     lastPosition = widget.currentInitPosition;
   }
 
   Future<void> initPhoneNumber() async {
-    recipient = await user_storage.read(key: 'guardianPhoneNumber').toString();
-    print('휴대폰 전화 초기화 확인 : ${recipient}');
+    recipient = user_storage.read(key: 'guardianPhoneNumber').toString();
+    print('휴대폰 전화 초기화 확인 : $recipient');
   }
 
   Duration timeConvert(int totalSeconds) {
@@ -107,14 +119,14 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   void startTimer() {
     if (!isRunning) {
-      timer = Timer.periodic(Duration(seconds: 1), (_) {
+      timer = Timer.periodic(const Duration(seconds: 1), (_) {
         if (duration.inSeconds > 0) {
           setState(() {
-            duration = duration - Duration(seconds: 1);
+            duration = duration - const Duration(seconds: 1);
             isRunning = true;
           });
         } else {
-          timer?.cancel();
+          timer.cancel();
           setState(() {
             isRunning = false;
           });
@@ -125,7 +137,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   void pauseTimer() {
     if (isRunning) {
-      timer?.cancel();
+      timer.cancel();
       setState(() {
         isRunning = false;
       });
@@ -193,7 +205,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     Card(
                       child: Center(
                         child: Text('$hours:$minutes:$seconds',
-                            style: TextStyle(fontSize: 48)),
+                            style: const TextStyle(fontSize: 48)),
                       ),
                     ),
                   ],
@@ -222,7 +234,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                             onPressed: () {
                               showStopDialog();
                             },
-                            child: Icon(Icons.stop),
+                            child: const Icon(Icons.stop),
                           ),
                         ],
                       ),
@@ -238,7 +250,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                           startTimer();
                         });
                       },
-                      child: Text('산책 시작'),
+                      child: const Text('산책 시작'),
                     ),
                   ),
           ],
@@ -251,7 +263,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     streamCurrentMarkers.clear();
     streamCurrentMarkers.add(
       Marker(
-        markerId: MarkerId('current'),
+        markerId: const MarkerId('current'),
         position: LatLng(currentPosition.latitude, currentPosition.longitude),
         icon: BitmapDescriptor.defaultMarker,
       ),
@@ -290,7 +302,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           streamCurrentMarkers.clear();
           streamCurrentMarkers.add(
             Marker(
-              markerId: MarkerId('current'),
+              markerId: const MarkerId('current'),
               position:
                   LatLng(currentPosition.latitude, currentPosition.longitude),
               icon: BitmapDescriptor.defaultMarkerWithHue(
@@ -311,7 +323,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             if (distance < 10) {
               if (isMovementTimerRunning==false) {
                 movementTimer = Timer(
-                  Duration(minutes: 7),
+                  const Duration(seconds: 5),
                   () {
                     isMovementTimerRunning = true;
                     if (isRunning) {
@@ -364,12 +376,12 @@ class _TrackingScreenState extends State<TrackingScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('산책 완료'),
+          title: const Text('산책 완료'),
           content: SizedBox(
             height: 100,
             child: Column(
               children: [
-                Text('산책의 만족도를 평가해 주세요'),
+                const Text('산책의 만족도를 평가해 주세요'),
                 // NumberPicker(
                 //     axis: Axis.horizontal,
                 //     minValue: -9,
@@ -381,7 +393,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 //       });
                 //     })
                 TextFormField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: '평가',
                     hintText: '-9 ~ 9 까지의 수를 입력해 주세요',
                   ),
@@ -398,11 +410,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 feedbackTime(afterRating);
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => RootTab()),
+                  MaterialPageRoute(builder: (_) => const RootTab()),
                   (route) => false,
                 );
               },
-              child: Text('확인'),
+              child: const Text('확인'),
             ),
           ],
         );
@@ -420,8 +432,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        localtimer = Timer(Duration(minutes: 2), () {
-          print('보호자 번호: $recipient');
+        localtimer = Timer(const Duration(seconds: 3), () {
+          print('문자 발송함 보호자 번호: $recipient');
           sendSmsMessageToGuardian(
               '[Mamasteps 발송] 산모가 움직이지 않습니다.', [recipient]);
           localtimer?.cancel();
@@ -430,7 +442,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
         });
 
         return AlertDialog(
-          content: Text('보호자에게 문자를 전송합니다.'),
+          content: const Text('보호자에게 문자를 전송합니다.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -439,7 +451,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 Navigator.pop(context);
                 positionSubscription?.resume();
               },
-              child: Text('취소'),
+              child: const Text('취소'),
             ),
           ],
         );
@@ -453,16 +465,16 @@ class _TrackingScreenState extends State<TrackingScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Text('보호자에게 문자를 전송했습니다.'),
+          content: const Text('보호자에게 문자를 전송했습니다.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (_) => RootTab()),
+                    MaterialPageRoute(builder: (_) => const RootTab()),
                     (route) => false);
               },
-              child: Text('확인'),
+              child: const Text('확인'),
             ),
           ],
         );
@@ -473,9 +485,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
   // 보호자에게 문자 보내기
   void sendSmsMessageToGuardian(String message, List<String> recipents) async {
     final Telephony telephony = Telephony.instance;
-    bool? permissions = await telephony.requestPhoneAndSmsPermissions;
+    permissions = await telephony.requestPhoneAndSmsPermissions;
     if (permissions == true) {
       for (String recipent in recipents) {
+        print('보호자 전화번호 : ${recipent}');
         await telephony.sendSms(
           to: recipent,
           message: message,
@@ -489,25 +502,25 @@ class _TrackingScreenState extends State<TrackingScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Text('지금 중단하면 기록은 삭제돼요!\n 그래도 중단하시겠어요?'),
+          content: const Text('지금 중단하면 기록은 삭제돼요!\n 그래도 중단하시겠어요?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RootTab(),
+                    builder: (context) => const RootTab(),
                   ),
                   (route) => false,
                 );
               },
-              child: Text('예'),
+              child: const Text('예'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('아니요'),
+              child: const Text('아니요'),
             ),
           ],
         );

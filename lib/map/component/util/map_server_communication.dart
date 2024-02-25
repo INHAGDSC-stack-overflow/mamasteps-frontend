@@ -1,11 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mamasteps_frontend/login/screen/login_page.dart';
-import 'package:mamasteps_frontend/login/widget/google_login_components.dart';
 import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
@@ -27,7 +25,7 @@ Future<void> editRequestProfile(
   endClosewayPoints,
     walkSpeed,
 ) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/routes/editRequestProfile';
+  const url = 'https://dev.mamasteps.dev/api/v1/routes/editRequestProfile';
   final AccessToken = await storage.read(key: 'access_token');
   List<Coordinate> redMarker;
   List<Coordinate> blueMarker;
@@ -85,7 +83,7 @@ Future<void> editRequestProfile(
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => GoogleLogin(),
+          builder: (context) => const GoogleLogin(),
         ),
         (route) => false,
       );
@@ -97,7 +95,7 @@ Future<void> editRequestProfile(
 }
 
 Future<void> setOrigin(Position currentPosition) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/users/set-origin';
+  const url = 'https://dev.mamasteps.dev/api/v1/users/set-origin';
   final AccessToken = await storage.read(key: 'access_token');
   try {
     final response = await http.post(
@@ -128,7 +126,7 @@ Future<void> setOrigin(Position currentPosition) async {
 }
 
 Future<void> createRequestProfile() async {
-  final url = 'https://dev.mamasteps.dev/api/v1/routes/createRequestProfile';
+  const url = 'https://dev.mamasteps.dev/api/v1/routes/createRequestProfile';
   final AccessToken = await storage.read(key: 'access_token');
   try {
     final response = await http.post(
@@ -153,7 +151,7 @@ Future<void> createRequestProfile() async {
 }
 
 Future<ApiResponse> getRoutes(BuildContext context) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/routes/getRoutes';
+  const url = 'https://dev.mamasteps.dev/api/v1/routes/getRoutes';
   final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
 
   try {
@@ -175,7 +173,7 @@ Future<ApiResponse> getRoutes(BuildContext context) async {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => GoogleLogin(),
+          builder: (context) => const GoogleLogin(),
         ),
         (route) => false,
       );
@@ -187,7 +185,7 @@ Future<ApiResponse> getRoutes(BuildContext context) async {
 }
 
 Future<ApiResponse> computeRoutes(BuildContext context) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/routes/computeRoutes';
+  const url = 'https://dev.mamasteps.dev/api/v1/routes/computeRoutes';
   final AccessToken = await storage.read(key: 'access_token');
 
   try {
@@ -211,7 +209,7 @@ Future<ApiResponse> computeRoutes(BuildContext context) async {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => GoogleLogin(),
+          builder: (context) => const GoogleLogin(),
         ),
         (route) => false,
       );
@@ -236,7 +234,7 @@ Future<ApiResponse> computeRoutes(BuildContext context) async {
 // }
 
 Future SaveRoute(data) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/routes/saveRoute';
+  const url = 'https://dev.mamasteps.dev/api/v1/routes/saveRoute';
   final AccessToken = await storage.read(key: ACCESS_TOKEN_KEY);
   Map<String, dynamic> jsonData = data.toJson();
   final jsonString = jsonEncode(jsonData);
@@ -265,7 +263,7 @@ Future SaveRoute(data) async {
 }
 
 Future<getRequestResponse> getRequestProfile(BuildContext context) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/routes/getRequestProfile';
+  const url = 'https://dev.mamasteps.dev/api/v1/routes/getRequestProfile';
   final AccessToken = await storage.read(key: 'access_token');
 
   try {
@@ -288,7 +286,7 @@ Future<getRequestResponse> getRequestProfile(BuildContext context) async {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => GoogleLogin(),
+          builder: (context) => const GoogleLogin(),
         ),
         (route) => false,
       );
@@ -300,7 +298,7 @@ Future<getRequestResponse> getRequestProfile(BuildContext context) async {
 }
 
 Future<void> optimizeSpeed(double distanceMeters, int completeTimeSeconds) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/optimize/optimize-speed';
+  const url = 'https://dev.mamasteps.dev/api/v1/optimize/optimize-speed';
   final AccessToken = await storage.read(key: 'access_token');
 
   try {
@@ -329,7 +327,7 @@ Future<void> optimizeSpeed(double distanceMeters, int completeTimeSeconds) async
 }
 
 Future<void> feedbackTime(int feedback) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/optimize/feedback-time';
+  const url = 'https://dev.mamasteps.dev/api/v1/optimize/feedback-time';
   final AccessToken = await storage.read(key: 'access_token');
 
   try {
