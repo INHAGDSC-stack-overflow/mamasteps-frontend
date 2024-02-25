@@ -11,18 +11,8 @@ import 'package:mamasteps_frontend/ui/component/user_server_comunication.dart';
 import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
 import 'package:mamasteps_frontend/ui/screen/home_screen.dart';
 import 'package:mamasteps_frontend/ui/screen/user_profile_page.dart';
-import 'package:mamasteps_frontend/calendar/component/google_calendar.dart'
-    as myGoogleCalendar;
 import 'package:googleapis_auth/googleapis_auth.dart' as auth show AuthClient;
 import 'dart:collection';
-
-import 'package:numberpicker/numberpicker.dart';
-
-// final GoogleSignIn myGoogleSignIn = GoogleSignIn(
-//   // Optional clientId
-//   // clientId: dotenv.get("myClientId"),
-//   scopes: <String>[calendarv3.CalendarApi.calendarScope],
-// );
 
 class RootTab extends StatefulWidget {
   // final GoogleSignIn? myGoogleSignIn;
@@ -177,10 +167,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   (existingEvent) => // 유저가 매뉴얼로 입력하는 코드에서 변경해야 할 부분
                       existingEvent.date.year == localTempEvent.date.year &&
                       existingEvent.date.month == localTempEvent.date.month &&
-                      existingEvent.date.day == localTempEvent.date.day &&
-                      existingEvent.date.hour == localTempEvent.date.hour &&
-                      existingEvent.date.minute ==
-                          localTempEvent.date.minute) ??
+                      existingEvent.date.day == localTempEvent.date.day) ??
               false;
           if (!isDuplicate) {
             print("삽입되는 로컬 스케쥴 : " +
@@ -353,10 +340,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                   (existingEvent) => // 유저가 매뉴얼로 입력하는 코드에서 변경해야 할 부분
                       existingEvent.date.year == localTempEvent.date.year &&
                       existingEvent.date.month == localTempEvent.date.month &&
-                      existingEvent.date.day == localTempEvent.date.day &&
-                      existingEvent.date.hour == localTempEvent.date.hour &&
-                      existingEvent.date.minute ==
-                          localTempEvent.date.minute) ??
+                      existingEvent.date.day == localTempEvent.date.day) ??
               false;
           if (!isDuplicate) {
             print("삽입되는 로컬 스케쥴 : " +
@@ -540,48 +524,50 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
 
   void acceptGetRecords() async {
     getRecordResponse apiResponse = await getRecords();
-    setState(() {
-      if (apiResponse.isSuccess) {
-        DateTime now = DateTime.now();
-        DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
-        DateTime startOfWeek =
-            todayZeroHour.subtract(Duration(days: now.weekday - 1));
-        print("일주일의 시작" + startOfWeek.toString());
-        DateTime endOfWeek = todayZeroHour
-            .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
-        for (int i = 0; i < apiResponse.result.length; i++) {
-          DateTime apiDate = apiResponse.result[i].date;
-          int apiCompletedTimeSeconds =
-              apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
-          int difference = apiDate.difference(startOfWeek).inDays;
-          // 이번주 총 산책 시간 계산
-          if (apiResponse.result[i].date.isAfter(startOfWeek) &&
-              apiResponse.result[i].date.isBefore(endOfWeek)) {
-            // 요일별 시간 저장
-            weekWalkTime[difference] += apiCompletedTimeSeconds;
-            thisWeekWalkTimeTotalSeconds +=
-                apiResponse.result[i].completedTimeSeconds;
-            // 이번주에 몇 번 산책했는지
+    setState(
+      () {
+        if (apiResponse.isSuccess) {
+          DateTime now = DateTime.now();
+          DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
+          DateTime startOfWeek =
+              todayZeroHour.subtract(Duration(days: now.weekday - 1));
+          print("일주일의 시작" + startOfWeek.toString());
+          DateTime endOfWeek = todayZeroHour
+              .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
+          for (int i = 0; i < apiResponse.result.length; i++) {
+            DateTime apiDate = apiResponse.result[i].date;
+            int apiCompletedTimeSeconds =
+                apiResponse.result[i].completedTimeSeconds.toInt() ~/ 60;
+            int difference = apiDate.difference(startOfWeek).inDays;
+            // 이번주 총 산책 시간 계산
+            if (apiResponse.result[i].date.isAfter(startOfWeek) &&
+                apiResponse.result[i].date.isBefore(endOfWeek)) {
+              // 요일별 시간 저장
+              weekWalkTime[difference] += apiCompletedTimeSeconds;
+              thisWeekWalkTimeTotalSeconds +=
+                  apiResponse.result[i].completedTimeSeconds;
+              // 이번주에 몇 번 산책했는지
+            }
+            // 오늘 산책 시간 계산
+            isSameDate(apiDate, now)
+                ? todayWalkTimeTotalSeconds +=
+                    apiResponse.result[i].completedTimeSeconds
+                : null;
           }
-          // 오늘 산책 시간 계산
-          isSameDate(apiDate, now)
-              ? todayWalkTimeTotalSeconds +=
-                  apiResponse.result[i].completedTimeSeconds
-              : null;
-        }
-        for (int i = 0; i < 7; i++) {
-          if (weekWalkTime[i] > 0) {
-            thisWeekAchievement++;
-            print("이번주 산책 횟수 : " + thisWeekAchievement.toString());
+          for (int i = 0; i < 7; i++) {
+            if (weekWalkTime[i] > 0) {
+              thisWeekAchievement++;
+              print("이번주 산책 횟수 : " + thisWeekAchievement.toString());
+            }
           }
+          // for (int i = 0; i < weekWalkTime.length; i++) {
+          //   if (weekWalkTime[i] > recommended * 0.9) {
+          //     thisWeekAchievement++;
+          //   }
+          // }
         }
-        // for (int i = 0; i < weekWalkTime.length; i++) {
-        //   if (weekWalkTime[i] > recommended * 0.9) {
-        //     thisWeekAchievement++;
-        //   }
-        // }
-      }
-    });
+      },
+    );
   }
 
   @override
@@ -594,6 +580,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     //googleInit();
+
     controller = TabController(length: 3, vsync: this);
     controller.addListener(tabListener);
     selectedEvents = ValueNotifier(getEventsForDay(selectedDay));
@@ -602,14 +589,11 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     //   loginSilently();
     // }
     initSchedule();
-    acceptResponse();
+    //acceptResponse();
     acceptUserResponse();
     acceptGetRecords();
     acceptGetInfo();
   }
-  // void loginSilently()async{
-  //   await myGoogleSignIn.signIn();
-  // }
 
   void tabListener() {
     setState(() {
@@ -766,7 +750,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
               TextFormField(
                 decoration: InputDecoration(
                   hintText: "산책 시작 시간을 입력해 주세요 (시)",
-                  labelText: "산책 시작 시간",
+                  labelText: "산책 시작 시간 (시)",
                 ),
                 controller: _timeController,
                 onChanged: (value) {
@@ -777,7 +761,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
               TextFormField(
                 decoration: InputDecoration(
                   hintText: "산책 시작 시간을 입력해 주세요 (분)",
-                  labelText: "산책 시작 시간",
+                  labelText: "산책 시작 시간 (분)",
                 ),
                 controller: _miniuteController,
                 onChanged: (value) {

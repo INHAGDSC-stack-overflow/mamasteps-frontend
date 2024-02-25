@@ -292,7 +292,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             if (distance < 10) {
               if (movementTimer == null) {
                 movementTimer = Timer(
-                  Duration(seconds: 5),
+                  Duration(minutes: 5),
                   () {
                     if (isRunning) {
                       pauseTimer();

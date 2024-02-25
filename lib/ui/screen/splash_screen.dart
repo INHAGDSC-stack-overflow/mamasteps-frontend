@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void debugcheck() async {
-    //storage.deleteAll();
+    storage.deleteAll();
     String? accessToken = await storage.read(key: 'access_token');
     if(accessToken==null){// 토큰이 없는 경우
       Navigator.of(context).pushAndRemoveUntil(

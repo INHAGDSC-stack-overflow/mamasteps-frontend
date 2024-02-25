@@ -64,32 +64,22 @@ class _userProfilePageState extends State<userProfilePage> {
           onPressed: () {},
           child: Icon(Icons.edit),
         ),
-        body: Container(
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
-          child: Column(
-            children: [
-              _Header(
-                ImageUrl: widget.imageUrl,
-              ),
-              _Body(
-                nameTextController: nameTextController,
-                ageTextController: ageTextController,
-                pregnancyStartTextController: pregnancyStartTextController,
-                guardianPhoneNumberController: guardianPhoneNumberController,
-                activityLevelController: activityLevelController,
-                walkTimeController: walkTimeController,
-                walkPreferences: widget.walkPreferences,
-                // futureApiResponse: initSetting(),
-              ),
-            ],
-          ),
+        body: Column(
+          children: [
+            _Header(
+              ImageUrl: widget.imageUrl,
+            ),
+            _Body(
+              nameTextController: nameTextController,
+              ageTextController: ageTextController,
+              pregnancyStartTextController: pregnancyStartTextController,
+              guardianPhoneNumberController: guardianPhoneNumberController,
+              activityLevelController: activityLevelController,
+              walkTimeController: walkTimeController,
+              walkPreferences: widget.walkPreferences,
+              // futureApiResponse: initSetting(),
+            ),
+          ],
         ),
       ),
     );
@@ -114,15 +104,11 @@ class _Header extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            child: Container(
+            child: Image.asset(
+              'asset/image/others_home_screen_back_ground_image.png',
+              fit: BoxFit.fill,
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height * 0.2,
-              child: Positioned(
-                child: Image.asset(
-                  'asset/image/others_home_screen_back_ground_image.png',
-                  fit: BoxFit.fill,
-                ),
-              ),
             ),
           ),
           Positioned(
@@ -148,10 +134,9 @@ class _Header extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
-                child: Image(
+                child: Image.network(
+                  ImageUrl ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png',
                   fit: BoxFit.cover,
-                  image: NetworkImage(ImageUrl ??
-                      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png'),
                 ),
               ),
             ),
@@ -212,86 +197,81 @@ class _BodyState extends State<_Body> {
       return dayOfWeekKorean[formattedDay] ?? "알 수 없는 요일";
     }
 
-    return Expanded(
-      flex: 1,
+    return SizedBox(
+      height: MediaQuery.of(context).size.height*0.45,
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Container(
-            width: screenWidth,
-            height: 600,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ProfileFormField(
-                  labelText: '유저 이메일',
-                  controller: widget.nameTextController,
-                ),
-                Divider(),
-                ProfileFormField(
-                  labelText: '나이',
-                  controller: widget.ageTextController,
-                ),
-                Divider(),
-                ProfileFormField(
-                  labelText: '임신 날짜',
-                  controller: widget.pregnancyStartTextController,
-                ),
-                Divider(),
-                ProfileFormField(
-                    labelText: '보호자 전화번호',
-                    controller: widget.guardianPhoneNumberController),
-                Divider(),
-                ProfileFormField(
-                  labelText: '평소 활동량',
-                  controller: widget.activityLevelController,
-                ),
-                Divider(),
-                Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ProfileFormField(
+                labelText: '유저 이메일',
+                controller: widget.nameTextController,
+              ),
+              Divider(),
+              ProfileFormField(
+                labelText: '나이',
+                controller: widget.ageTextController,
+              ),
+              Divider(),
+              ProfileFormField(
+                labelText: '임신 날짜',
+                controller: widget.pregnancyStartTextController,
+              ),
+              Divider(),
+              ProfileFormField(
+                  labelText: '보호자 전화번호',
+                  controller: widget.guardianPhoneNumberController),
+              Divider(),
+              ProfileFormField(
+                labelText: '평소 활동량',
+                controller: widget.activityLevelController,
+              ),
+              Divider(),
+              Container(
+                width: screenWidth,
+                height: 80,
+                child: Container(
                   width: screenWidth,
-                  height: 80,
-                  child: Container(
-                    width: screenWidth,
-                    height: 110,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '산책 선호시간',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                  height: 110,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '산책 선호시간',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: screenWidth,
+                        height: 50,
+                        child: SingleChildScrollView(
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: widget.walkPreferences
+                                  .map<Widget>(
+                                    (WalkPreference e) => Text(
+                                        dayOfWeekToKorean(e.dayOfWeek) +
+                                            ' : ' +
+                                            e.startTime.hour.toString() +
+                                            "시 " +
+                                            e.startTime.minute.toString() +
+                                            "분 ~ "+
+                                            e.endTime.hour.toString() +
+                                            "시 " +
+                                            e.endTime.minute.toString() +
+                                            "분"),
+                                  )
+                                  .toList()),
                         ),
-                        const SizedBox(height: 8),
-                        Container(
-                          width: screenWidth,
-                          height: 50,
-                          child: SingleChildScrollView(
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: widget.walkPreferences
-                                    .map<Widget>(
-                                      (WalkPreference e) => Text(
-                                          dayOfWeekToKorean(e.dayOfWeek) +
-                                              ' : ' +
-                                              e.startTime.hour.toString() +
-                                              "시 " +
-                                              e.startTime.minute.toString() +
-                                              "분 ~ "+
-                                              e.endTime.hour.toString() +
-                                              "시 " +
-                                              e.endTime.minute.toString() +
-                                              "분"),
-                                    )
-                                    .toList()),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
