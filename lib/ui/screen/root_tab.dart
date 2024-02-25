@@ -51,7 +51,6 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
 
   //Schedule
   //0.
-  late GoogleSignInAccount? _currentUser;
   //1. 전체 스케쥴 리스트(key(DateTime), value(event.date)를 기준으로 정렬됨)
   final Map<DateTime, List<Event>> events =
       SplayTreeMap<DateTime, List<Event>>();
@@ -59,7 +58,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
   // 특정 기간 내의 검색된 구글 스케쥴의 목록
   late calendarv3.Events googleEvents = calendarv3.Events();
   //2. 선택한 날짜의 스케쥴 리스트
-  late ValueNotifier<List<Event>> selectedEvents;
+  late ValueNotifier<List<Event>> selectedEvents = ValueNotifier(getEventsForDay(selectedDay));
   //3. 선택한 날짜 변경 감지 코드
   // selectedEvents = ValueNotifier(_getEventsForDay(selectedDay));
   //4. 선택한 날짜의 이벤트 반환 함수
@@ -120,8 +119,8 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     //_currentUser = await myGoogleSignIn.signIn();
     //var tempEvent = calendarv3.Event();
     DateTime usersFirstScheduleDate =
-        DateTime.now().subtract(Duration(days: 240));
-    DateTime usersLastScheduleDate = DateTime.now().add(Duration(days: 240));
+        DateTime.now().subtract(Duration(days: 300));
+    DateTime usersLastScheduleDate = DateTime.now().add(Duration(days: 300));
     //await myGoogleSignIn.signInSilently();
     final auth.AuthClient? client = await myGoogleSignIn.authenticatedClient();
     assert(client != null, 'Authenticated client missing!');
@@ -513,13 +512,15 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
           apiResponse.pregnancyStartDate[0],
           apiResponse.pregnancyStartDate[1],
           apiResponse.pregnancyStartDate[2]));
-      weeks = difference.inDays ~/ 7;
+      weeks = (difference.inDays ~/ 7) + 1;
       // if (apiResponse.isSuccess) {
       //   weeks = weeks;
       // }
-      user_storage.write(
-          key: 'guardianPhoneNumber', value: apiResponse.guardianPhoneNumber);
     });
+    await user_storage.write(
+        key: 'guardianPhoneNumber', value: apiResponse.guardianPhoneNumber);
+    String? recipent = await user_storage.read(key: 'guardianPhoneNumber');
+    print(recipent);
   }
 
   void acceptGetRecords() async {

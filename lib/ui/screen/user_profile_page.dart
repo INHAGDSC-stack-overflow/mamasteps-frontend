@@ -50,20 +50,10 @@ class _userProfilePageState extends State<userProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    double screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: Icon(Icons.edit),
-        ),
         body: Column(
           children: [
             _Header(
@@ -135,7 +125,8 @@ class _Header extends StatelessWidget {
                   color: Colors.white,
                 ),
                 child: Image.network(
-                  ImageUrl ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png',
+                  ImageUrl ??
+                      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/340px-Default_pfp.svg.png',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -198,7 +189,7 @@ class _BodyState extends State<_Body> {
     }
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height*0.45,
+      height: MediaQuery.of(context).size.height * 0.45,
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -258,7 +249,7 @@ class _BodyState extends State<_Body> {
                                             e.startTime.hour.toString() +
                                             "시 " +
                                             e.startTime.minute.toString() +
-                                            "분 ~ "+
+                                            "분 ~ " +
                                             e.endTime.hour.toString() +
                                             "시 " +
                                             e.endTime.minute.toString() +
