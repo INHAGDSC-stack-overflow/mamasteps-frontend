@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mamasteps_frontend/login/screen/login_page.dart';
@@ -7,7 +6,7 @@ import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
 
 Future<getMeResponse> getMe() async {
-  final url = 'https://dev.mamasteps.dev/api/v1/users/me';
+  const url = 'https://dev.mamasteps.dev/api/v1/users/me';
   final AccessToken = await storage.read(key: 'access_token');
   try {
     final response = await http.get(
@@ -63,7 +62,7 @@ Future<getMeResponse> getMe() async {
 // }
 
 Future<myInfo> getMyInfo(BuildContext context) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/optimize/get-info';
+  const url = 'https://dev.mamasteps.dev/api/v1/optimize/get-info';
   final AccessToken = await storage.read(key: 'access_token');
 
   try {
@@ -83,7 +82,7 @@ Future<myInfo> getMyInfo(BuildContext context) async {
       final myInfo apiResponse = myInfo.fromJson(jsonResponse);
       return apiResponse;
     } else {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => GoogleLogin()));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const GoogleLogin()));
       return Future.error('getMyInfo server error');
     }
   } catch (error) {

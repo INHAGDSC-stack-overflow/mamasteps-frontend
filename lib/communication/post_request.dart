@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class PostRequest extends StatelessWidget {
+  const PostRequest({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('HTTP Controller'),
+        title: const Text('HTTP Controller'),
       ),
       body: Center(
         child: Column(
@@ -22,14 +24,14 @@ class PostRequest extends StatelessWidget {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Response Message'),
+                        title: const Text('Response Message'),
                         content: Text(message),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: Text('OK'),
+                            child: const Text('OK'),
                           ),
                         ],
                       );
@@ -37,7 +39,7 @@ class PostRequest extends StatelessWidget {
                   );
                 });
               },
-              child: Text('Send POST Request'),
+              child: const Text('Send POST Request'),
             ),
           ],
         ),
@@ -46,7 +48,7 @@ class PostRequest extends StatelessWidget {
   }
 
   Future<String> sendPostRequest() async {
-    final String apiUrl = 'http://172.20.10.2:8080/api/v1/auth/login'; // 스프링 서버의 API 주소로 변경
+    const String apiUrl = 'http://172.20.10.2:8080/api/v1/auth/login'; // 스프링 서버의 API 주소로 변경
 
     // 요청 데이터 생성
     Map<String, dynamic> requestData = {

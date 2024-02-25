@@ -1,13 +1,10 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
-import 'package:mamasteps_frontend/login/screen/login_page.dart';
-import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 
 Future<void> addRecord(int completedTimeSeconds) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/calendar/addRecord';
+  const url = 'https://dev.mamasteps.dev/api/v1/calendar/addRecord';
   final AccessToken = await storage.read(key: 'access_token');
   DateTime date = DateTime.now();
   String isoDate = date.toIso8601String();
@@ -47,7 +44,7 @@ Future<void> addRecord(int completedTimeSeconds) async {
 }
 
 Future<void> addSchedule(DateTime date, int targetTimeSeconds, int id) async {
-  final url = 'https://dev.mamasteps.dev/api/v1/calendar/addSchedule';
+  const url = 'https://dev.mamasteps.dev/api/v1/calendar/addSchedule';
   final AccessToken = await storage.read(key: 'access_token');
   String isoDate = date.toIso8601String();
 
@@ -87,7 +84,7 @@ Future<void> addSchedule(DateTime date, int targetTimeSeconds, int id) async {
 
 
 Future<void> createAutoSchedule() async {
-  final url = 'https://dev.mamasteps.dev/api/v1/calendar/createAutoSchedule';
+  const url = 'https://dev.mamasteps.dev/api/v1/calendar/createAutoSchedule';
   final AccessToken = await storage.read(key: 'access_token');
 
   try {
@@ -115,7 +112,7 @@ Future<void> createAutoSchedule() async {
 }
 
 Future<getScheduleResponse> getSchedule() async {
-  final url = 'https://dev.mamasteps.dev/api/v1/calendar/getSchedules';
+  const url = 'https://dev.mamasteps.dev/api/v1/calendar/getSchedules';
   final AccessToken = await storage.read(key: 'access_token');
 
   try {
@@ -145,7 +142,7 @@ Future<getScheduleResponse> getSchedule() async {
 }
 
 Future<getRecordResponse> getRecords() async {
-  final url = 'https://dev.mamasteps.dev/api/v1/calendar/getRecords';
+  const url = 'https://dev.mamasteps.dev/api/v1/calendar/getRecords';
   final AccessToken = await storage.read(key: 'access_token');
   try {
     final response = await http.get(

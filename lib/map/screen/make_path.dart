@@ -54,6 +54,7 @@ class _MakePathState extends State<MakePath> {
     setBlueMarker();
   }
 
+  @override
   void dispose(){
     widget.deleteMarkers();
   }
@@ -90,7 +91,7 @@ class _MakePathState extends State<MakePath> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        icon: Icon(Icons.arrow_left)),
+                        icon: const Icon(Icons.arrow_left)),
                     ElevatedButton(
                       // onPressed: () {
                       //   setState(() {
@@ -108,7 +109,7 @@ class _MakePathState extends State<MakePath> {
                           Navigator.pop(context);
                         });
                       },
-                      child: Text('경로 검색'),
+                      child: const Text('경로 검색'),
                     ),
                   ],
                 ),
@@ -127,7 +128,7 @@ class _MakePathState extends State<MakePath> {
                     const SizedBox(width: 8.0),
                     ElevatedButton(
                       onPressed: startWayPointAdd,
-                      child: Text('경유지 추가'),
+                      child: const Text('경유지 추가'),
                     ),
                     const SizedBox(width: 8.0),
                     ElevatedButton(
@@ -137,7 +138,7 @@ class _MakePathState extends State<MakePath> {
                           widget.endClosewayPoints.clear();
                         });
                       },
-                      child: Icon(Icons.delete),
+                      child: const Icon(Icons.delete),
                     ),
                   ],
                 ),
@@ -154,7 +155,7 @@ class _MakePathState extends State<MakePath> {
     //   ImageConfiguration(devicePixelRatio: 2.5),
     //   'asset/image/blue_marker.png',
     // );
-    blue_marker = await BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+    blue_marker = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
   }
 
   Future<void> setRedMarker() async {
@@ -162,7 +163,7 @@ class _MakePathState extends State<MakePath> {
     //   ImageConfiguration(devicePixelRatio: 2.5),
     //   'asset/image/red_marker.png',
     // );
-    red_marker = await BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+    red_marker = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
   }
 
   void startWayPointAdd() {
@@ -242,8 +243,8 @@ class _MakePathState extends State<MakePath> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('경유지 추가'),
-          content: Text('경유지를 추가할 위치를 선택해주세요'),
+          title: const Text('경유지 추가'),
+          content: const Text('경유지를 추가할 위치를 선택해주세요'),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -253,7 +254,7 @@ class _MakePathState extends State<MakePath> {
                 });
                 Navigator.pop(context);
               },
-              child: Text('가는길'),
+              child: const Text('가는길'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -263,7 +264,7 @@ class _MakePathState extends State<MakePath> {
                 });
                 Navigator.pop(context);
               },
-              child: Text('오는길'),
+              child: const Text('오는길'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -273,7 +274,7 @@ class _MakePathState extends State<MakePath> {
                   _removeBlueMarker(markerId);
                 }
               },
-              child: Text('삭제'),
+              child: const Text('삭제'),
             ),
           ],
         );

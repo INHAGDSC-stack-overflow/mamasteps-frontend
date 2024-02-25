@@ -18,11 +18,11 @@ class Header extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            Positioned(
+            const Positioned(
               left: 0,
               top: 40,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   "산책 경로 만들기",
                   style: TextStyle(

@@ -1,10 +1,7 @@
-import 'dart:async';
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:googleapis/calendar/v3.dart' as calendarv3;
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
 import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
 import 'package:mamasteps_frontend/calendar/screen/calendar_page.dart';
@@ -83,7 +80,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         this.selectedDay = selectedDay;
         this.focusedDay = focusedDay;
       });
-      this.selectedEvents.value = getEventsForDay(selectedDay);
+      selectedEvents.value = getEventsForDay(selectedDay);
     }
   }
 
@@ -122,15 +119,15 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     //_currentUser = await myGoogleSignIn.signIn();
     //var tempEvent = calendarv3.Event();
     DateTime usersFirstScheduleDate =
-        DateTime.now().subtract(Duration(days: 300));
-    DateTime usersLastScheduleDate = DateTime.now().add(Duration(days: 300));
+        DateTime.now().subtract(const Duration(days: 300));
+    DateTime usersLastScheduleDate = DateTime.now().add(const Duration(days: 300));
     //await myGoogleSignIn.signInSilently();
     final auth.AuthClient? client = await myGoogleSignIn.authenticatedClient();
     assert(client != null, 'Authenticated client missing!');
     if (client == null) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => GoogleLogin()),
+        MaterialPageRoute(builder: (_) => const GoogleLogin()),
         (route) => false,
       );
     }
@@ -142,10 +139,10 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
         DateTime startOfWeek =
             todayZeroHour.subtract(Duration(days: now.weekday - 1));
-        print("일주일의 시작" + startOfWeek.toString());
+        print("일주일의 시작$startOfWeek");
         DateTime endOfWeek = todayZeroHour
             .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
-        print("일주일의 끝" + endOfWeek.toString());
+        print("일주일의 끝$endOfWeek");
         for (int i = 0; i < apiResponse.result.length; i++) {
           DateTime apiDate = apiResponse.result[i].date;
           // 이번주 총 산책 시간 계산
@@ -172,16 +169,14 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                       existingEvent.date.day == localTempEvent.date.day) ??
               false;
           if (!isDuplicate) {
-            print("삽입되는 로컬 스케쥴 : " +
-                localTempEvent.title +
-                localTempEvent.date.toString());
+            print("삽입되는 로컬 스케쥴 : ${localTempEvent.title}${localTempEvent.date}");
             events.putIfAbsent(eventDate, () => []).add(localTempEvent);
             if (localTempEvent.date.isAfter(startOfWeek) &&
                 localTempEvent.date.isBefore(endOfWeek)) {
               // 이번주에 산책 일정이 몇개인지
               totalWeekAchievement++;
               print(
-                  "totalWeekAchievement : " + totalWeekAchievement.toString());
+                  "totalWeekAchievement : $totalWeekAchievement");
             }
           }
 
@@ -203,9 +198,9 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         });
         if (events.isNotEmpty) {
           usersFirstScheduleDate = events.keys.first;
-          usersLastScheduleDate = events.keys.last.add(Duration(days: 1));
-          print("userFirstScheduleDate :" + usersFirstScheduleDate.toString());
-          print("userLastScheduleDate :" + usersLastScheduleDate.toString());
+          usersLastScheduleDate = events.keys.last.add(const Duration(days: 1));
+          print("userFirstScheduleDate :$usersFirstScheduleDate");
+          print("userLastScheduleDate :$usersLastScheduleDate");
         }
         print("events length: ${events.length}");
       });
@@ -295,15 +290,15 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     //_currentUser = await myGoogleSignIn.signIn();
     //var tempEvent = calendarv3.Event();
     DateTime usersFirstScheduleDate =
-        DateTime.now().subtract(Duration(days: 240));
-    DateTime usersLastScheduleDate = DateTime.now().add(Duration(days: 240));
+        DateTime.now().subtract(const Duration(days: 240));
+    DateTime usersLastScheduleDate = DateTime.now().add(const Duration(days: 240));
     await myGoogleSignIn.signInSilently();
     final auth.AuthClient? client = await myGoogleSignIn.authenticatedClient();
     assert(client != null, 'Authenticated client missing!');
     if (client == null) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => GoogleLogin()),
+        MaterialPageRoute(builder: (_) => const GoogleLogin()),
         (route) => false,
       );
     }
@@ -315,10 +310,10 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
         DateTime startOfWeek =
             todayZeroHour.subtract(Duration(days: now.weekday - 1));
-        print("일주일의 시작" + startOfWeek.toString());
+        print("일주일의 시작$startOfWeek");
         DateTime endOfWeek = todayZeroHour
             .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
-        print("일주일의 끝" + endOfWeek.toString());
+        print("일주일의 끝$endOfWeek");
         for (int i = 0; i < apiResponse.result.length; i++) {
           DateTime apiDate = apiResponse.result[i].date;
           // 이번주 총 산책 시간 계산
@@ -345,16 +340,14 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
                       existingEvent.date.day == localTempEvent.date.day) ??
               false;
           if (!isDuplicate) {
-            print("삽입되는 로컬 스케쥴 : " +
-                localTempEvent.title +
-                localTempEvent.date.toString());
+            print("삽입되는 로컬 스케쥴 : ${localTempEvent.title}${localTempEvent.date}");
             events.putIfAbsent(eventDate, () => []).add(localTempEvent);
             if (localTempEvent.date.isAfter(startOfWeek) &&
                 localTempEvent.date.isBefore(endOfWeek)) {
               // 이번주에 산책 일정이 몇개인지
               totalWeekAchievement++;
               print(
-                  "totalWeekAchievement : " + totalWeekAchievement.toString());
+                  "totalWeekAchievement : $totalWeekAchievement");
             }
           }
 
@@ -376,9 +369,9 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         });
         if (events.isNotEmpty) {
           usersFirstScheduleDate = events.keys.first;
-          usersLastScheduleDate = events.keys.last.add(Duration(days: 1));
-          print("userFirstScheduleDate :" + usersFirstScheduleDate.toString());
-          print("userLastScheduleDate :" + usersLastScheduleDate.toString());
+          usersLastScheduleDate = events.keys.last.add(const Duration(days: 1));
+          print("userFirstScheduleDate :$usersFirstScheduleDate");
+          print("userLastScheduleDate :$usersLastScheduleDate");
         }
         print("events length: ${events.length}");
       });
@@ -535,7 +528,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
           DateTime todayZeroHour = DateTime(now.year, now.month, now.day);
           DateTime startOfWeek =
               todayZeroHour.subtract(Duration(days: now.weekday - 1));
-          print("일주일의 시작" + startOfWeek.toString());
+          print("일주일의 시작$startOfWeek");
           DateTime endOfWeek = todayZeroHour
               .add(Duration(days: DateTime.daysPerWeek - now.weekday + 1));
           for (int i = 0; i < apiResponse.result.length; i++) {
@@ -561,7 +554,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
           for (int i = 0; i < 7; i++) {
             if (weekWalkTime[i] > 0) {
               thisWeekAchievement++;
-              print("이번주 산책 횟수 : " + thisWeekAchievement.toString());
+              print("이번주 산책 횟수 : $thisWeekAchievement");
             }
           }
           // for (int i = 0; i < weekWalkTime.length; i++) {
@@ -574,11 +567,6 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     );
   }
 
-  @override
-  void dispose() async {
-    super.dispose();
-    //await myGoogleSignIn.signOut();
-  }
 
   @override
   void initState() {
@@ -605,11 +593,11 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     });
   }
 
-  // void dispose() {
-  //   controller.removeListener(tabListener);
-  //   selectedEvents.dispose();
-  //   super.dispose();
-  // }
+  void dispose() {
+    controller.removeListener(tabListener);
+    selectedEvents.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -623,7 +611,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height * 0.4,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('asset/image/root_tab_top_image.png'),
                     fit: BoxFit.cover,
@@ -633,7 +621,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
             ),
             Center(
               child: TabBarView(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 controller: controller,
                 children: [
                   Center(
@@ -697,7 +685,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
               controller.animateTo(index);
             },
             currentIndex: index,
-            items: [
+            items: const [
               BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined), label: ''),
               BottomNavigationBarItem(
@@ -713,7 +701,7 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('이벤트 추가'),
+        title: const Text('이벤트 추가'),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -722,14 +710,14 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
               });
               Navigator.of(context).pop();
             },
-            child: Text('자동 추가 하기'),
+            child: const Text('자동 추가 하기'),
           ),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               showAddDialog();
             },
-            child: Text('직접 입력 하기'),
+            child: const Text('직접 입력 하기'),
           ),
         ],
       ),
@@ -737,51 +725,51 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
   }
 
   void showAddDialog() {
-    final TextEditingController _timeController = TextEditingController();
-    final TextEditingController _miniuteController = TextEditingController();
-    final TextEditingController _walkTimeController = TextEditingController();
-    var _hour = 0, _min = 0, _time = 0;
+    final TextEditingController timeController = TextEditingController();
+    final TextEditingController miniuteController = TextEditingController();
+    final TextEditingController walkTimeController = TextEditingController();
+    var hour = 0, min = 0, time = 0;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add Event'),
-        content: Container(
+        title: const Text('Add Event'),
+        content: SizedBox(
           height: 300,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               TextFormField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "산책 시작 시간을 입력해 주세요 (시)",
                   labelText: "산책 시작 시간 (시)",
                 ),
-                controller: _timeController,
+                controller: timeController,
                 onChanged: (value) {
-                  _timeController.text = value;
-                  _hour = int.parse(value);
+                  timeController.text = value;
+                  hour = int.parse(value);
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "산책 시작 시간을 입력해 주세요 (분)",
                   labelText: "산책 시작 시간 (분)",
                 ),
-                controller: _miniuteController,
+                controller: miniuteController,
                 onChanged: (value) {
-                  _miniuteController.text = value;
-                  _min = int.parse(value);
+                  miniuteController.text = value;
+                  min = int.parse(value);
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "산책 시간을 입력해 주세요 (분)",
                   labelText: "산책 시간",
                 ),
-                controller: _walkTimeController,
+                controller: walkTimeController,
                 onChanged: (value) {
-                  _walkTimeController.text = value;
-                  _time = int.parse(value);
+                  walkTimeController.text = value;
+                  time = int.parse(value);
                 },
               ),
             ],
@@ -790,22 +778,22 @@ class _RootTabState extends State<RootTab> with SingleTickerProviderStateMixin {
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
               var now = DateTime.now();
               var id = now.year + now.month * 12 + now.day * 30;
               var dateTime = DateTime(selectedDay.year, selectedDay.month,
-                  selectedDay.day, _hour, _min);
-              var targetTimeSeconds = _time * 60;
+                  selectedDay.day, hour, min);
+              var targetTimeSeconds = time * 60;
               await addSchedule(dateTime, targetTimeSeconds, id);
               setState(() {
                 initSchedule();
               });
               Navigator.of(context).pop();
             },
-            child: Text('Save'),
+            child: const Text('Save'),
           ),
         ],
       ),

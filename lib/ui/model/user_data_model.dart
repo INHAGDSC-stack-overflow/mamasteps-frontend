@@ -1,4 +1,3 @@
-import 'package:googleapis/cloudsearch/v1.dart';
 
 class getMeResponse {
   final bool isSuccess;

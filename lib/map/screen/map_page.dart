@@ -16,8 +16,7 @@ import 'package:mamasteps_frontend/map/screen/tracking_page.dart';
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/map/model/route_model.dart';
 import 'package:mamasteps_frontend/map/component/util/map_server_communication.dart';
-// import 'package:mamasteps_frontend/map/screen/map_page_body.dart';
-// import 'package:mamasteps_frontend/map/screen/map_page_header.dart';
+
 
 bool check = false;
 final List<String> resultsString = [
@@ -38,6 +37,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  var cnt = 0;
   final pageController = PageController(viewportFraction: 0.877);
   double currentPage = 0;
 
@@ -45,8 +45,6 @@ class _MapPageState extends State<MapPage> {
   int currentMin = 0;
   int currentSec = 0;
   int totalSec = 0;
-
-
 
   Set<Marker> startClosewayPoints = {};
   Set<Marker> endClosewayPoints = {};
@@ -120,6 +118,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
@@ -239,7 +238,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  void deleteMarkers(){
+  void deleteMarkers() {
     setState(() {
       startClosewayPoints.clear();
       endClosewayPoints.clear();
@@ -311,7 +310,7 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> acceptResponse() async {
     //clientToServerTimeConvert();
-    var seconds = currentHour*3600 + currentMin*60 +currentSec;
+    var seconds = currentHour * 3600 + currentMin * 60 + currentSec;
     await editRequestProfile(context, seconds, currentPosition,
         startClosewayPoints, endClosewayPoints, widget.walkSpeed);
     final value = await computeRoutes(context);
@@ -322,9 +321,18 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  Future<void> acceptNew() async {
+    final value = await computeRoutes(context);
+    print(value.result[0].polyLine);
+    setState(() {
+      manageRouteList(value.result, 'addAll');
+      apiResponse = value;
+    });
+  }
+
   Future<void> acceptEditResponse() async {
     //clientToServerTimeConvert();
-    var seconds = currentHour*3600 + currentMin*60 +currentSec;
+    var seconds = currentHour * 3600 + currentMin * 60 + currentSec;
     await editRequestProfile(context, seconds, currentPosition,
         startClosewayPoints, endClosewayPoints, widget.walkSpeed);
     // print(value.result[0].polyLine);
@@ -383,11 +391,15 @@ class _MapPageState extends State<MapPage> {
               scrollDirection: Axis.horizontal,
               itemCount: serverRoute.length + 1,
               itemBuilder: (context, index) {
-                if (index == serverRoute.length) {
-                  // 마지막 페이지에 도달 했을 때
+                cnt += 1;
+
+                if (cnt <= 2) {
                   setState(() {
-                    acceptResponse();
+                    acceptNew();
                   });
+                }
+
+                if (index == serverRoute.length) {
                 } else {
                   // 마지막 페이지가 아닐 때
                   return InkWell(

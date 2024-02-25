@@ -14,7 +14,7 @@ class GetRequestWithAuth {
         headers: <String, String>{
           'Authorization': 'Bearer $token',
         },
-      ).timeout(Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 10));
 
       // 응답 확인
       if (response.statusCode == 200) {

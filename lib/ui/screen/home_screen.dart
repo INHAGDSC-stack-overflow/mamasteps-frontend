@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter_updated/flutter.dart' as charts;
-import 'package:mamasteps_frontend/calendar/component/calendar_server_communication.dart';
-import 'package:mamasteps_frontend/calendar/model/calendar_schedule_model.dart';
-import 'package:mamasteps_frontend/login/screen/login_page.dart';
-import 'package:mamasteps_frontend/storage/login/login_data.dart';
-import 'package:mamasteps_frontend/storage/user/user_data.dart';
-import 'package:mamasteps_frontend/ui/component/user_server_comunication.dart';
 import 'package:mamasteps_frontend/ui/layout/home_screen_default_layout.dart';
-import 'package:mamasteps_frontend/ui/model/user_data_model.dart';
 
 class HomeScreen extends StatefulWidget {
   final int weeks;
@@ -177,7 +170,6 @@ class _Header extends StatelessWidget {
   final int weeks;
 
   const _Header({
-    super.key,
     required this.weeks,
   });
 
@@ -224,7 +216,7 @@ class _Header extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  child: Text(
+                  child: const Text(
                     '임신',
                     style: TextStyle(
                       fontSize: 20,
@@ -237,7 +229,7 @@ class _Header extends StatelessWidget {
                 Container(
                   child: Text(
                     weeks.toString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 52,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -246,7 +238,7 @@ class _Header extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Container(
-                  child: Text(
+                  child: const Text(
                     '주차',
                     style: TextStyle(
                       fontSize: 20,
@@ -318,13 +310,13 @@ class SimpleBarChart extends StatelessWidget {
       charts.Series(
         id: 'Times',
         data: seriesList,
-        domainFn: (walkTime day_of_week, _) => day_of_week.day_of_week,
+        domainFn: (walkTime dayOfWeek, _) => dayOfWeek.day_of_week,
         measureFn: (walkTime time, _) => time.times,
       ),
     ];
 
     return charts.BarChart(
-      primaryMeasureAxis: new charts.NumericAxisSpec(
+      primaryMeasureAxis: const charts.NumericAxisSpec(
           tickProviderSpec:
               charts.StaticNumericTickProviderSpec(<charts.TickSpec<num>>[
         charts.TickSpec<num>(0),
@@ -335,7 +327,7 @@ class SimpleBarChart extends StatelessWidget {
       series,
       animate: true,
       behaviors: [
-        new charts.RangeAnnotation(
+        charts.RangeAnnotation(
           [
             charts.LineAnnotationSegment(
               recommended,
@@ -379,8 +371,8 @@ List<Widget> buildWidgetsList(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: const Text(
                 '오늘의 산책 시간',
                 style: TextStyle(
                   fontSize: 20,
@@ -389,12 +381,12 @@ List<Widget> buildWidgetsList(
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
                 todayHours > 0
                     ? '${todayHours.toString().padLeft(2, '0')} 시간 ${todayMinutes.toString().padLeft(2, '0')} 분'
                     : '${todayMinutes.toString().padLeft(2, '0')} 분',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xffa412db),
@@ -415,8 +407,8 @@ List<Widget> buildWidgetsList(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: const Text(
                 '이번 주 총 산책 시간',
                 style: TextStyle(
                   fontSize: 20,
@@ -425,12 +417,12 @@ List<Widget> buildWidgetsList(
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
                 thisWeekWalkTimeHour > 0
                     ? '${thisWeekWalkTimeHour.toString().padLeft(2, '0')} 시간 ${thisWeekWalkTimeMin.toString().padLeft(2, '0')} 분'
                     : '${thisWeekWalkTimeMin.toString().padLeft(2, '0')} 분',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Color(0xffa412db),
@@ -456,8 +448,8 @@ List<Widget> buildWidgetsList(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: const Text(
                         '이번 주 목표 달성률',
                         style: TextStyle(
                           fontSize: 20,
@@ -471,18 +463,18 @@ List<Widget> buildWidgetsList(
                       child: Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(
+                          side: const BorderSide(
                             color: Colors.blue,
                             width: 2,
                           ),
                         ),
-                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
                         elevation: 2,
                         shadowColor: Colors.blue,
                         child: Center(
                           child: Text(
                             '$thisWeekAchievement/$totalWeekAchievement',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.blue,
                             ),
                           ),
@@ -511,7 +503,7 @@ List<Widget> buildWidgetsList(
                       height: 20,
                       width: progressBarWidth.isNaN ? 0 : progressBarWidth * 0.9,
                       decoration: BoxDecoration(
-                        color: Color(0xffa412db),
+                        color: const Color(0xffa412db),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -533,8 +525,8 @@ List<Widget> buildWidgetsList(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: const Text(
                 '일별 산책 시간',
                 style: TextStyle(
                   fontSize: 20,
@@ -542,7 +534,7 @@ List<Widget> buildWidgetsList(
                 ),
               ),
             ),
-            Container(
+            SizedBox(
               height: 300,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),

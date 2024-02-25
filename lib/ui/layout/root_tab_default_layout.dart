@@ -15,7 +15,7 @@ class DefaultLayout extends StatelessWidget {
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height*0.9,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
                     'asset/image/sign_up_back_ground_image.png'), // 로컬 에셋에서 이미지를 로드합니다.

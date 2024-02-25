@@ -79,13 +79,12 @@ class _userProfilePageState extends State<userProfilePage> {
 class _Header extends StatelessWidget {
   final String? ImageUrl;
   const _Header({
-    super.key,
     required this.ImageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.4,
       child: Stack(
@@ -101,7 +100,7 @@ class _Header extends StatelessWidget {
               height: MediaQuery.of(context).size.height * 0.2,
             ),
           ),
-          Positioned(
+          const Positioned(
             left: 16,
             top: 40,
             child: Text(
@@ -120,7 +119,7 @@ class _Header extends StatelessWidget {
               child: Container(
                 width: 150,
                 height: 150,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
@@ -149,7 +148,6 @@ class _Body extends StatefulWidget {
   // final Future<ApiResponse> futureApiResponse;
 
   const _Body({
-    super.key,
     required this.nameTextController,
     required this.ageTextController,
     required this.pregnancyStartTextController,
@@ -200,41 +198,41 @@ class _BodyState extends State<_Body> {
                 labelText: '유저 이메일',
                 controller: widget.nameTextController,
               ),
-              Divider(),
+              const Divider(),
               ProfileFormField(
                 labelText: '나이',
                 controller: widget.ageTextController,
               ),
-              Divider(),
+              const Divider(),
               ProfileFormField(
                 labelText: '임신 날짜',
                 controller: widget.pregnancyStartTextController,
               ),
-              Divider(),
+              const Divider(),
               ProfileFormField(
                   labelText: '보호자 전화번호',
                   controller: widget.guardianPhoneNumberController),
-              Divider(),
+              const Divider(),
               ProfileFormField(
                 labelText: '평소 활동량',
                 controller: widget.activityLevelController,
               ),
-              Divider(),
-              Container(
+              const Divider(),
+              SizedBox(
                 width: screenWidth,
                 height: 80,
-                child: Container(
+                child: SizedBox(
                   width: screenWidth,
                   height: 110,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         '산책 선호시간',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Container(
+                      SizedBox(
                         width: screenWidth,
                         height: 50,
                         child: SingleChildScrollView(
@@ -286,7 +284,7 @@ class ProfileFormField extends StatefulWidget {
 class _ProfileFormFieldState extends State<ProfileFormField> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8.0),
@@ -294,10 +292,10 @@ class _ProfileFormFieldState extends State<ProfileFormField> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(widget.labelText,
-                style: TextStyle(fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             TextFormField(
               controller: widget.controller,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: InputBorder.none,
               ),
             ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mamasteps_frontend/login/screen/login_page.dart';
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
-import 'package:http/http.dart' as http;
-import 'package:mamasteps_frontend/ui/screen/home_screen.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -26,18 +24,18 @@ class _SplashScreenState extends State<SplashScreen> {
     if(accessToken==null){// 토큰이 없는 경우
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (_) => GoogleLogin(),
+          builder: (_) => const GoogleLogin(),
         ),
             (route) => false,
       );
     }
     else {// 토큰이 있는 경우
       print(myGoogleSignIn.currentUser);
-      myGoogleSignIn.signInSilently();
+      await myGoogleSignIn.signInSilently();
       print(myGoogleSignIn.currentUser);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (_) => RootTab(),
+          builder: (_) => const RootTab(),
         ),
             (route) => false,
       );
@@ -81,11 +79,12 @@ class _SplashScreenState extends State<SplashScreen> {
   //   }
   //
   // }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
-        child: Column(
+        child: const Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.abc, size: 100, color: Colors.white),

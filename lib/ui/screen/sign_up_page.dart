@@ -1,14 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:googleapis/calendar/v3.dart' as calendarv3;
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:mamasteps_frontend/storage/login/login_data.dart';
 import 'package:mamasteps_frontend/ui/data/contents.dart';
-import 'package:mamasteps_frontend/ui/layout/sign_up_default_layout.dart';
 import 'package:mamasteps_frontend/ui/screen/root_tab.dart';
-import 'package:mamasteps_frontend/ui/screen/splash_screen.dart';
-import 'package:numberpicker/numberpicker.dart';
 
 class SignUpPage extends StatefulWidget {
   final String userEmail;
@@ -39,7 +35,7 @@ class _SignUpPageState extends State<SignUpPage> {
     '',
   ];
   DateTime? selectedDate;
-  PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController(initialPage: 0);
   List<List<bool>> scheduleData = List.generate(
     7,
     (i) => List.generate(24, (j) => false),
@@ -49,7 +45,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: Stack(
@@ -58,7 +54,7 @@ class _SignUpPageState extends State<SignUpPage> {
               top: 0,
               left: 0,
               right: 0,
-              child: Container(
+              child: SizedBox(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height * 0.8,
                   child: Image.asset(
@@ -76,7 +72,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     Expanded(
                       child: PageView(
                         onPageChanged: onPageChanged,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         controller: _pageController,
                         children: [
                           _nameSubPage(
@@ -117,28 +113,28 @@ class _SignUpPageState extends State<SignUpPage> {
                         children: [
                           ElevatedButton(
                             onPressed: currentPage > 0 ? onPrevPressed : null,
-                            child: Text(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: currentPage > 0
+                                  ? const Color(0xffa412db)
+                                  : Colors.grey,
+                            ),
+                            child: const Text(
                               '이전',
                               style: TextStyle(color: Colors.white),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: currentPage > 0
-                                  ? Color(0xffa412db)
-                                  : Colors.grey,
                             ),
                           ),
                           ElevatedButton(
                             onPressed: currentPage < 5
                                 ? onNextPressed
                                 : onSubmitPressed,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: currentPage < 6
+                                  ? const Color(0xffa412db)
+                                  : Colors.grey,
+                            ),
                             child: Text(
                               currentPage < 5 ? '다음' : '제출',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: currentPage < 6
-                                  ? Color(0xffa412db)
-                                  : Colors.grey,
+                              style: const TextStyle(color: Colors.white),
                             ),
                           ),
                           // OutlinedButton(
@@ -165,13 +161,13 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void onSubmitPressed() async {
-    final url = 'https://dev.mamasteps.dev/api/v1/auth/signup';
+    const url = 'https://dev.mamasteps.dev/api/v1/auth/signup';
     final AccessToken = await storage.read(key: 'access_token');
     final Map<String, dynamic> requestData = {
       "email": widget.userEmail,
       "name": userInformation[0],
       "age": int.parse(userInformation[1]),
-      "pregnancyStartDate": (selectedDate?.toIso8601String() ?? '') + 'Z',
+      "pregnancyStartDate": '${selectedDate?.toIso8601String() ?? ''}Z',
       "guardianPhoneNumber": userInformation[3],
       "profileImage": widget.userPhotoUrl,
       "activityLevel": "HIGH",
@@ -201,7 +197,7 @@ class _SignUpPageState extends State<SignUpPage> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (context) => RootTab(),
+              builder: (context) => const RootTab(),
             ),
             (route) => false,
           );
@@ -280,14 +276,14 @@ class _SignUpPageState extends State<SignUpPage> {
   void onPrevPressed() {
     setState(() {
       _pageController.previousPage(
-          duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
     });
   }
 
   void onNextPressed() {
     setState(() {
       _pageController.nextPage(
-          duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
     });
   }
 }
@@ -296,7 +292,6 @@ class _nameSubPage extends StatelessWidget {
   final ValueChanged onChanged;
   final String content;
   const _nameSubPage({
-    super.key,
     required this.onChanged,
     required this.content,
   });
@@ -309,14 +304,14 @@ class _nameSubPage extends StatelessWidget {
       children: [
         Text(
           content,
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: const TextStyle(fontSize: 20, color: Colors.white),
         ),
         const SizedBox(height: 16.0),
         TextFormField(
           autofocus: true,
           onChanged: onChanged,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white),
             ),
@@ -335,7 +330,6 @@ class _ageSubPage extends StatelessWidget {
   final String content;
 
   const _ageSubPage({
-    super.key,
     required this.content,
     required this.onChanged,
   });
@@ -348,14 +342,14 @@ class _ageSubPage extends StatelessWidget {
       children: [
         Text(
           content,
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: const TextStyle(fontSize: 20, color: Colors.white),
         ),
         const SizedBox(height: 16.0),
         TextFormField(
           autofocus: true,
           onChanged: onChanged,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white),
             ),
@@ -374,8 +368,7 @@ class _dateSubPage extends StatefulWidget {
   final TextEditingController dateController;
   final GestureTapCallback onTap;
   const _dateSubPage(
-      {super.key,
-      required this.onTap,
+      {required this.onTap,
       required this.dateController,
       required this.content});
 
@@ -393,15 +386,15 @@ class _dateSubPageState extends State<_dateSubPage> {
       children: [
         Text(
           widget.content,
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: const TextStyle(fontSize: 20, color: Colors.white),
         ),
         const SizedBox(height: 16.0),
         TextFormField(
           controller: widget.dateController,
           readOnly: true,
           onTap: widget.onTap,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white),
             ),
@@ -421,7 +414,6 @@ class _activitiesSubPage extends StatefulWidget {
   final VoidCallback onlowChanged;
   final String content;
   const _activitiesSubPage({
-    super.key,
     required this.onhighChanged,
     required this.onmiddleChanged,
     required this.onlowChanged,
@@ -445,7 +437,7 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
       children: [
         Text(
           widget.content,
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: const TextStyle(fontSize: 20, color: Colors.white),
         ),
         const SizedBox(height: 16.0),
         Container(
@@ -459,19 +451,19 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
                 });
                 widget.onhighChanged();
               },
-              child: Text(
-                '하루에 30분 이상 가벼운 운동 / 산책',
-                style: TextStyle(color: Colors.white),
-              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: highIsSelected ? Colors.grey : Colors.blue,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 fixedSize: Size(MediaQuery.of(context).size.width * 0.8, 50),
-                side: BorderSide(
+                side: const BorderSide(
                   width: 2,
                 ),
+              ),
+              child: const Text(
+                '하루에 30분 이상 가벼운 운동 / 산책',
+                style: TextStyle(color: Colors.white),
               )),
           const SizedBox(
             height: 10,
@@ -485,16 +477,19 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
                 });
                 widget.onmiddleChanged();
               },
-              child: Text('하루에 20~30분 이상 가벼운 운동 / 산책'),
               style: ElevatedButton.styleFrom(
                   backgroundColor: midIsSelected ? Colors.grey : Colors.blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   fixedSize: Size(MediaQuery.of(context).size.width * 0.8, 50),
-                  side: BorderSide(
+                  side: const BorderSide(
                     width: 2,
-                  ))),
+                  )),
+              child: const Text(
+                '하루에 20~30분 이상 가벼운 운동 / 산책',
+                style: TextStyle(color: Colors.white),
+              )),
           const SizedBox(
             height: 10,
           ),
@@ -507,16 +502,19 @@ class _activitiesSubPageState extends State<_activitiesSubPage> {
                 });
                 widget.onlowChanged();
               },
-              child: Text('하루에 20분 미만 가벼운 운동 / 산책'),
               style: ElevatedButton.styleFrom(
                   backgroundColor: lowIsSelected ? Colors.grey : Colors.blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   fixedSize: Size(MediaQuery.of(context).size.width * 0.8, 50),
-                  side: BorderSide(
+                  side: const BorderSide(
                     width: 2,
-                  ))),
+                  )),
+              child: const Text(
+                '하루에 20분 미만 가벼운 운동 / 산책',
+                style: TextStyle(color: Colors.white),
+              )),
         ])),
       ],
     );
@@ -528,7 +526,6 @@ class _scheduleSubPage extends StatefulWidget {
   final String content;
 
   const _scheduleSubPage({
-    super.key,
     required this.scheduleData,
     required this.content,
   });
@@ -550,14 +547,14 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
       children: [
         Text(
           widget.content,
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: const TextStyle(fontSize: 20, color: Colors.white),
         ),
         Expanded(
           child: SingleChildScrollView(
             child: Container(
               child: Table(
                 // 테이블의 열을 정의합니다. 여기서는 요일을 나타냅니다.
-                columnWidths: {
+                columnWidths: const {
                   0: FixedColumnWidth(50.0), // 시간을 나타내는 첫번째 열
                   1: FlexColumnWidth(), // 나머지 요일 열
                   2: FlexColumnWidth(),
@@ -570,7 +567,7 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
                 border: TableBorder.all(),
                 children: [
                   // 테이블의 행을 정의합니다. 여기서는 각 시간대를 나타냅니다.
-                  TableRow(children: [
+                  const TableRow(children: [
                     Text('Time'), // 첫 번째 열은 시간을 나타냅니다.
                     Text('Mon'),
                     Text('Tue'),
@@ -583,7 +580,7 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
                   ...List.generate(24, (hour) {
                     // 24시간을 나타내는 행들을 생성합니다.
                     return TableRow(children: [
-                      Text('${hour}:00'), // 시간을 나타내는 첫 번째 셀
+                      Text('$hour:00'), // 시간을 나타내는 첫 번째 셀
                       for (var day = 0; day < 7; day++)
                         InkWell(
                           onTap: () {
@@ -593,8 +590,8 @@ class _scheduleSubPageState extends State<_scheduleSubPage> {
                             color: widget.scheduleData[day][hour]
                                 ? Colors.blue
                                 : Colors.transparent,
-                            padding: EdgeInsets.all(8),
-                            child: Text(''),
+                            padding: const EdgeInsets.all(8),
+                            child: const Text(''),
                           ),
                         ), // 나머지 셀은 비워둡니다.
                     ]);
@@ -613,7 +610,6 @@ class _onNumberSubPage extends StatelessWidget {
   final String content;
   final ValueChanged onChanged;
   const _onNumberSubPage({
-    super.key,
     required this.content,
     required this.onChanged,
   });
@@ -626,14 +622,14 @@ class _onNumberSubPage extends StatelessWidget {
       children: [
         Text(
           content,
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: const TextStyle(fontSize: 20, color: Colors.white),
         ),
         const SizedBox(height: 16.0),
         TextFormField(
           autofocus: true,
           onChanged: onChanged,
-          style: TextStyle(color: Colors.white),
-          decoration: InputDecoration(
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white),
             ),
@@ -657,9 +653,7 @@ List<Map<String, dynamic>> convertToWalkPreferencesList(
 
     for (int hour = 0; hour < 24; hour++) {
       if (scheduleData[day][hour]) {
-        if (startTime == null) {
-          startTime = hour;
-        }
+        startTime ??= hour;
       } else {
         if (startTime != null) {
           endTime = hour;
