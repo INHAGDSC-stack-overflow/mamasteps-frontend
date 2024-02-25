@@ -45,6 +45,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   late Duration duration;
   late StreamSubscription<Position>? positionSubscription;
   late int afterRating = 0;
+  late String recipient;
 
   //polyline들의 집합
   Set<Polyline> polylines = {};
@@ -58,6 +59,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
   bool isRunning = false;
   bool isSelect = false;
   bool ismiddle = false;
+  bool isMovementTimerRunning = false;
+
+  Position? lastPosition;
+  Timer? movementTimer;
 
   @override
   void initState() {
@@ -67,9 +72,20 @@ class _TrackingScreenState extends State<TrackingScreen> {
     resultList = PointToLatLng(results);
     drawPolylines(polylines, resultList);
     drawMarkers(markers, resultList);
+    initPhoneNumber();
     initTimer();
     // startTimer();
     _determinePosition();
+    initSettingLastPosition();
+  }
+
+  void initSettingLastPosition(){
+    lastPosition = widget.currentInitPosition;
+  }
+
+  Future<void> initPhoneNumber() async {
+    recipient = await user_storage.read(key: 'guardianPhoneNumber').toString();
+    print('휴대폰 전화 초기화 확인 : ${recipient}');
   }
 
   Duration timeConvert(int totalSeconds) {
@@ -127,6 +143,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
     // TODO: implement dispose
     super.dispose();
     timer.cancel();
+    positionSubscription?.cancel();
+    positionSubscription = null;
   }
 
   @override
@@ -259,8 +277,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
       return Future.error('위치 권한이 영구적으로 거부되었습니다, 설정에서 변경해주세요.');
     }
 
-    Position? lastPosition;
-    Timer? movementTimer;
+    // Position? lastPosition;
+    // Timer? movementTimer;
 
     setState(() {
       positionSubscription = Geolocator.getPositionStream().listen(
@@ -275,7 +293,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
               markerId: MarkerId('current'),
               position:
                   LatLng(currentPosition.latitude, currentPosition.longitude),
-              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueCyan),
             ),
           );
 
@@ -290,10 +309,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
             // 사용자가 움직이지 않음
             if (distance < 10) {
-              if (movementTimer == null) {
+              if (isMovementTimerRunning==false) {
                 movementTimer = Timer(
-                  Duration(seconds: 5),
+                  Duration(minutes: 7),
                   () {
+                    isMovementTimerRunning = true;
                     if (isRunning) {
                       pauseTimer();
                     }
@@ -307,7 +327,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             // 사용자가 움직였음, 타이머 리셋
             print('사용자가 다시 움직임');
             movementTimer?.cancel();
-            movementTimer = null;
+            //movementTimer = null;
           }
           double initDistance = Geolocator.distanceBetween(
             widget.currentInitPosition.latitude,
@@ -392,15 +412,18 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   // 보호자 문자 보내기 팝업 창
   void showSendSmsDialog() {
+    positionSubscription?.pause();
+    isMovementTimerRunning = false;
+    movementTimer?.cancel();
+    movementTimer=null;
     Timer? localtimer;
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        localtimer = Timer(Duration(seconds: 5), () {
-          String recipient = user_storage.read(key: 'guardian_phone').toString();
+        localtimer = Timer(Duration(minutes: 2), () {
           print('보호자 번호: $recipient');
-          sendSmsMessageToGuardian('[Mamasteps 발송] 산모가 움직이지 않습니다.', ['01081314240']);
+          sendSmsMessageToGuardian(
+              '[Mamasteps 발송] 산모가 움직이지 않습니다.', [recipient]);
           localtimer?.cancel();
           Navigator.pop(context);
           afterSendSmsDialog();
@@ -414,6 +437,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                 localtimer?.cancel();
                 resumeTimer();
                 Navigator.pop(context);
+                positionSubscription?.resume();
               },
               child: Text('취소'),
             ),

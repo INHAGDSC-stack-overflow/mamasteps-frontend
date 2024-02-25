@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void debugcheck() async {
-    // storage.deleteAll();
+    storage.deleteAll();
     String? accessToken = await storage.read(key: 'access_token');
     if(accessToken==null){// 토큰이 없는 경우
       Navigator.of(context).pushAndRemoveUntil(
@@ -32,6 +32,9 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     }
     else {// 토큰이 있는 경우
+      print(myGoogleSignIn.currentUser);
+      myGoogleSignIn.signInSilently();
+      print(myGoogleSignIn.currentUser);
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => RootTab(),

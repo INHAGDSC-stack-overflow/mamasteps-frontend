@@ -206,19 +206,19 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            right: 0,
-            child: IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                deleteAll();
-                Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => GoogleLogin()),
-                    (route) => false);
-              },
-            ),
-          ),
+          // Positioned(
+          //   right: 0,
+          //   child: IconButton(
+          //     icon: Icon(Icons.settings),
+          //     onPressed: () {
+          //       deleteAll();
+          //       Navigator.pushAndRemoveUntil(
+          //           context,
+          //           MaterialPageRoute(builder: (_) => GoogleLogin()),
+          //           (route) => false);
+          //     },
+          //   ),
+          // ),
           Positioned(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

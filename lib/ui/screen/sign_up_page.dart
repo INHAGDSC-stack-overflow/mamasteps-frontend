@@ -235,7 +235,7 @@ class _SignUpPageState extends State<SignUpPage> {
         context: context,
         initialDate: date,
         firstDate: DateTime(2000),
-        lastDate: DateTime(2025),
+        lastDate: DateTime.now(),
       ).then((value) {
         if (value != null) {
           setState(() {
