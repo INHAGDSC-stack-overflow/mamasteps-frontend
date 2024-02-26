@@ -393,7 +393,7 @@ class _MapPageState extends State<MapPage> {
               itemBuilder: (context, index) {
                 cnt += 1;
 
-                if (cnt <= 5) {
+                if (cnt <= 3) {
                   setState(() {
                     acceptNew();
                   });
